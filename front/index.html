@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="chrome=1" charset="utf-8" />
+		<!--[if IE]>
+		<script type="text/javascript"
+		src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
+
+		<style>
+		.chromeFrameInstallDefaultStyle {
+		width: 100%; /* default is 800px */
+		border: 5px solid blue;
+		}
+		</style>
+
+		<div id="prompt">
+
+		</div>
+
+		<script>
+		
+		// The conditional ensures that this code will only execute in IE,
+		// Therefore we can use the IE-specific attachEvent without worry
+		window.attachEvent("onload", function() {
+		alert("To use TellMeFirst with Internet Explorer you need to download the Google Chrome Frame.");	
+		CFInstall.check({
+		mode: "overlay",
+		destination: "http://tellmefirst.polito.it/"
+		});
+		});
+		</script>
+		<![endif]-->
+
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="main.js"></script>
+		<script src="jquery.uniform.js" type="text/javascript"></script>
+		<script src="transformjs.js" type="text/javascript"></script>
+		<script src="metadatahelper.js" type="text/javascript"></script>
+		<script src="http://raw.github.com/malsup/form/cfd9c57a502bd12cce4d00ade717dcac6fee6db1/jquery.form.js"></script>
+		<link rel="stylesheet" href="uniform.default.css" type="text/css" media="screen" charset="utf-8" />
+		<link rel="stylesheet" type="text/css" href="tmf2.css">
+
+		<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+		<script type="text/javascript" src="fancybox/source/jquery.fancybox.js?v=2.0.6"></script>
+		<script type="text/javascript" src="fancybox/source/dynamic.fancybox.js"></script>
+
+		<script type="text/javascript" src="wikiscrap.js"></script>
+		<script src="http://cdn.leafletjs.com/leaflet-0.4/leaflet.js"></script>
+		<link rel="stylesheet" href="fancybox/source/jquery.fancybox.css?v=2.0.6" type="text/css" media="screen" />
+		<link rel="stylesheet" type="text/css" href="fancyboxmod.css">
+		<script type="text/javascript" src="./jCarousel/jquery.jcarousel.js"></script>
+		<link rel="stylesheet" type="text/css" href="./jCarousel/skin.css" />
+		<link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
+		<link rel="icon" href="images/favicon.ico" type="image/x-icon">
+		<link rel="image_src" href="http://tellmefirst.polito.it/images/tellmefirst-logo.jpg" />
+
+		<script src="jquery.lionbars.0.3.js" type="text/javascript"></script>
+		<link rel="stylesheet" type="text/css" href="lionbars.css">
+
+		<script>
+			var _gaq = _gaq || [];
+			_gaq.push(['_setAccount', 'UA-37489696-1']);
+			_gaq.push(['_trackPageview']);
+
+			(function() {
+				var ga = document.createElement('script');
+				ga.type = 'text/javascript';
+				ga.async = true;
+				ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+				var s = document.getElementsByTagName('script')[0];
+				s.parentNode.insertBefore(ga, s);
+			})();
+			var examples = ["http://www.repubblica.it/2009/03/sezioni/arte/news/cl-mar-09/cl-mar-09/cl-mar-09.html", "http://trovacinema.repubblica.it/attori-registi/roberto-benigni/164021", "http://www.guardian.co.uk/environment/2012/nov/05/letter-decarbonisation-target-energy-bill", "http://plato.stanford.edu/entries/aristotle/"];
+
+			function submitExample(url, lang) {
+				$("#formUrl").val(url);
+				$("#text").val("");
+				$('input:radio:checked').val(lang);
+				$("#mainForm, #instructionP").hide();
+				$("#home-jc").click();
+				setTimeout(function() {
+					$("#uploadButton").click();
+				}, 400);
+			}
+
+			//Set the init function for JCarousel
+			function mycarousel_initCallback(carousel) {
+				jQuery('.jcarousel-control a').bind('click', function() {
+					carousel.scroll(nav_lookup($(this).text()));
+					return false;
+				});
+			};
+			//Set the navigation menu for JCarousel
+			function nav_lookup(nav_page) {
+				switch(nav_page) {
+					case "Home":
+						return 1;
+					case "About":
+						return 2;
+					case "How-to":
+						return 3;
+					case "News":
+						return 4;
+					case "GitHub":
+						return 5;
+					case "Credits":
+						return 6;
+					case "Hidden":
+						return 7;
+				}
+			}
+
+
+			jQuery(document).ready(function() {
+				$('#formcontainer').css('zoom', window.innerHeight / 700 - 0.05);
+				$('.ui-accordion-content').css('overflow', 'hidden');
+				//Set the behaviour for mobile devices after the document is ready
+				if (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)) {
+					//Change the font size of the labels
+					$('.innerlabel').css('font-size', '15pt');
+				}
+				//Set the Twitter CSS after its content is ready and loaded, necessary for Chrome and Safari
+				$('#twitterwindow').contents().find('#twitter-widget-0').ready(function() {
+					setTimeout(function() {
+						//$('#twitterwindow').contents().find('#twitter-widget-0').contents().find('.stream').lionbars();
+						$('#twitterwindow').contents().find('#twitter-widget-0').css('width', '95%');
+						$('#twitterwindow').contents().find('#twitter-widget-0').css('height', '2000px');
+						//if ((window.innerHeight / 700) < 1) {
+						$('#twitterwindow').contents().find('#twitter-widget-0').contents().find('body').css('zoom', window.innerHeight / 700 - 0.1);
+						//}
+						if (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)) {
+							$('#twitterwindow').contents().find('#twitter-widget-0').contents().find('.twitter-follow-button').css('opacity', '0');
+						}
+						$('#twitterwindow').contents().find('body').css('overflow', 'hidden');
+					}, 1200);
+				});
+				$('.howto-content').css("overflow-x", "hidden");
+				$('.howto-content').lionbars();
+
+				//Init JCarousel
+				jQuery("#mycarousel").jcarousel({
+					initCallback : mycarousel_initCallback,
+					buttonNextHTML : null,
+					buttonPrevHTML : null
+				});
+
+				//For setting an automatic text processing
+
+				/*var number = Math.floor((50-0)*Math.random())+1;
+				 TMF.logTime("Sto caricando la url numero "+number);
+				 var str = $("#url"+number).text();
+				 $("#formUrl").val(str);
+				 $('#uploadButton').click();*/
+			});
+
+			// Adjust height based on window resize event
+			function adjustHeight() {
+				//Set the CSS behaviour for mobile devices
+				if (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)) {
+					//$('#twitterwindow').contents().find('#twitter-widget-0').contents().find('body').css('zoom', '0.8');
+				} else {
+					$('#formcontainer').css('zoom', window.innerHeight / 700 - 0.05);
+					$('#twitterwindow').contents().find('#twitter-widget-0').contents().find('body').css('zoom', window.innerHeight / 700 - 0.1);
+					if (window.innerHeight / 800 > 1)
+						$('#formcontainer').css('-moz-transform', 'scale(' + window.innerHeight / 800 + ') translate(0px, 100px)');
+					else if (window.innerHeight / 800 < 0.5)
+						$('#formcontainer').css('-moz-transform', 'scale(' + window.innerHeight / 800 + ') translate(0px, -200px)');
+					else
+						$('#formcontainer').css('-moz-transform', 'scale(' + window.innerHeight / 800 + ') translate(0px, -10px)');
+				}
+			}
+
+
+			$(window).resize(adjustHeight);
+		</script>
+
+		<script type="text/javascript" src="wikiscrap.js"></script>
+		<script src="http://cdn.leafletjs.com/leaflet-0.4/leaflet.js"></script>
+
+		<link rel="stylesheet" href="fancybox/source/jquery.fancybox.css?v=2.0.6" type="text/css" media="screen" />
+
+		<link rel="stylesheet" type="text/css" href="fancyboxmod.css">
+
+		<title> TellMeFirst - A Knowledge Discovery Application </title>
+	</head>
+
+	<body>
+
+		<div id="gridcontainer">
+			<div id="box1" class="box">
+				<a href="#" class="group1" rel="group1" id="imglink1"></a>
+				<span class="fancyboxtext"> </span>
+				<span class="fancyboxmetadata"> </span>
+				<span class="fancyboxnews"> </span>
+				<span class="fancyboxvideo"> </span>
+				<span class="fancyboxmap"> </span>
+				<div class="innercontent" id="content1" >
+					<div class="labelwrapper">
+						<div class="innerlabel" id="label1">
+							India
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="box2" class="box">
+				<a href="#" class="group2" rel="group2" id="imglink2"></a>
+				<span class="fancyboxtext"> </span>
+				<span class="fancyboxmetadata"> </span>
+				<span class="fancyboxnews"> </span>
+				<span class="fancyboxvideo"> </span>
+				<span class="fancyboxmap"> </span>
+				<div class="innercontent" id="content2">
+					<div class="labelwrapper">
+						<div class="innerlabel" id="label2">
+							Sonia Gandhi
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="box3" class="box">
+				<a href="#" class="group3" rel="group3" id="imglink3"></a>
+				<span class="fancyboxtext"> </span>
+				<span class="fancyboxmetadata"> </span>
+				<span class="fancyboxnews"> </span>
+				<span class="fancyboxvideo"> </span>
+				<span class="fancyboxmap"> </span>
+				<div class="innercontent" id="content3">
+					<div class="labelwrapper">
+						<div class="innerlabel" id="label3">
+							Taj Mahal
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div id="box4" class="box">
+				<a href="#" class="group4" rel="group4" id="imglink4"></a>
+				<span class="fancyboxtext"> </span>
+				<span class="fancyboxmetadata"> </span>
+				<span class="fancyboxnews"> </span>
+				<span class="fancyboxvideo"> </span>
+				<span class="fancyboxmap"> </span>
+				<div class="innercontent" id="content4">
+					<div class="labelwrapper">
+						<div class="innerlabel" id="label4">
+							Gandhi
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div id="box5" class="box">
+				<a href="#" class="group5" rel="group5" id="imglink5"></a>
+				<span class="fancyboxtext"> </span>
+				<span class="fancyboxmetadata"> </span>
+				<span class="fancyboxnews"> </span>
+				<span class="fancyboxvideo"> </span>
+				<span class="fancyboxmap"> </span>
+				<div class="innercontent" id="content5">
+					<div class="labelwrapper">
+						<div class="innerlabel" id="label5">
+							Hinduism
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div id="box6" class="box">
+				<a href="#" class="group6" rel="group6" id="imglink6"></a>
+				<span class="fancyboxtext"> </span>
+				<span class="fancyboxmetadata"> </span>
+				<span class="fancyboxnews"> </span>
+				<span class="fancyboxvideo"> </span>
+				<span class="fancyboxmap"> </span>
+				<div class="innercontent" id="content6">
+					<div class="labelwrapper">
+						<div class="innerlabel" id="label6">
+							Indian peakock
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div id="box7" class="box">
+				<a href="#" class="group7" rel="group7" id="imglink7"></a>
+				<span class="fancyboxtext"> </span>
+				<span class="fancyboxmetadata"> </span>
+				<span class="fancyboxnews"> </span>
+				<span class="fancyboxvideo"> </span>
+				<span class="fancyboxmap"> </span>
+				<div class="innercontent" id="content7">
+					<div class="labelwrapper">
+						<div class="innerlabel" id="label7">
+							Bollywood
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="formcontainer">
+
+			<h1 class="heading" style="font-size: 45px;"> TellMeFirst </h1>
+			<h2 class="heading"> A Knowledge Discovery Application </h2>
+
+			<div id="formbox">
+				<div id="mycarousel" class="jcarousel-skin-tango">
+					<ul>
+						<li>
+							<div class="formwrapper">
+								<div style="margin:5px;">
+									<p id="instructionP" style="margin-top:-20px" class="heading">
+										Insert some text using one of the options below:
+									</p>
+									<form id="mainForm" method="POST" action="return.json">
+										<div id="accordion">
+											<h3 id="textHeader" class="heading"><a href="#">Input a text</a></h3>
+											<div>
+												<p id="textInput">
+													<textarea id="text" name="text" style="overflow:hidden;">The final work of legendary director Stanley Kubrick, who died within a week of completing the edit, is based upon a novel by Arthur Schnitzler. Tom Cruise and Nicole Kidman play William and Alice Harford, a physician and a gallery manager who are wealthy, successful, and travel in a sophisticated social circle.</textarea>
+												</p>
+											</div>
+											<h3 id="urlHeader" class="heading"><a href="#">Insert a web page URL</a></h3>
+											<div>
+												<p id="urlInput">
+													<input type="text" id="formUrl" name="url">
+													</input>
+												</p>
+											</div>
+											<h3 id="fileHeader" class="heading"><a href="#">Upload a file (txt, pdf or doc)</a></h3>
+											<div>
+												<p id="fileUri">
+													<span id="requiredError">*</span>
+													<input id="file" name="file" type="file" />
+												</p>
+											</div>
+										</div>
+										<p id="languageSelection" class="heading">
+											Select the language of your text:
+											<label for="italian"><img src="images/it.png"/></label>
+											<input id="italian" type="radio" name="lang" value="italian">
+											<label for="english"><img src="images/uk.png" /></label>
+											<input checked id="english" type="radio" name="lang" value="english">
+										</p>
+										<p>
+											<input name="numTopics" type="hidden" value="7">
+										</p>
+
+										<p id="button" class="heading">
+											<button id="uploadButton" value="submit">
+												Enhance!
+											</button>
+										</p>
+										<input type="hidden" id="fileName" name="fileName" value="SASDASD">
+										</input>
+									</form>
+
+									<div class="loadingwrapper">
+										<p>
+											Processing text...
+										</p>
+										<img src="ajax-loader.gif"></img>
+										<div id="errormessage">
+											<p>
+												Error message goes here
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</li>
+
+						<li>
+							<div class="homepage" style="padding-right: 10px;">
+								<div style="margin: 5px; text-align: center;">
+									<h1 class="heading"> About </h1>
+									<br>
+									<p class="heading">
+										TellMeFirst is a tool for classifying and enriching textual documents via Linked Open Data.
+									</p>
+
+									<p class="heading">
+										TellMeFirst leverages NLP and Semantic Web technologies to extract main topics from texts in the form of DBpedia resources. Input texts are enhanced with new information and contents retrieved from the Web (images, videos, maps, news) concerning those topics.
+										</p class="heading">
+
+									<p class="heading">
+										The TellMeFirst project started in October 2011 thanks to a <a href="http://www.workingcapital.telecomitalia.it/2011/10/tellmefirst/" style="color:black;" target="_blank">Working Capital – Premio Nazionale Innovazione</a> grant from Telecom Italia. It has been developed mostly within the <a href="http://nexa.polito.it/" style="color: black;" target="_blank">Nexa Center for Internet & Society</a> at the Politecnico di Torino (DAUIN).
+										</p class="heading">
+
+									<p class="heading">
+										Contact us at <a style="color:black" href="mailto:tellmefirst.dev@gmail.com?Subject=This%20application%20is%20great">tellmefirst.dev@gmail.com</a>.
+									</p>
+									<p class="heading">
+										<span style="top: -15px;">Follow us on</span> :<br> <a href="https://twitter.com/tell_me_first" target="_blank"><img src="images/twit-small.png" /></a> <a href="https://www.facebook.com/pages/TellMeFirst/295944490506184" target="_blank" ><img src="images/fb-small.png" /></a>
+									</p>
+								</div>
+							</div>
+						</li>
+						<li>
+							<div id="howto" class="homepage" style="overflow: hidden; width: 620px;">
+								<h1 class="heading" id="howtoTitle"> How to use TellMeFirst </h1>
+								<br>
+								<div class="howto-content" style="height:400px; width: 580px; overflow: hidden; padding-right: 45px; margin: 5px; ">
+									<p class="heading" align="center">
+										After you have submitted a text, TellMeFirst shows a grid containing its main topics. Click on the images to focus on a specific topic. A box appears which has two arrows (right and left), clicking on which you can browse various contents related to the input text (images, metadata, texts, news, maps, videos, whenever they are available).
+									</p>
+
+									<p align="center" style="font-size: 20px; font-family: 'MuseoSansRounded900Regular';">
+										<b>Examples</b>
+									</p>
+
+									<p class="heading" align="center">
+										TellMeFirst works fine with both informative and specialized texts in any domain. However, the most current news articles may give inaccurate results, because the knowledge base we use (<a href="http://dbpedia.org/" style="color:black;" target="_blank">DBpedia</a> 3.8) is not so up to date (August 2012). TellMeFirst obviously doesn’t recognize topics that do not have a specific item in Wikipedia. Here some examples to test the system:
+									</p>
+
+									<p class="heading" align="center">
+										<a href="http://www.repubblica.it/2009/03/sezioni/arte/news/cl-mar-09/cl-mar-09/cl-mar-09.html" target="_blank" style="color: black; font-family: 'MuseoSansRounded900Regular';">I futuristi fanno il botto - La Repubblica</a>&nbsp;&nbsp;&nbsp;&nbsp;
+										<button onclick="submitExample(examples[0], 'italian');">
+											Enhance!
+										</button>
+									</p>
+
+									<p class="heading" align="center">
+										<a href="http://trovacinema.repubblica.it/attori-registi/roberto-benigni/164021" target="_blank" style="color: black; font-family: 'MuseoSansRounded900Regular'";>Roberto Benigni - TrovaCinema</a>&nbsp;&nbsp;&nbsp;&nbsp;
+										<button onclick="submitExample(examples[1], 'italian');">
+											Enhance!
+										</button>
+									</p>
+
+									<p class="heading" align="center">
+										<a href="http://www.guardian.co.uk/environment/2012/nov/05/letter-decarbonisation-target-energy-bill" target="_blank" style="color: black; font-family: 'MuseoSansRounded900Regular'";>Calls for decarbonisation - The Guardian</a>&nbsp;&nbsp;&nbsp;&nbsp;
+										<button onclick="submitExample(examples[2], 'english');">
+											Enhance!
+										</button>
+									</p>
+
+									<p class="heading" align="center">
+										<a href="http://plato.stanford.edu/entries/aristotle/" target="_blank" style="color: black; font-family: 'MuseoSansRounded900Regular'";>Aristotle - Stanford Encyclopedia of Philosophy</a>&nbsp;&nbsp;&nbsp;&nbsp;
+										<button onclick="submitExample(examples[3], 'english');">
+											Enhance!
+										</button>
+									</p>
+									<br>
+									<br>
+								</div>
+							</div>
+
+						</li>
+
+						<li>
+							<div class="homepage" style="overflow: hidden; width: 600px; padding-right: 10px;">
+								<h1 class="heading"> Recent News </h1>
+								<br>
+								<iframe id="twitterwindow" style="position:relative;bottom:10px;left:20px;border:none;" width="590px" height="1500px" src="twitter_feed.html"></iframe>
+							</div>
+						</li>
+						<li>
+							<div class="homepage">
+								<h1 class="heading"> GitHub </h1>
+								<br>
+								<p align="center">
+									TMF source code is moving to a new license (AGPL).
+								</p>
+								<p align="center">
+									It will be available on GitHub soon.
+								</p>	
+							</div>
+						</li>
+
+						<li>
+							<!--CREDITS-->
+							<div class="homepage" style="padding-left: 1px; overflow: hidden;">
+								<div style="margin: 5px;">
+									<h1 style="margin-bottom:-20px" class="heading"> Credits </h1>
+									<div class="credit">
+										<img src="./credit_images/federico-cairo.jpeg">
+										<div class="creditText">
+											<h1 id="h1" class="heading"><a href="http://it.linkedin.com/in/federicocairo" target="_blank"> Federico Cairo </a></h1>
+											<p class="heading">
+												Federico Cairo, research fellow at Nexa Center for Internet and Society, is the project manager and main developer of TellMeFirst.
+											</p>
+										</div>
+									</div>
+
+									<div class="credit">
+										<img src="./credit_images/giuseppe-futia.jpeg">
+										<div class="creditText">
+											<h1 id="h1" class="heading"><a href="http://it.linkedin.com/in/giuseppefutia" target="_blank"> Giuseppe Futia </a></h1>
+											<p class="heading">
+												Giuseppe Futia, communication manager at Nexa Center for Internet and Society, has worked on the development of TellMeFirst web interface.
+											</p>
+										</div>
+									</div>
+
+									<div class="credit">
+										<img src="./credit_images/federico-benedetto.jpeg">
+										<div class="creditText">
+											<h1 id="h1" class="heading"><a href="http://it.linkedin.com/in/fedons" target="_blank"> Federico Benedetto </a></h1>
+											<p class="heading">
+												Federico Benedetto, currently software engineer at the BBC, has worked on the development of TellMeFirst web interface.
+											</p>
+										</div>
+									</div>
+
+									<div class="credit">
+										<img src="./credit_images/dash-elhauge.jpg">
+										<div class="creditText">
+											<h1 id="h1" class="heading"><a href="http://web.mit.edu/primes/t-Elhauge.shtml" target="_blank"> Dash Elhauge </a></h1>
+											<p class="heading">
+												Dash Elhauge, <a style="text-decoration:none" href="http://www.bettertab.com" target="_blank">BetterTab.com</a>, has contributed to TellMeFirst website and other modules of the platform client-side.
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</li>
+
+						<li>
+							<div class="homepage">
+								<h1 class="heading"></h1>
+								<br>
+								<p></p>
+							</div>
+						</li>
+
+					</ul>
+				</div>
+
+				<div class="jcarousel-control">
+					<a href="#" id="home-jc" class="heading" style="color:white;">Home</a>
+					<a href="#" id="about-jc" class="heading" style="color:white;">About</a>
+					<a href="#" id="howto-jc" class="heading" style="color:white;">How-to</a>
+					<a href="#" id="news-jc" class="heading" style="color:white;">News</a>
+					<a href="#" id="github-jc" class="heading" style="color:white;">GitHub</a>
+					<a href="#" id="credits" class="heading" style="color:white;">Credits</a>
+
+					<!--<a href="#" class="heading" style="color:white;">How To</a>-->
+				</div>
+
+			</div>
+			<!--<span id="imagecredits">Photo by <a href="http://www.flickr.com/photos/cefeida/2098433884/in/photostream/">Magic Madzik</a>-->
+		</div>
+	</body>
+	<script>
+		adjustHeight();
+	</script>
+</html>

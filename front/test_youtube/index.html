@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Test Embed Youtube</title>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+	<script type="text/javascript">
+	var player=null;
+	var onYouTubePlayerReady = function(playerid) {
+		player=document.getElementById("myytplayer");
+	}
+
+	var stopPlayback = function() {
+		if(player) {
+			player.stopVideo();
+		}
+	}
+
+	var togglePause = function() {
+		if(player) {
+			if(player.getPlayerState()==1) {
+				player.pauseVideo();
+			} else {
+				player.playVideo();
+			}
+		}
+	}
+
+	</script>
+  <script type="text/javascript">
+
+    var params = { allowScriptAccess: "always" };
+    var atts = { id: "myytplayer" };
+    swfobject.embedSWF("https://www.youtube.com/v/qnR7CFB8Pts?version=3&autoplay=1&cc_load_policy=0&controls=0&loop=1&modestbranding=1&rel=0&showinfo=0&start=30&iv_load_policy=3&enablejsapi=1",
+                       "ytapiplayer", "425", "356", "8", null, null, params, atts);
+
+  </script>
+
+</head>
+
+<body>
+	<h1>Parametri:</h1>
+	<ul>
+		<li>autoplay=0 //Autoplay acceso</li>
+		<li>cc_load_policy=0 //Non mostrare i sottotitoli</li>
+		<li>controls=0 //Non mostrare i controlli</li>
+		<li>loop=1 //Ripeti il video</li>
+		<li>modestbranding=1 //Se mostrata la barra info (in alto), non mostrare il logo di youtube in basso</li>
+		<li>rel=0 //Non mostrare i video correlati</li>
+		<li>showinfo=0 //Non mostrare la infobar in alto</li>
+		<li>start=30 //Inizia a 30 secondi</li>
+		<li>iv_load_policy=3 //Non mostrare le annotazioni (i msg sul video)</li>
+	</ul>
+  <div><button onclick="stopPlayback()">Stop the video</button> <button onclick="togglePause()">Play/Pause the video</button></div>
+
+
+  <div id="ytapiplayer">
+    You need Flash player 8+ and JavaScript enabled to view this video.
+  </div>
+
+
+
+</body>
+
+</html>

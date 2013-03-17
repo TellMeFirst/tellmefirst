@@ -1,0 +1,609 @@
+@font-face {
+	font-family: ncsr55w;
+	src: url('ncsr55w.ttf');
+}
+
+@font-face {
+	font-family: OldNewspaperTypes;
+	src: url('OldNewspaperTypes.ttf');
+}
+
+@font-face {
+    font-family: 'MuseoSansRounded900Regular';
+    src: url('MuseoSansRounded-900-webfont.eot');
+    src: url('MuseoSansRounded-900-webfont.eot?#iefix') format('embedded-opentype'),
+         url('MuseoSansRounded-900-webfont.woff') format('woff'),
+         url('MuseoSansRounded-900-webfont.ttf') format('truetype'),
+         url('MuseoSansRounded-900-webfont.svg#MuseoSansRounded900Regular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'MuseoSansRounded700Regular';
+    src: url('MuseoSansRounded-700-webfont.eot');
+    src: url('MuseoSansRounded-700-webfont.eot?#iefix') format('embedded-opentype'),
+         url('MuseoSansRounded-700-webfont.woff') format('woff'),
+         url('MuseoSansRounded-700-webfont.ttf') format('truetype'),
+         url('MuseoSansRounded-700-webfont.svg#MuseoSansRounded700Regular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+	font-family: 'ArchitectsDaughter';
+	src: url('ArchitectsDaughter.ttf');
+}	
+
+
+
+@include 'lionbars/css/lionbars.css';
+
+body {
+   /* -moz-transform-origin: 90 90;*/
+	margin: 0px;
+	padding: 0px;
+	width: 100%;
+	height: 100%;
+	background-color: white;
+	overflow: hidden;
+	font-family: sans-serif;
+	font-weight: bold;
+	background-image: url('images/background_box.jpg');
+	background-attachment: fixed;
+	-moz-background-size: cover;
+	-webkit-background-size: cover;
+	background-size: cover;
+}
+
+div#errormessage {
+    background-image:url('images/post-nowhitespace.png');
+    background-size: 70% Auto;
+    background-repeat:no-repeat;
+    background-position:center;
+	display: none;
+	height: 250px;
+	text-align: center;
+    margin-top:20px;
+}
+
+div#errormessage p{
+    width:220px;
+    margin:auto;
+	color: black;
+	text-align: center;
+	/*font-weight: bold;*/
+	font-size: 100%;
+    font-family:'ArchitectsDaughter';
+    position:relative;
+    top: 80px;
+}
+
+div.homepage{
+	overflow-y:auto;
+}
+
+/*****************/
+/*  Title  */
+/*****************/
+
+h1.heading, h2.heading {
+	text-align: center;
+	font-family: 'MuseoSansRounded900Regular';
+}
+
+h1.heading {
+	color: #1a1107;
+}
+
+h2.heading {
+	margin-top: -25px;
+	color: white;/*lightgray;*/
+	font-size: 14pt;
+}
+
+.heading{
+	font-family: 'MuseoSansRounded900Regular';
+}
+
+p.heading{
+	font-family: 'MuseoSansRounded700Regular';
+}
+
+h3.heading{
+	font-family: 'MuseoSansRounded700Regular';
+}
+
+
+/*****************/
+/*     GRID      */
+/*****************/
+
+#gridcontainer {
+	display: none;
+}
+
+.innercontent {
+	display: block;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	border: 1px solid black;
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-color: white;
+	background-size: 100% auto;
+}
+
+.innerlabel {
+	background: black;
+	display: inline-block;
+	max-width: 60%;
+	opacity: 0.7;
+	filter: alpha(opacity=700); /* For IE8 and earlier */
+	color: white;
+	font-family: sans-serif;
+	font-size: 25pt;
+	font-weight: bold;
+	word-wrap: break-word;
+	padding: 5px;
+	border: 5px solid white;
+	border-radius: 15px;
+	bottom: 10%;
+}
+
+.innerlabel a {
+	text-decoration: none;
+	color: white;
+}
+
+.labelwrapper {
+	position: absolute;
+	bottom: 10%;
+	width: 100%;
+}
+
+.box {
+	/*background-color: #d34013;*/
+	/*background-image: url('images/background.jpg');*/
+	display: block;
+	position: absolute;
+	overflow: visible;
+	text-align: center;
+	border-collapse: collapse;
+}
+
+div#box1 {
+	height: 50%;
+	width: 66.6%;
+	top: 0%;
+}
+
+div#content1 {
+	margin: 10px 5px 5px 10px;
+	/*background-image: url("./images/1.jpg");*/
+}
+
+div#box2 {
+	height: 50.1%;
+	width: 33.3%;
+	top: 50%;
+	
+}
+
+div#content2 {
+	margin: 5px 5px 10px 10px;
+}
+
+div#box3 {
+	height: 50.1%;
+	width: 33.3%;
+	top: 50%;
+	left: 33.3%;
+}
+
+div#content3 {
+	margin: 5px 5px 10px 5px;
+}
+
+div#box4 {
+	height: 33.3%;
+	width: 33.5%;
+	left: 66.6%;
+}
+
+div#content4 {
+	margin: 10px 10px 5px 5px;
+}
+
+div#box5 {
+	height: 33.3%;
+	width: 33.5%;
+	top: 33.3%;
+	left: 66.6%;
+}
+
+div#content5 {
+	margin: 5px 10px 5px 5px;
+}
+
+div#box6 {
+	height: 33.6%;
+	width: 16.8%;
+	top: 66.6%;
+	left: 66.6%;
+}
+div#content6 {
+	margin: 5px 5px 10px 5px;
+}
+div#box7 {
+	height: 33.6%;
+	width: 16.7%;
+	top: 66.6%;
+	left: 83.4%;
+}
+
+div#label7, div#label6 {
+	font-size: 1.6em
+}
+
+div#content7 {
+	margin: 5px 10px 10px 5px;
+}
+
+/*****************/
+/*     CREDITS      */
+/*****************/
+.credit {
+	margin-top: 40px;
+	margin-bottom: 30px;
+	width: 600px;
+	position: relative;
+}
+
+.creditText a {
+	color: black;
+	text-decoration: none;
+}
+
+.credit .creditText {
+	width: 595px;
+}
+
+.credit img {
+	float: left;
+	height: 70px;
+	margin-right: 20px;
+}
+
+.credit p {
+	font-size: 11pt;
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+.credit #h1 {
+	text-align: left;
+	font-size: 14pt;
+}
+
+/*****************/
+/*   INPUT FORM  */
+/*****************/
+
+div#formcontainer {
+	position: absolute;
+	display: block;
+	width: 100%;
+	height: 100%;
+	/*background-image: url('images/background_box.jpg');
+	background-attachment: fixed;*/
+	-moz-background-size: cover;
+	-webkit-background-size: cover;
+	background-size: cover;
+}
+
+div#formbox {
+	display: block;
+	position: relative;
+	/*top:10%;*/
+	width: 700px; height: 450px;
+	/*width: 90%;
+	height: 50%;*/
+	margin: 4px auto auto auto;
+	background: rgba(236,236,236,0.30); /*alpha=.23*/
+	box-shadow: 0 0 30px 3px black;
+	/*text-align: center;*/
+	border-radius: 18px;
+	/*padding: 10px;*/
+	padding-top: 50px;
+}
+
+div.formwrapper {
+	/*margin: -155px 0px 0px -220px;*/
+	margin: auto;
+	text-align: left;
+	width: 450px;
+	/*width: 70%;*/
+	/*height: 160px;*/
+	/*background-color: rgba(223,223,223,0.5);
+	 border-radius: 18px;*/
+	padding: 0px;
+	/*border: 1px solid #dfdfdf;*/
+	position: absolute;
+	top: 60px;
+	left: 75px;
+	/*top: 50%;
+	left: 50%;*/
+}
+
+span#imagecredits {
+	position: absolute;
+	bottom: 1px;
+	width: 100%;
+	text-align: right;
+	color: gray;
+	font-style: italic;
+	font-size: 10pt;
+}
+
+#imagecredits a {
+	color: gray;
+	text-decoration: none;
+}
+
+#formbox h1 {
+	text-align: center;
+	padding-top: 0px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	color: #1a1107;
+}
+
+#formbox h2 {
+	text-align: center;
+	padding-top: 0px;
+	margin-top: 0px;
+	color: lightgray;
+	font-size: 14pt;
+}
+
+#formbox button {
+	width: 150px;
+	height: 40px;
+	border-radius: 10px;
+	background-color: orange;
+	color: black;
+	font-weight: bold;
+	border: 1px solid white;
+	cursor: pointer;
+	font-size: 13pt;
+	text-shadow: rgba(255,255,255,0.5) 0px 1px 0px;
+}
+
+#formUrl {
+	width: 250px;
+	position: absolute;
+	left: 50%;
+	margin-left: -125px;
+	font-size: 13pt;
+}
+
+p#languageSelection {
+	text-align: center;
+	padding-right: 0px;
+}
+
+#languageSelection img {
+	margin: 0px 20px 0px 20px;
+	padding: 0px;
+	cursor: pointer;
+}
+
+input[type="radio"] {
+	display: none;
+}
+
+p#button {
+	margin-top: 10px;
+	text-align: right;
+}
+
+p#fileUri {
+	text-align: center;
+}
+
+textarea#text {
+	top: -20px;
+	width: 370px;
+	height: 110px;
+	resize: none;
+	overflow: none;
+	font-size: 10pt;
+}
+
+p#textInput {
+	width: 100%;
+	text-align: center;
+	margin-top: 4px;
+}
+
+span#requiredError {
+	color: red;
+	font-weight: bold;
+	display: none;
+}
+
+div.loadingwrapper {
+	display: none;
+	text-align: center;
+	width: 100%;
+}
+
+
+#twitter-widget-0{
+	height: 2000px;
+}
+
+/*********************/
+/* GRID HOVER EFFECT */
+/*********************/
+
+.box:hover {
+	cursor: pointer;
+}
+
+.innercontent {
+	-webkit-transform: perspective(5000);
+	-webkit-transition-property: transform, perspective, z-index;
+	-webkit-transition-duration: 0.3s;
+	-webkit-transition-delay: 0s;
+	-moz-transition-property: -moz-transform, -moz-perspective, z-index;
+	-moz-transition-duration: 0.3s;
+	-moz-transition-delay: 0s;
+	-moz-perspective: 5000px;
+	transform: perspective(5000);
+	transition-property: transform, perspective, z-index;
+	transition-duration: 0.3s;
+	transition-delay: 0s;
+}
+
+.innerlabel {
+	-webkit-transform: perspective(8000);
+	-webkit-transition-property: transform, perspective, box-shadow, z-index;
+	-webkit-transition-duration: 0.3s;
+	-webkit-transition-delay: 0s;
+	-moz-transition-property: -moz-transform, box-shadow, -moz-perspective, z-index;
+	-moz-transition-duration: 0.3s;
+	-moz-transition-delay: 0s;
+	-moz-perspective: 8000px;
+	transform: perspective(8000);
+	transition-property: transform, perspective, box-shadow, z-index;
+	transition-duration: 0.3s;
+	transition-delay: 0s;
+}
+
+.labelwrapper {
+	-webkit-transition-property: z-index;
+	-webkit-transition-duration: 0.3s;
+	-webkit-transition-delay: 0s;
+	-moz-transition-property: z-index;
+	-moz-transition-duration: 0.3s;
+	-moz-transition-delay: 0s;
+	transition-property: z-index;
+	transition-duration: 0.3s;
+	transition-delay: 0s;
+}
+
+.box:hover div.innercontent {
+	-webkit-transform: perspective(3000) translateZ(200px);
+	-moz-transform: scale(1.1);
+	-moz-perspective: 3000px;
+	transform: perspective(3000) translateZ(200px);
+	z-index: 90;
+	box-shadow: 0 0 35px 5px black;
+}
+.box:hover div.innerlabel {
+	-webkit-transform: perspective(500) rotateX(5deg) translateZ(60px);
+	-moz-transform: rotateX(5deg) scale(1.1);
+	-moz-perspective: 500px;
+	transform: perspective(500) rotateX(5deg) translateZ(60px);
+	box-shadow: 0 0 20px 8px white;
+	z-index: 100;
+}
+
+.box:hover div.labelwrapper {
+	z-index: 100;
+}
+
+/*********************/
+/*    NYTIMES NEWS   */
+/*********************/
+
+div.nyTimesNews {
+	display: block;
+	font-family: OldNewspaperTypes;
+	background-color: white;
+	margin: auto;
+	background-image: url('images/newspaper_texture.jpg');
+	color: black;
+	/*font-size: large;*/
+	width: 700px;
+	padding-top: 10px;
+}
+
+.nyTimesDate {
+	padding-top: 7px;
+	padding-right: 20px;
+}
+
+div.nyTimesNews h2 {
+	padding-bottom: 0px;
+	margin-bottom: 0px;
+	padding-top: 0px;
+	margin-top: 0px;
+}
+
+div.nyTimesNews img {
+	display: block;
+	margin: auto;
+}
+
+div.nyTimesNews tr {
+	vertical-align: top;
+}
+
+div.nyTimesNews table {
+	margin-top: 20px;
+	margin-right: 20px;
+}
+
+/*********************/
+/*    Wiki Text   */
+/*********************/
+
+.wikiText h1 {
+	padding-top: 0px;
+}
+
+.wikiText {
+	
+	font-family: 'MuseoSansRounded700Regular';
+}
+
+
+
+/*********************/
+/*  TOP LEFT LOGO    */
+/*********************/
+div.topleftlogo {
+	position: absolute;
+	left: 50%;
+	bottom: 100%;
+	width: 140px;
+	height: 50px;
+	/*background-repeat: no-repeat;*/
+	/*box-shadow: 0 0 30px 3px black;
+	 border-bottom-right-radius: 10px;*/
+}
+
+div.inside {
+	position: absolute;
+	width: 140px;
+	height: 50px;
+	bottom: 10px;
+	right: 70px;
+	background-image: url('images/title_background.png');
+	border-radius: 25px;
+}
+
+/*********************/
+/*    Custom Scrollpane   */
+/*********************/
+
+
+
