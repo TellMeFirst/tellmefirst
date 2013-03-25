@@ -219,7 +219,7 @@ TMF.loadImages = function() {
 			else {
 				var action;
 				if(TMF.localUse)
-					action = 'getImage.json';
+					action = '/json/getImage.json';
 				else
 					action = TMF.setLanguageService()+"getImage";
 				jQuery.ajax(action, {
@@ -245,7 +245,7 @@ TMF.checkImageFromJson = function(i){
 		else{
 			var action;
 			if(TMF.localUse)
-				action = 'getImage.json';
+				action = '/json/getImage.json';
 			else
 				action = TMF.setLanguageService()+"getImage";
 			jQuery.ajax(action, {
@@ -260,7 +260,7 @@ TMF.checkImageFromJson = function(i){
 	img.addEventListener('error', function(){
 		var action;
 		if(TMF.localUse)
-			action = 'getImage.json';
+			action = '/json/getImage.json';
 		else
 			action = TMF.setLanguageService()+"getImage";
 		jQuery.ajax(action, {
@@ -435,7 +435,7 @@ TMF.getBetterImage = function (i, badImageUrl) {
 	if (TMF.data) {
 		var action;
 		if(localeUse)
-			action = 'getBetterImage.json'
+			action = '/json/getBetterImage.json'
 		else
 			action = TMF.setLanguageService()+"getBetterImage";
 		jQuery.ajax(action, {
@@ -553,7 +553,7 @@ TMF.getTextRemote = function(i) {
 	if (TMF.data) {
 		var action;
 		if(TMF.localUse)
-			action = 'getText.json'
+			action = '/json/getText.json'
 		else
 			action = TMF.setLanguageService()+"getText";
 		jQuery.ajax(action, {
@@ -604,7 +604,7 @@ TMF.getAbstract = function(i) {
 	if (TMF.data) {
 		var action;
 		if(TMF.localUse)
-			action = 'getAbstract.json'
+			action = '/json/getAbstract.json'
 		else
 			action = TMF.setLanguageService()+"getAbstract";
 		jQuery.ajax(action, {
@@ -631,7 +631,7 @@ TMF.getNews = function (i) {
 	TMF.log("getNews called for resource "+i);
 	var action;
 	if(TMF.localUse)
-		action = 'getNews.json';
+		action = '/json/getNews.json';
 	else
 		action = TMF.setLanguageService()+"getNews";
 	jQuery.ajax(action, {
@@ -670,7 +670,7 @@ TMF.getVideo = function(i) {
 	TMF.log("getVideo called for resource "+i);
 	var action;
 	if(TMF.localUse)
-		action = 'getVideo.json';
+		action = '/json/getVideo.json';
 	else
 		action = TMF.setLanguageService()+"getVideo";
 	jQuery.ajax(action, {
@@ -692,7 +692,7 @@ TMF.publishVideo = function(video,i){
 	if(video){
 		TMF.log('found video for resource '+i+": "+video);
 		TMF.data.Resources[i]["@videoURL"] = video;
-		$('#box'+(i+1)+' .fancyboxvideo').append('<a href="test_youtube/player.html?rand='+Math.random()+'&id='+i+'" class="group'+(i+1)+' fancybox.iframe video" content="video" rel="group'+(i+1)+'" title="'+TMF.data.Resources[i]["@label"]+' - Video"></a>');
+		$('#box'+(i+1)+' .fancyboxvideo').append('<a href="youtube/player.html?rand='+Math.random()+'&id='+i+'" class="group'+(i+1)+' fancybox.iframe video" content="video" rel="group'+(i+1)+'" title="'+TMF.data.Resources[i]["@label"]+' - Video"></a>');
 	} else {
 		 TMF.log("No video found for resource "+i);
 	}
@@ -707,7 +707,7 @@ TMF.getMap = function(i) {
 	TMF.log("getMap called for resource "+i);
 	var action;
 	if(TMF.localUse)
-		action = 'getMap.json'
+		action = '/json/getMap.json'
 	else
 		action = TMF.setLanguageService()+"getMap";
 	jQuery.ajax(action, {
@@ -723,7 +723,7 @@ TMF.getMap = function(i) {
 TMF.publishMap = function(latLong, i) {
 	if(latLong["@lat"] && latLong["@long"]) {
 		TMF.data.Resources[i]["@latLong"] = latLong;
-		$('#box'+(i+1)+' .fancyboxmap').append('<a href="Leaflet/index.html?'+Math.random()+'&id='+i+'" class="group'+(i+1)+' fancybox.iframe video" content="map" rel="group'+(i+1)+'" title="'+TMF.data.Resources[i]["@label"]+' - Map"></a>');
+		$('#box'+(i+1)+' .fancyboxmap').append('<a href="leaflet/index.html?'+Math.random()+'&id='+i+'" class="group'+(i+1)+' fancybox.iframe video" content="map" rel="group'+(i+1)+'" title="'+TMF.data.Resources[i]["@label"]+' - Map"></a>');
 	} else {
 		TMF.log("No map found for resource "+i);
 	}

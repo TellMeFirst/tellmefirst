@@ -1,20 +1,20 @@
 @font-face {
 	font-family: ncsr55w;
-	src: url('ncsr55w.ttf');
+	src: url('/fonts/ncsr55w.ttf');
 }
 
 @font-face {
 	font-family: OldNewspaperTypes;
-	src: url('OldNewspaperTypes.ttf');
+	src: url('/fonts/OldNewspaperTypes.ttf');
 }
 
 @font-face {
     font-family: 'MuseoSansRounded900Regular';
-    src: url('MuseoSansRounded-900-webfont.eot');
-    src: url('MuseoSansRounded-900-webfont.eot?#iefix') format('embedded-opentype'),
-         url('MuseoSansRounded-900-webfont.woff') format('woff'),
-         url('MuseoSansRounded-900-webfont.ttf') format('truetype'),
-         url('MuseoSansRounded-900-webfont.svg#MuseoSansRounded900Regular') format('svg');
+    src: url('/fonts/MuseoSansRounded-900-webfont.eot');
+    src: url('/fonts/MuseoSansRounded-900-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/MuseoSansRounded-900-webfont.woff') format('woff'),
+         url('/fonts/MuseoSansRounded-900-webfont.ttf') format('truetype'),
+         url('/fonts/MuseoSansRounded-900-webfont.svg#MuseoSansRounded900Regular') format('svg');
     font-weight: normal;
     font-style: normal;
 
@@ -22,11 +22,11 @@
 
 @font-face {
     font-family: 'MuseoSansRounded700Regular';
-    src: url('MuseoSansRounded-700-webfont.eot');
-    src: url('MuseoSansRounded-700-webfont.eot?#iefix') format('embedded-opentype'),
-         url('MuseoSansRounded-700-webfont.woff') format('woff'),
-         url('MuseoSansRounded-700-webfont.ttf') format('truetype'),
-         url('MuseoSansRounded-700-webfont.svg#MuseoSansRounded700Regular') format('svg');
+    src: url('/fonts/MuseoSansRounded-700-webfont.eot');
+    src: url('/fonts/MuseoSansRounded-700-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/MuseoSansRounded-700-webfont.woff') format('woff'),
+         url('/fonts/MuseoSansRounded-700-webfont.ttf') format('truetype'),
+         url('/fonts/MuseoSansRounded-700-webfont.svg#MuseoSansRounded700Regular') format('svg');
     font-weight: normal;
     font-style: normal;
 
@@ -34,7 +34,7 @@
 
 @font-face {
 	font-family: 'ArchitectsDaughter';
-	src: url('ArchitectsDaughter.ttf');
+	src: url('/fonts/ArchitectsDaughter.ttf');
 }	
 
 
