@@ -1,17 +1,20 @@
 /**
- * Copyright 2011 Pablo Mendes, Max Jakob
+ * TellMeFirst - A Knowledge Discovery Application
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Copyright (C) 2012 Federico Cairo, Giuseppe Futia, Federico Benedetto
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package it.polito.tellmefirst.web.rest;
@@ -46,7 +49,8 @@ public class TMFServer {
     // TMF starting point. From rest directory, launch this command:
     // mvn exec:java -Dexec.mainClass="it.polito.temefirst.web.rest.TMFServer" -Dexec.args="<path_to_TMF_installation>/conf/server.properties"
     // or use the run.sh file in bin directory
-    public static void main(String[] args) throws TMFConfigurationException, TMFIndexesWarmUpException, URISyntaxException, InterruptedException, IOException {
+    public static void main(String[] args) throws TMFConfigurationException, TMFIndexesWarmUpException,
+            URISyntaxException, InterruptedException, IOException {
         LOG.debug("[main] - BEGIN");
         String configFileName = args[0];
         TMFVariables tmfVariables = new TMFVariables(configFileName);
@@ -56,11 +60,13 @@ public class TMFServer {
         italianClassifier = new Classifier("it");
         englishClassifier = new Classifier("en");
 
-        //The following is adapted from DBpedia Spotlight (Pablo Mendes, Max Jacob)
+        //The following is adapted from DBpedia Spotlight (https://github.com/dbpedia-spotlight/dbpedia-spotlight)
         final Map<String, String> initParams = new HashMap<String, String>();
-        initParams.put("com.sun.jersey.config.property.resourceConfigClass", "com.sun.jersey.api.core.PackagesResourceConfig");
+        initParams.put("com.sun.jersey.config.property.resourceConfigClass", "com.sun.jersey.api.core." +
+                "PackagesResourceConfig");
         initParams.put("com.sun.jersey.config.property.packages", "it.polito.tellmefirst.web.rest.services");
-        initParams.put("com.sun.jersey.config.property.WadlGeneratorConfig", "it.polito.tellmefirst.web.rest.wadl.ExternalUriWadlGeneratorConfig");
+        initParams.put("com.sun.jersey.config.property.WadlGeneratorConfig", "it.polito.tellmefirst.web.rest.wadl." +
+                "ExternalUriWadlGeneratorConfig");
         SelectorThread threadSelector = GrizzlyWebContainerFactory.create(serverURI, initParams);
         threadSelector.start();
         System.err.println("Server started in " + System.getProperty("user.dir") + " listening on " + serverURI);
