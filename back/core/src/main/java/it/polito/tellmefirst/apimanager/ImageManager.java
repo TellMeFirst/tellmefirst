@@ -34,6 +34,7 @@ public class ImageManager {
 
     static Log LOG = LogFactory.getLog(ImageManager.class);
 
+    // used in enhancer
     public String scrapeImageFromPage(String pageURL) {
         LOG.debug("[scrapeImageFromPage] - BEGIN");
         String result = Enhancer.DEFAULT_IMAGE;
@@ -45,6 +46,21 @@ public class ImageManager {
             LOG.error("[scrapeImageFromPage] - EXCEPTION: ", e);
         }
         LOG.debug("[scrapeImageFromPage] - END");
+        return result;
+    }
+
+    // used in classifier
+    public String scrapeDBpediaImageFromPage(String pageURL) {
+        LOG.debug("[scrapeDBpediaImageFromPage] - BEGIN");
+        String result = "";
+        try {
+            Document doc = Jsoup.connect(pageURL).get();
+            Element image = doc.select("img").first();
+            result = "http:"+ image.attr("src");
+        } catch (Exception e) {
+            LOG.error("[scrapeDBpediaImageFromPage] - EXCEPTION: ", e);
+        }
+        LOG.debug("[scrapeDBpediaImageFromPage] - END");
         return result;
     }
 

@@ -261,7 +261,7 @@ public class Classifier {
                             String dirtyImage = doc.getField("IMAGE").stringValue();
                             // we scrape anyway, even when the image URL is in DBpedia, to have always the right size
                             String[] fileNameSplit = dirtyImage.replace(" ","_").split("/");
-                            image = imageManager.scrapeImageFromPage("http://it.wikipedia.org/wiki/File:"+
+                            image = imageManager.scrapeDBpediaImageFromPage("http://it.wikipedia.org/wiki/File:"+
                                     fileNameSplit[fileNameSplit.length-1]);
 
                         }
@@ -273,7 +273,7 @@ public class Classifier {
                         String dirtyImage = IndexesUtil.getImage(uri, "en");
                         // we scrape anyway, even when the image URL is in DBpedia, to have always the right size
                         String[] fileNameSplit = dirtyImage.replace(" ","_").split("/");
-                        image = imageManager.scrapeImageFromPage("http://en.wikipedia.org/wiki/File:"+
+                        image = imageManager.scrapeDBpediaImageFromPage("http://en.wikipedia.org/wiki/File:"+
                                 fileNameSplit[fileNameSplit.length-1]);
                         ArrayList<String> typesArray = IndexesUtil.getTypes(uri, "en");
                         StringBuilder typesString = new StringBuilder();
@@ -291,7 +291,7 @@ public class Classifier {
                         String dirtyImage = doc.getField("IMAGE").stringValue();
                         // we scrape anyway, even when the image URL is in DBpedia, to have always the right size
                         String[] fileNameSplit = dirtyImage.replace(" ","_").split("/");
-                        image = imageManager.scrapeImageFromPage("http://en.wikipedia.org/wiki/File:"+
+                        image = imageManager.scrapeDBpediaImageFromPage("http://en.wikipedia.org/wiki/File:"+
                                 fileNameSplit[fileNameSplit.length-1]);
                     }
                     Field[] types = doc.getFields("TYPE");
