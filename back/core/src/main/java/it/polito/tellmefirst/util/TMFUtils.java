@@ -19,9 +19,21 @@
 
 package it.polito.tellmefirst.util;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
+
+import it.polito.tellmefirst.parsing.DOCparser;
+import it.polito.tellmefirst.parsing.PDFparser;
+import it.polito.tellmefirst.parsing.TMFTextParser;
+import it.polito.tellmefirst.parsing.TXTparser;
+
 import java.io.*;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.security.MessageDigest;
 import java.util.*;
 
 /**
@@ -86,4 +98,92 @@ public class TMFUtils {
         LOG.debug("[countWords] - END");
         return words.length;
     }
+    
+    public static final Map<String, TMFTextParser> parseAssociation = new HashMap<String, TMFTextParser>();
+    static {
+    	parseAssociation.put("pdf",new PDFparser());
+    	parseAssociation.put("doc",new DOCparser());
+    	parseAssociation.put("txt",new TXTparser());
+    }
+    
+    public static void optional(Behaviour b, String warning){
+		try{
+			b.behaviour();
+		}catch(Exception e){
+			LOG.warn(warning);
+		}
+	}
+    
+    public static void unchecked(Behaviour b, String warning){
+		try{
+			b.behaviour();
+		}catch(Exception e){
+			throw new RuntimeException(e);
+		}
+	}
+    
+    public static <T> T optional(Ret<T> ret, String warning){
+    	T returnValue=null;
+    	try{
+			returnValue = ret.ret();
+		}catch(Exception e){
+			LOG.warn(warning);
+		}
+    	return returnValue;
+    }
+    
+    public static <T> T unchecked(Ret<T> ret, String warning){
+    	T returnValue=null;
+    	try{
+			returnValue = ret.ret();
+		}catch(Exception e){
+			throw new RuntimeException(e);
+		}
+    	return returnValue;
+    }
+    
+    public static Collection<String> filter(Collection<String> c, String ... patterns){
+    	for (String pattern : patterns) {
+			for (Iterator<String> iterator = c.iterator(); iterator.hasNext();) {
+				String string = (String) iterator.next();
+				if(string.contains(pattern))
+					iterator.remove();
+			}
+		}
+    	return c;
+    }
+    
+    /**
+     * Remove the first "File:" and then replace whitespace characters with underscore '_'
+     * @return the {@link String} used to calculate hash.
+     */
+    public static String processWikiFileLabelForHashComputation(String original){
+    	return original.replaceFirst("File:", "").replaceAll(" ", "_");
+    }
+    
+    public static String getWikiURL(final String file){
+    	String wikiBase = "http://upload.wikimedia.org/wikipedia/commons";
+    	String md5 = unchecked(new Ret<String>() {
+			public String ret() throws Exception {
+				final MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+				messageDigest.reset();
+				messageDigest.update(file.getBytes(Charset.forName("UTF8")));
+				final byte[] resultByte = messageDigest.digest();
+				return new String(Hex.encodeHex(resultByte));
+			}
+		}, "Wiki img URL not found");
+    	String finalURL = wikiBase+"/"+md5.charAt(0)+"/"+md5.charAt(0)+md5.charAt(1)+"/";
+    	String encodedFileLabel = unchecked(new Ret<String>() {
+			public String ret() throws Exception {
+				return URLDecoder.decode(file, "UTF-8");
+			}
+		}, "Wiki img URL not found");
+    	return finalURL+=encodedFileLabel;
+    }
+    
+    public static String getFileExtension(String fileName){
+    	String [] splat = fileName.split(".");
+    	return splat[splat.length-1];
+    }
+    
 }

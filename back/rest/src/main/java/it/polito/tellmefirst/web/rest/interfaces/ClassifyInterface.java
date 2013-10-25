@@ -19,17 +19,19 @@
 
 package it.polito.tellmefirst.web.rest.interfaces;
 
-import it.polito.tellmefirst.exception.TMFOutputException;
 import it.polito.tellmefirst.classify.Classifier;
+import it.polito.tellmefirst.exception.TMFOutputException;
 import it.polito.tellmefirst.exception.TMFVisibleException;
-import it.polito.tellmefirst.web.rest.TMFServer;
+import it.polito.tellmefirst.web.rest.TMFListener;
+
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+
+import javax.xml.transform.sax.TransformerHandler;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xml.sax.helpers.AttributesImpl;
-import javax.xml.transform.sax.TransformerHandler;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA.
@@ -39,29 +41,29 @@ public class ClassifyInterface extends AbsResponseInterface {
 
     static Log LOG = LogFactory.getLog(ClassifyInterface.class);
 
-    public String getJSON(String text, File file, String url, String fileName, int numTopics, String lang) throws Exception {
+    public String getJSON(String textStr, int numTopics, String lang, boolean wikihtml) throws Exception {
         LOG.debug("[getJSON] - BEGIN");
         String result;
-        String xml = getXML(text, file, url, fileName, numTopics, lang);
+        String xml = getXML(textStr, numTopics, lang, wikihtml);
         result = xml2json(xml);
         //no prod
         LOG.info("--------Result from Classify--------");
-        LOG.info(result);
+        //LOG.info(result);
         LOG.debug("[getJSON] - END");
         return result;
     }
 
-    public String getXML(String text, File file, String url, String fileName, int numTopics, String lang) throws TMFVisibleException, TMFOutputException {
+    public String getXML(String textStr, int numTopics, String lang, boolean wikihtml) throws TMFVisibleException, TMFOutputException {
         LOG.debug("[getXML] - BEGIN");
         String result;
-        Classifier classifier = (lang.equals("italian")) ? TMFServer.getItalianClassifier() : TMFServer.getEnglishClassifier();
-        ArrayList<String[]> topics = classifier.classify(text, file, url, fileName, numTopics, lang);
-        result = produceXML(topics);
+        Classifier classifier = (lang.equals("italian")) ? TMFListener.getItalianClassifier() : TMFListener.getEnglishClassifier();  
+        ArrayList<String[]> topics = classifier.classify(textStr, numTopics, lang, wikihtml);
+        result = produceXML(topics, wikihtml);
         LOG.debug("[getXML] - END");
         return result;
     }
 
-    private String produceXML(ArrayList<String[]> topics) throws TMFOutputException {
+    private String produceXML(ArrayList<String[]> topics, boolean wikihtml) throws TMFOutputException {
         LOG.debug("[produceXML] - BEGIN");
         String xml;
         try {
@@ -72,6 +74,7 @@ public class ClassifyInterface extends AbsResponseInterface {
             hd.startElement("","","Classification",atts);
             int i=0;
             for (String[] topic : topics){
+            	
                 if (i==0){
                     atts.clear();
                     hd.startElement("","","Resources",atts);
@@ -82,6 +85,9 @@ public class ClassifyInterface extends AbsResponseInterface {
                 atts.addAttribute("","","score","",topic[3]);
                 atts.addAttribute("", "", "mergedTypes", "", topic[4]);
                 atts.addAttribute("", "", "image", "", topic[5]);
+                atts.addAttribute("", "", "wikilink", "", topic[6]);
+                if(wikihtml)
+                	atts.addAttribute("", "", "htmlwiki", "", topic[7]);
                 hd.startElement("","","Resource",atts);
                 hd.endElement("","","Resource");
                 i++;
@@ -90,8 +96,9 @@ public class ClassifyInterface extends AbsResponseInterface {
             hd.endElement("","","Classification");
             hd.endDocument();
             xml = out.toString("utf-8");
-            System.out.println(xml);
+            //System.out.println(xml);
         } catch (Exception e) {
+        	LOG.error("Error creating XML output.",e);
             throw new TMFOutputException("Error creating XML output.", e);
         }
         LOG.debug("[produceXML] - END");

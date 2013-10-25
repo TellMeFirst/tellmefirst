@@ -1,187 +1,198 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>it.polito.tellmefirst</groupId>
-        <artifactId>tellmefirst</artifactId>
-        <version>${tellmefirst.version}</version>
-    </parent>
+	<parent>
+		<groupId>it.polito.tellmefirst</groupId>
+		<artifactId>tellmefirst</artifactId>
+		<version>1.0.5</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
 
-    <artifactId>core</artifactId>
-    <packaging>jar</packaging>
-    <name>TellMeFirst Core</name>
+	<artifactId>core</artifactId>
+	<packaging>jar</packaging>
+	<name>TellMeFirst Core</name>
 
-    <build>
-        <plugins>
-            <plugin>
+	<build>
+		<plugins>
+			<plugin>
 
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-install-plugin</artifactId>
-                <version>${maven.install.plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>install-goose-jar</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>install-file</goal>
-                        </goals>
-                        <configuration>
-                            <groupId>com.gravity</groupId>
-                            <artifactId>goose</artifactId>
-                            <version>2.1.22</version>
-                            <packaging>jar</packaging>
-                            <file>${basedir}/../lib/goose-2.1.22.jar</file>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>install-lingpipe-jar</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>install-file</goal>
-                        </goals>
-                        <configuration>
-                            <groupId>com.aliasi</groupId>
-                            <artifactId>lingpipe</artifactId>
-                            <version>4.0.0</version>
-                            <packaging>jar</packaging>
-                            <file>${basedir}/../lib/lingpipe-4.0.0.jar</file>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>2.3.1</version>
+				<executions>
+					<execution>
+						<id>install-goose-jar</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<configuration>
+							<groupId>com.gravity</groupId>
+							<artifactId>goose</artifactId>
+							<version>2.1.22</version>
+							<packaging>jar</packaging>
+							<file>${basedir}/../lib/goose-2.1.22.jar</file>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-lingpipe-jar</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<configuration>
+							<groupId>com.aliasi</groupId>
+							<artifactId>lingpipe</artifactId>
+							<version>4.0.0</version>
+							<packaging>jar</packaging>
+							<file>${basedir}/../lib/lingpipe-4.0.0.jar</file>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-snacktory-1.1-SNAPSHOT-jar</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<configuration>
+							<groupId>de.jetwick</groupId>
+							<artifactId>snacktory</artifactId>
+							<version>1.1-SNAPSHOT</version>
+							<packaging>jar</packaging>
+							<file>${basedir}/../lib/snacktory-1.1-SNAPSHOT.jar</file>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 
-        </plugins>
-    </build>
+		</plugins>
+	</build>
 
-    <dependencies>
+	<dependencies>
 
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>com.google.inject</groupId>
+			<artifactId>guice</artifactId>
+			<version>3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-client</artifactId>
+			<version>1.17.1</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.10</version>
+			<scope>test</scope>
+		</dependency>
 
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
-            <version>3.6.0</version>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-core</artifactId>
+			<version>3.6.0</version>
+		</dependency>
 
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers</artifactId>
-            <version>3.6.0</version>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-analyzers</artifactId>
+			<version>3.6.0</version>
+		</dependency>
 
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-misc</artifactId>
-            <version>3.6.0</version>
-        </dependency>
+		<dependency>
+			<groupId>com.aliasi</groupId>
+			<artifactId>lingpipe</artifactId>
+			<version>4.0.0</version>
+		</dependency>
 
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-queries</artifactId>
-            <version>4.0.0-BETA</version>
-            <type>jar</type>
-        </dependency>
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>3.2.1</version>
+		</dependency>
 
-        <dependency>
-            <groupId>jcs</groupId>
-            <artifactId>jcs</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xerces</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.4</version>
+		</dependency>
 
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.jena</groupId>
+			<artifactId>jena-arq</artifactId>
+			<version>2.9.3</version>
+		</dependency>
 
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>pdfbox</artifactId>
+			<version>1.7.0</version>
+		</dependency>
 
-        <dependency>
-            <groupId>com.aliasi</groupId>
-            <artifactId>lingpipe</artifactId>
-            <version>4.0.0</version>
-        </dependency>
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.6.3</version>
+		</dependency>
 
-        <dependency>
-            <groupId>net.debasishg</groupId>
-            <artifactId>sjson_2.9.1</artifactId>
-            <version>0.15</version>
-        </dependency>
+		<dependency>
+			<groupId>de.jetwick</groupId>
+			<artifactId>snacktory</artifactId>
+			<version>1.1-SNAPSHOT</version>
+		</dependency>
 
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.8.2</version>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-scratchpad</artifactId>
+			<version>3.8</version>
+		</dependency>
 
-        <dependency>
-            <groupId>org.apache.jena</groupId>
-            <artifactId>jena-arq</artifactId>
-            <version>2.9.3</version>
-        </dependency>
+		<dependency>
+			<groupId>com.gravity</groupId>
+			<artifactId>goose</artifactId>
+			<version>2.1.22</version>
+		</dependency>
 
-        <dependency>
-            <groupId>org.apache.pdfbox</groupId>
-            <artifactId>pdfbox</artifactId>
-            <version>1.7.0</version>
-        </dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.scala-lang</groupId> -->
+<!-- 			<artifactId>scala-library</artifactId> -->
+<!-- 			<version>2.9.0-1</version> -->
+<!-- 		</dependency> -->
 
-        <dependency>
-            <groupId>org.jsoup</groupId>
-            <artifactId>jsoup</artifactId>
-            <version>1.6.3</version>
-        </dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.scala-lang</groupId> -->
+<!-- 			<artifactId>scala-compiler</artifactId> -->
+<!-- 			<version>2.9.0-1</version> -->
+<!-- 		</dependency> -->
 
-        <dependency>
-            <groupId>de.jetwick</groupId>
-            <artifactId>snacktory</artifactId>
-            <version>1.1-SNAPSHOT</version>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.3</version>
+		</dependency>
 
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi</artifactId>
-            <version>3.8</version>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+			<version>4.3</version>
+		</dependency>
 
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-scratchpad</artifactId>
-            <version>3.8</version>
-        </dependency>
+		<dependency>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache</artifactId>
+			<version>2.7.2</version>
+		</dependency>
 
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-            <version>3.8</version>
-        </dependency>
+		<dependency>
+			<groupId>org.codehaus.jettison</groupId>
+			<artifactId>jettison</artifactId>
+			<version>1.3.4</version>
+		</dependency>
 
-        <dependency>
-            <groupId>com.gravity</groupId>
-            <artifactId>goose</artifactId>
-            <version>2.1.22</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.1.2</version>
-        </dependency>
-
-    </dependencies>
+	</dependencies>
 
 </project>

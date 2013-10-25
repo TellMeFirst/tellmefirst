@@ -23,9 +23,11 @@ package it.polito.tellmefirst.exception;
  * Created by IntelliJ IDEA.
  * User: Federico Cairo
  */
-public class TMFConfigurationException extends Exception{
+public class TMFConfigurationException extends RuntimeException{
 
-    public TMFConfigurationException(String s, Exception e){
+	private static final long serialVersionUID = 1972646310653054180L;
+
+	public TMFConfigurationException(String s, Exception e){
         super(s, e);
     }
 }

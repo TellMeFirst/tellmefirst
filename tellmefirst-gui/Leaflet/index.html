@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.css" />
+	<script src="http://cdn.leafletjs.com/leaflet-0.4/leaflet.js"></script>
+	<style type="text/css">
+	#map { height: 400px; width: 700px; }
+	body {padding:0px; margin:0px;}
+	</style>
+</head>
+<body>
+	<div id="map"></div>
+</body>
+
+<script type="text/javascript">
+
+function getURLParameter(name) {
+    return decodeURI(
+        (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
+    );
+}
+ 
+$(document).ready(function() {
+	var latLong = parent.TMF.retrieveCoordinates(getURLParameter('id'));
+	var map = L.map('map');
+	L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+		minZoom: 1,
+		maxZoom: 10
+	}).addTo(map);
+	map.setView([latLong["@lat"], latLong["@long"]], 6);
+	var marker = L.marker([latLong["@lat"], latLong["@long"]]).addTo(map);
+});
+
+</script>
+</html>

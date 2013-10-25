@@ -31,16 +31,29 @@ import java.net.URL;
  * Created by IntelliJ IDEA.
  * User: Federico Cairo
  */
+// XXX Reimplementare utilizzando il Jersey client.
 public class RestManager {
 
     static Log LOG = LogFactory.getLog(RestManager.class);
 
     public String getStringFromAPI(String urlStr) {
-        LOG.debug("[getStringFromAPI] - BEGIN");
+        LOG.debug("[getStringFromAPI] - BEGIN - url="+urlStr);
         String result = "";
         try{
+        	
+        	LOG.debug("[getStringFromAPI] - http.proxyHost="+System.getProperty("http.proxyHost"));
+        	LOG.debug("[getStringFromAPI] - http.proxyPort="+System.getProperty("http.proxyPort")); 
+        	LOG.debug("[getStringFromAPI] - https.proxyHost="+System.getProperty("https.proxyHost"));
+        	LOG.debug("[getStringFromAPI] - https.proxyPort="+System.getProperty("https.proxyPort"));  	
+        	
+        	LOG.debug("[getStringFromAPI] - http.nonProxyHosts="+System.getProperty("http.nonProxyHosts"));
+        
             URL url = new URL(urlStr);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            
+            conn.setConnectTimeout(15000); //set timeout to 15 seconds
+            conn.setReadTimeout(15000);   //set timeout to 15 seconds
+            
             if (conn.getResponseCode() != 200) {
                 throw new IOException(conn.getResponseMessage());
             }
@@ -54,7 +67,7 @@ public class RestManager {
             conn.disconnect();
             result = sb.toString();
         }catch (Exception e){
-            LOG.error("[getStringFromAPI] - EXCEPTION: ", e);
+            LOG.error("[getStringFromAPI] - EXCEPTION for url="+urlStr, e);
         }
         LOG.debug("[getStringFromAPI] - END");
         return result;

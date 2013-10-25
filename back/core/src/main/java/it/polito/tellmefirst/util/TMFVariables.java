@@ -48,6 +48,12 @@ public class TMFVariables {
     public static String KB_EN;
     public static String RESIDUAL_KB_EN;
     public static Set<String> STOPWORDS_EN;
+    
+    public static int CACHE_TTL = 0;
+    
+    public static String EXT_LOWER_DOC = "doc";
+    public static String EXT_LOWER_PDF = "pdf";
+    public static String EXT_LOWER_TXT = "txt";
 
 
     public TMFVariables(String confFile) throws TMFConfigurationException {
@@ -66,6 +72,11 @@ public class TMFVariables {
             KB_EN = config.getProperty("kb.en", "").trim();
             RESIDUAL_KB_EN = config.getProperty("residualkb.en", "").trim();
             STOPWORDS_EN = TMFUtils.getStopWords(config.getProperty("stopWords.en", "").trim());
+            
+            String cacheTTL = config.getProperty("cache.TTL");
+            if(cacheTTL!=null)
+            	CACHE_TTL = new Integer(cacheTTL);
+            
         } catch (IOException e) {
             //exceptions are not catched here, because we want to stop TMF server
             throw new TMFConfigurationException("Problem with configuring initial parameters: ", e);

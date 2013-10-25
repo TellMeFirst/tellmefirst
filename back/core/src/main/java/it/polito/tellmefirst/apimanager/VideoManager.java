@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import java.io.IOException;
 
 /**
@@ -34,13 +35,24 @@ public class VideoManager {
     static Log LOG = LogFactory.getLog(VideoManager.class);
 
     public String extractVideoIdFromResult(String input) {
-        LOG.debug("[extractVideoIdFromResult] - BEGIN");
-        String result;
+        
+    	LOG.debug("[extractVideoIdFromResult] - BEGIN");
+        
+    	String result = null;
         Document doc = Jsoup.parse(input);
-        String idDirty = doc.select("id").get(1).text();
-        System.out.println("ID dirty: "+ idDirty);
-        String[] idArray = idDirty.split("video:");
-        result = idArray[idArray.length-1];
+        
+        Elements ids = doc.select("id");
+        
+        if(ids!=null && ids.size()>1)
+        {
+        	String idDirty = ids.get(1).text();
+        	System.out.println("ID dirty: "+ idDirty);
+        	String[] idArray = idDirty.split("video:");
+        	result = idArray[idArray.length-1];
+        }
+        else
+        	LOG.error("no video id available");
+        
         LOG.debug("[extractVideoIdFromResult] - END");
         return result;
     }

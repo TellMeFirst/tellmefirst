@@ -47,8 +47,7 @@ public class ImageInterface extends AbsResponseInterface {
     public String getXML(String uri, String label) throws TMFOutputException {
         LOG.debug("[getXML] - BEGIN");
         String result;
-        ArrayList<String> oldResults = new ArrayList<String>();
-        String imageURL = enhancer.getImageFromMediaWiki(uri, label, oldResults);
+        String imageURL = enhancer.getImageFromMediaWiki2(label);
         result = produceXML(imageURL);
         LOG.debug("[getXML] - END");
         return result;

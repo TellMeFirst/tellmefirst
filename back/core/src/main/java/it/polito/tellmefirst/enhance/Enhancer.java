@@ -25,7 +25,11 @@ import it.polito.tellmefirst.apimanager.VideoManager;
 import it.polito.tellmefirst.lodmanager.DBpediaManager;
 import it.polito.tellmefirst.lodmanager.NewYorkTimesLODManager;
 import it.polito.tellmefirst.apimanager.RestManager;
+import it.polito.tellmefirst.dao.WikiDAO;
 import it.polito.tellmefirst.lucene.IndexesUtil;
+import it.polito.tellmefirst.util.TMFUtils;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jsoup.Jsoup;
@@ -33,7 +37,16 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
+
+import static it.polito.tellmefirst.dao.DAOFactory.*;
+import static org.apache.commons.lang.StringUtils.isEmpty;
+import static it.polito.tellmefirst.util.TMFUtils.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -63,7 +76,37 @@ public class Enhancer {
         videoManager = new VideoManager();
         LOG.debug("[constructor] - END");
     }
-
+    
+    public String getImageFromMediaWiki2(String searchText){
+    	LOG.debug("Looking images for label => "+searchText);
+    	WikiDAO wikidao = getDAO(WikiDAO.class);
+    	List<String> fileLabel = wikidao.getFileLabels(searchText);
+    	filter(fileLabel, ".ogg", "Flag of ",".svg", ".gif");
+    	String imgLabel = mostSimilar(fileLabel, searchText);
+    	LOG.debug("imgLabelWinner - "+imgLabel);
+    	if(isEmpty(imgLabel))
+    		return DEFAULT_IMAGE;
+    	String url = getWikiURL(processWikiFileLabelForHashComputation(imgLabel));
+    	LOG.debug("hash computed URL => "+ url);
+    	if(!wikidao.existsImage(url)){
+    		url = url.replace("/commons/", "/en/");
+    		if(!wikidao.existsImage(url))
+    			return DEFAULT_IMAGE;
+    	}
+    	return url;
+    }
+    
+    public String mostSimilar(List<String> images, String label){
+    	Map<Double,String> sortedMap = new TreeMap<Double, String>();
+        JaroWinklerDistance jaroWinklerDistance = new JaroWinklerDistance();
+        for (String image : images){
+            sortedMap.put(jaroWinklerDistance.distance(label,image),image);
+            LOG.debug("* IMAGE: "+image+" - DISTANCE: "+jaroWinklerDistance.distance(label,image));
+        }
+        Iterator<String> it = sortedMap.values().iterator();
+        return (it.hasNext())?it.next():"";
+    }
+    
     // TODO: this recursive stuff is quite tortuous, try simplifying
     public String getImageFromMediaWiki(String uri, String label, ArrayList<String> oldResults) {
         LOG.debug("[getImageFromMediaWiki] - BEGIN");
@@ -113,7 +156,7 @@ public class Enhancer {
                     LOG.debug("[getImageFromMediaWiki] - END");
                     return DEFAULT_IMAGE;
                 }
-            }  else {
+            } else {
                 ArrayList<String> imagesFound = new ArrayList<String>();
                 for (Element e : elementsFound){
                     if(!e.attr("title").contains(".ogg")){
@@ -350,6 +393,8 @@ public class Enhancer {
         badWords.add("Monitor padlock.svg");
         badWords.add("Wikisource-logo.svg");
         badWords.add("Wiktionary_small.svg");
+        badWords.add("Gnome-mime-sound-openclipart.svg");
+        badWords.add("File:Cscr-featured.svg");
         // TODO: test this one!
         badWords.add("Nuvola mimetypes charnotfound.PNG");
         return badWords;
