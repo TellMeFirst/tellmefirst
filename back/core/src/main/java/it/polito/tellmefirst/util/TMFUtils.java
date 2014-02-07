@@ -127,7 +127,7 @@ public class TMFUtils {
     	try{
 			returnValue = ret.ret();
 		}catch(Exception e){
-			LOG.warn(warning);
+			LOG.warn(warning, e);
 		}
     	return returnValue;
     }
@@ -184,6 +184,10 @@ public class TMFUtils {
     public static String getFileExtension(String fileName){
     	String [] splat = fileName.split(".");
     	return splat[splat.length-1];
+    }
+    
+    public static boolean hasContent (String string){
+    	return string!=null && !string.isEmpty();
     }
     
 }

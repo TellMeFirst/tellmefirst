@@ -54,6 +54,10 @@ public class TMFVariables {
     public static String EXT_LOWER_DOC = "doc";
     public static String EXT_LOWER_PDF = "pdf";
     public static String EXT_LOWER_TXT = "txt";
+    
+    //Constants for query params in classify
+    public static String ALTERNATIVE_IMAGE = "alternativeImage";
+    public static String YOUTUBE_VIDEO	   = "youtubeVideo";
 
 
     public TMFVariables(String confFile) throws TMFConfigurationException {

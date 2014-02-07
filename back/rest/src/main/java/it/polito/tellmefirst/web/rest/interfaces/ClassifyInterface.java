@@ -22,16 +22,26 @@ package it.polito.tellmefirst.web.rest.interfaces;
 import it.polito.tellmefirst.classify.Classifier;
 import it.polito.tellmefirst.exception.TMFOutputException;
 import it.polito.tellmefirst.exception.TMFVisibleException;
+import it.polito.tellmefirst.util.Behaviour;
+import it.polito.tellmefirst.util.Ret;
 import it.polito.tellmefirst.web.rest.TMFListener;
+import it.polito.tellmefirst.web.rest.services.Classify;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Map;
 
 import javax.xml.transform.sax.TransformerHandler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONObject;
 import org.xml.sax.helpers.AttributesImpl;
+
+import static it.polito.tellmefirst.classify.Classifier.getOptionalFields;
+import static it.polito.tellmefirst.util.TMFUtils.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -41,14 +51,18 @@ public class ClassifyInterface extends AbsResponseInterface {
 
     static Log LOG = LogFactory.getLog(ClassifyInterface.class);
 
-    public String getJSON(String textStr, int numTopics, String lang, boolean wikihtml) throws Exception {
+    public String getJSON(String textStr, int numTopics, String lang, boolean wikihtml, String optionalFieldsComma) throws Exception {
         LOG.debug("[getJSON] - BEGIN");
-        String result;
+        
         String xml = getXML(textStr, numTopics, lang, wikihtml);
-        result = xml2json(xml);
+        String result = xml2json(xml);
+        
+        //post-process result JSON string in order to add optional fields when required.
+        if(hasContent(optionalFieldsComma))
+        	result = addOptionalFields(result, optionalFieldsComma);
+        
         //no prod
         LOG.info("--------Result from Classify--------");
-        //LOG.info(result);
         LOG.debug("[getJSON] - END");
         return result;
     }
@@ -104,4 +118,39 @@ public class ClassifyInterface extends AbsResponseInterface {
         LOG.debug("[produceXML] - END");
         return xml;
     }
+    
+    private String addOptionalFields(final String result, final String optionalFieldsComma){
+    	try{
+			JSONObject classifyJSONResult = new JSONObject(result);
+			JSONArray resourcesArray = classifyJSONResult.getJSONArray("Resources");
+			JSONArray resultArray = new JSONArray();
+			for (int i=0; i<resourcesArray.length() ;i++){
+				LOG.debug("\n\n\nAdding optional fields: "+optionalFieldsComma+" for "+i+" object, where max length is "+resourcesArray.length()+" \n\n\n");
+				resultArray.put(addOptionalFieldsInASingleObject(resourcesArray.getJSONObject(i), optionalFieldsComma));
+			}
+			classifyJSONResult.put("Resources", resultArray);
+		    return classifyJSONResult.toString();
+    	} catch (Exception e) {
+    		LOG.error("Optional fields not added",e);
+    		return result;
+		}
+    }
+    
+    private JSONObject addOptionalFieldsInASingleObject(JSONObject singleResult, final String optionalFieldsComma){
+    	try{
+		    String uri 	 = singleResult.getString("@uri");
+		    String label = singleResult.getString("@label");
+		    String [] optionalFields = optionalFieldsComma.split(",");
+		    Map<String, String> optionalFieldsMap = getOptionalFields(uri, label, optionalFields);
+		    for (Map.Entry<String, String> entry : optionalFieldsMap.entrySet())
+		    	//XXX get rid of those '@'
+		    	singleResult.put("@"+entry.getKey(), entry.getValue());
+		    
+		    return singleResult;
+    	} catch (Exception e) {
+    		LOG.error("Optional fields not added",e);
+    		return singleResult;
+		}
+    }
+    
 }

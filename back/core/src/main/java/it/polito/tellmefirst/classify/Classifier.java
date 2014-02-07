@@ -22,11 +22,13 @@ package it.polito.tellmefirst.classify;
 import it.polito.tellmefirst.apimanager.ImageManager;
 import it.polito.tellmefirst.classify.threads.ClassiThread;
 import it.polito.tellmefirst.classify.threads.GetWikiHtmlThread;
+import it.polito.tellmefirst.enhance.Enhancer;
 import it.polito.tellmefirst.exception.TMFVisibleException;
 import it.polito.tellmefirst.lodmanager.DBpediaManager;
 import it.polito.tellmefirst.lucene.IndexesUtil;
 import it.polito.tellmefirst.lucene.LuceneManager;
 import it.polito.tellmefirst.lucene.SimpleSearcher;
+import it.polito.tellmefirst.util.Ret;
 import it.polito.tellmefirst.util.TMFUtils;
 
 import java.io.IOException;
@@ -35,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.collections.map.LinkedMap;
@@ -53,6 +56,12 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+
+import static it.polito.tellmefirst.util.TMFVariables.ALTERNATIVE_IMAGE;
+import static it.polito.tellmefirst.util.TMFVariables.YOUTUBE_VIDEO;
+
+import static it.polito.tellmefirst.util.TMFUtils.*;
+
 
 /**
  * Created by IntelliJ IDEA. User: Federico Cairo
@@ -463,8 +472,7 @@ public class Classifier {
 		return result;
 	}
 
-	public ArrayList<ScoreDoc> sortByRank(
-			LinkedHashMap<ScoreDoc, Integer> inputList) {
+	public ArrayList<ScoreDoc> sortByRank(LinkedHashMap<ScoreDoc, Integer> inputList) {
 		LOG.debug("[sortByRank] - BEGIN");
 		ArrayList<ScoreDoc> result = new ArrayList<ScoreDoc>();
 		LinkedMap apacheMap = new LinkedMap(inputList);
@@ -485,4 +493,34 @@ public class Classifier {
 		LOG.debug("[sortByRank] - END");
 		return result;
 	}
+
+	@SuppressWarnings("serial")
+	public static Map<String, String> getOptionalFields(final String uri, final String label, String ... params){
+	
+		final Ret<String> fetchVideo = new Ret<String>() {
+			public String ret() throws Exception {
+				return new Enhancer().getVideoFromYouTube(uri, label);
+			}
+		};
+		final Ret<String> fetchImage = new Ret<String>() {
+			public String ret() throws Exception {
+				return new Enhancer().getImageFromMediaWiki2(label);
+			}
+		};
+		Map<String, Ret<String>> optionalValuesBinding = new HashMap<String, Ret<String>>(){{
+			put(ALTERNATIVE_IMAGE, 	fetchImage);
+			put(YOUTUBE_VIDEO,		fetchVideo);
+		}};
+
+		Map<String, String> optionalParams = new HashMap<String, String>();
+		for (String param : params) {
+			String paramValue = optional(optionalValuesBinding.get(param),
+										 "params "+param+" not retrieved correctly");
+			if(hasContent(paramValue))
+				optionalParams.put(param,paramValue);
+		}
+		
+		return optionalParams;
+	}
+	
 }

@@ -36,6 +36,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -67,7 +68,8 @@ public class Classify {
 			@FormDataParam("fileName") String fileName,
 			@FormDataParam("numTopics") int numTopics,
 			@FormDataParam("lang") String lang,
-			@FormDataParam("wikihtml") boolean wikihtml) {
+			@FormDataParam("wikihtml") boolean wikihtml,
+			@QueryParam("optional_fields") String optionalFields) {
 		LOG.debug("[postJSON] - BEGIN");
 		LOG.info("Classify REST Service called with lang=" + lang);
 		try {
@@ -110,8 +112,7 @@ public class Classify {
 			}
 			LOG.debug("detected lang=" + detectLang);
 
-			String response = classifyInterface.getJSON(textString, numTopics,
-					detectLang, wikihtml);
+			String response = classifyInterface.getJSON(textString, numTopics,detectLang, wikihtml, optionalFields);
 			long endTime = System.currentTimeMillis();
 			long duration = (endTime - startTime) / 1000;
 			// no prod
