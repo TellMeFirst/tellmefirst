@@ -29,6 +29,7 @@ import it.polito.tellmefirst.web.rest.services.Classify;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.transform.sax.TransformerHandler;
@@ -37,6 +38,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -54,8 +56,10 @@ public class ClassifyInterface extends AbsResponseInterface {
     public String getJSON(String textStr, int numTopics, String lang, boolean wikihtml, String optionalFieldsComma) throws Exception {
         LOG.debug("[getJSON] - BEGIN");
         
-        String xml = getXML(textStr, numTopics, lang, wikihtml);
-        String result = xml2json(xml);
+//        String xml = getXML(textStr, numTopics, lang, wikihtml);
+//        String result = xml2json(xml);
+        
+        String result = produceJSON(callClassify(textStr, numTopics, lang, wikihtml));
         
         //post-process result JSON string in order to add optional fields when required.
         if(hasContent(optionalFieldsComma))
@@ -66,6 +70,18 @@ public class ClassifyInterface extends AbsResponseInterface {
         LOG.debug("[getJSON] - END");
         return result;
     }
+    
+    public List<String[]> callClassify(final String textStr,final int numTopics,final String lang,final boolean wikihtml){
+    	return unchecked(new Ret<List<String[]>>() {
+    		public List<String[]> ret() throws Exception {
+    			LOG.debug("[callClassify] - BEGIN");
+    			 Classifier classifier = (lang.equals("italian")) ? TMFListener.getItalianClassifier() : TMFListener.getEnglishClassifier();  
+    		     List<String[]> topics = classifier.classify(textStr, numTopics, lang, wikihtml);
+    		     LOG.debug("[callClassify] - END");
+    		     return topics;
+    		}
+		}, "Classify failed ");
+    }
 
     public String getXML(String textStr, int numTopics, String lang, boolean wikihtml) throws TMFVisibleException, TMFOutputException {
         LOG.debug("[getXML] - BEGIN");
@@ -75,6 +91,32 @@ public class ClassifyInterface extends AbsResponseInterface {
         result = produceXML(topics, wikihtml);
         LOG.debug("[getXML] - END");
         return result;
+    }
+    
+    public static String produceJSON(List<String[]> topics){
+    	String result = "";
+    	JSONObject classifyResult = new JSONObject();
+    	try {
+			classifyResult.put("service", "Classify");
+			
+			JSONArray resources = new JSONArray();
+			for (String[] topic : topics) {
+				JSONObject resource = new JSONObject();
+				resource.put("uri"			,topic[0]);
+				resource.put("label"		,topic[1]);
+				resource.put("title"		,topic[2]);
+				resource.put("score"		,topic[3]);
+				resource.put("mergedTypes"  ,topic[4]);
+				resource.put("image"		,topic[5]);
+				resource.put("wikilink"		,topic[6]);
+				resources.put(resource);
+			}
+			classifyResult.put("Resources", resources);
+			result = classifyResult.toString();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+    	return result;
     }
 
     private String produceXML(ArrayList<String[]> topics, boolean wikihtml) throws TMFOutputException {
@@ -93,13 +135,13 @@ public class ClassifyInterface extends AbsResponseInterface {
                     atts.clear();
                     hd.startElement("","","Resources",atts);
                 }
-                atts.addAttribute("","","uri","",topic[0]);
-                atts.addAttribute("","","label","",topic[1]);
-                atts.addAttribute("","","title","",topic[2]);
-                atts.addAttribute("","","score","",topic[3]);
-                atts.addAttribute("", "", "mergedTypes", "", topic[4]);
-                atts.addAttribute("", "", "image", "", topic[5]);
-                atts.addAttribute("", "", "wikilink", "", topic[6]);
+                atts.addAttribute("","" ,"uri"			,"",topic[0]);
+                atts.addAttribute("","" ,"label"		,"",topic[1]);
+                atts.addAttribute("","" ,"title"		,"",topic[2]);
+                atts.addAttribute("","" ,"score"		,"",topic[3]);
+                atts.addAttribute("", "","mergedTypes"  ,"",topic[4]);
+                atts.addAttribute("", "","image"		,"",topic[5]);
+                atts.addAttribute("", "","wikilink"		,"",topic[6]);
                 if(wikihtml)
                 	atts.addAttribute("", "", "htmlwiki", "", topic[7]);
                 hd.startElement("","","Resource",atts);
