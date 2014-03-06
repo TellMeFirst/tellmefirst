@@ -158,9 +158,9 @@ TMF.ajaxFormSuccess= function(data, textStatus, jqXHR) {
 
 TMF.splitMergedTypes = function() {
 	for (var i=0; i<7; i++) {
-		var mergedTypes = TMF.data.Resources[i]["@mergedTypes"].replace(/#$/,"");
-		TMF.data.Resources[i]["@mergedTypesString"] = TMF.data.Resources[i]["@mergedTypes"];
-		TMF.data.Resources[i]["@mergedTypes"] = mergedTypes.split("#");
+		var mergedTypes = TMF.data.Resources[i]["mergedTypes"].replace(/#$/,"");
+		TMF.data.Resources[i]["mergedTypesString"] = TMF.data.Resources[i]["mergedTypes"];
+		TMF.data.Resources[i]["mergedTypes"] = mergedTypes.split("#");
 		TMF.log(mergedTypes);
 	}
 }
@@ -205,7 +205,7 @@ TMF.showGrid = function() {
 TMF.writeLabels = function(resources, callback) {
 	callback();
 	for (var i = 0; i < resources.length; i++) {
-		$('#label'+(i+1)).html(/*'<a href="'+resources[i]['@uri']+'" target="_blank" id="dbpedialink"'+(i+1)+'>'+*/resources[i]['@label']/*+'</a>'*/);
+		$('#label'+(i+1)).html(/*'<a href="'+resources[i]['@uri']+'" target="_blank" id="dbpedialink"'+(i+1)+'>'+*/resources[i]['label']/*+'</a>'*/);
 		/*$('#label'+(i+1)).click(function(k){
 			return function(event) {
 				event.stopPropagation();
