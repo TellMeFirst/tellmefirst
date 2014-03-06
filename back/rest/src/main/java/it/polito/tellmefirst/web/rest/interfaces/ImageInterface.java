@@ -20,12 +20,17 @@
 package it.polito.tellmefirst.web.rest.interfaces;
 
 import it.polito.tellmefirst.exception.TMFOutputException;
+import it.polito.tellmefirst.util.Ret;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jettison.json.JSONObject;
 import org.xml.sax.helpers.AttributesImpl;
 import javax.xml.transform.sax.TransformerHandler;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+
+import static it.polito.tellmefirst.util.TMFUtils.unchecked;
 
 /**
  * Created by IntelliJ IDEA.
@@ -37,40 +42,17 @@ public class ImageInterface extends AbsResponseInterface {
 
     public String getJSON(String uri, String label) throws TMFOutputException {
         LOG.debug("[getJSON] - BEGIN");
-        String result;
-        String xml = getXML(uri, label);
-        result = xml2json(xml);
+        String result = produceJSON( enhancer.getImageFromMediaWiki2(label) );
         LOG.debug("[getJSON] - END");
         return result;
     }
-
-    public String getXML(String uri, String label) throws TMFOutputException {
-        LOG.debug("[getXML] - BEGIN");
-        String result;
-        String imageURL = enhancer.getImageFromMediaWiki2(label);
-        result = produceXML(imageURL);
-        LOG.debug("[getXML] - END");
-        return result;
-    }
-
-    private String produceXML(String imageURL) throws TMFOutputException {
-        LOG.debug("[produceXML] - BEGIN");
-        String xml;
-        try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            TransformerHandler hd = initXMLDoc(out);
-            AttributesImpl atts = new AttributesImpl();
-            atts.addAttribute("","","imageURL","",imageURL);
-            hd.startElement("","","Enhancement",null);
-            hd.startElement("","","Result",atts);
-            hd.endElement("", "", "Result");
-            hd.endElement("","","Enhancement");
-            hd.endDocument();
-            xml = out.toString("utf-8");
-        } catch (Exception e) {
-            throw new TMFOutputException("Error creating XML output.", e);
-        }
-        LOG.debug("[produceXML] - END");
-        return xml;
+    
+    public static String produceJSON(final String imageURL){
+    	return unchecked(new Ret<String>() {
+			public String ret() throws Exception {
+				LOG.debug("producingJSON");
+		    	return new JSONObject().put("Result", new JSONObject().put("imageURL",imageURL)).toString();
+			}
+		}, "Failure in producing JSON for getImage");
     }
 }

@@ -221,7 +221,7 @@ TMF.writeLabels = function(resources, callback) {
 TMF.loadImages = function() {
 	if (TMF.data) {
 		for (var i = 0; i < TMF.data.Resources.length; i++) {
-			if(TMF.data.Resources[i]["@image"]!="") {
+			if(TMF.data.Resources[i]["image"]!="") {
 				TMF.checkImageFromJson(i);
 			}
 			else {
@@ -233,7 +233,7 @@ TMF.loadImages = function() {
 				jQuery.ajax(action, {
 					type: 'GET',
 					//data: {uri: TMF.data.Resources[i]['@uri'], label:TMF.data.Resources[i]['@label']},
-					data: {uri: TMF.data.Resources[i]['@uri'], label:TMF.data.Resources[i]['@title']},
+					data: {uri: TMF.data.Resources[i]['uri'], label:TMF.data.Resources[i]['title']},
 					success: TMF.imgPublishClosure(i+1),
 					error: TMF.imageLoadError
 				});
@@ -248,7 +248,7 @@ TMF.checkImageFromJson = function(i){
 	var img = new Image();
 	img.addEventListener('load', function(){
 		if(img.width>=100 && img.height>=100){
-			TMF.publishImage(i+1, $("#content"+(i+1)), TMF.data.Resources[i]["@image"]);
+			TMF.publishImage(i+1, $("#content"+(i+1)), TMF.data.Resources[i]["image"]);
 		}
 		else{
 			var action;
@@ -259,7 +259,7 @@ TMF.checkImageFromJson = function(i){
 			jQuery.ajax(action, {
 				type: 'GET',
 				//data: {uri: TMF.data.Resources[i]['@uri'], label:TMF.data.Resources[i]['@label']},
-				data: {uri: TMF.data.Resources[i]['@uri'], label:TMF.data.Resources[i]['@title']},
+				data: {uri: TMF.data.Resources[i]['uri'], label:TMF.data.Resources[i]['title']},
 				success: TMF.imgPublishClosure(i+1),
 				error: TMF.imageLoadError
 			});
@@ -274,12 +274,12 @@ TMF.checkImageFromJson = function(i){
 		jQuery.ajax(action, {
 		type: 'GET',
 		//data: {uri: TMF.data.Resources[i]['@uri'], label:TMF.data.Resources[i]['@label']},
-		data: {uri: TMF.data.Resources[i]['@uri'], label:TMF.data.Resources[i]['@title']},
+		data: {uri: TMF.data.Resources[i]['uri'], label:TMF.data.Resources[i]['title']},
 		success: TMF.imgPublishClosure(i+1),
 		error: TMF.imageLoadError
 		});
 	});
-	img.src = TMF.data.Resources[i]["@image"];
+	img.src = TMF.data.Resources[i]["image"];
 }
 
 TMF.showError = function(msg) {
@@ -314,7 +314,7 @@ TMF.logMetadata = function(msg){
 
 TMF.imgPublishClosure = function(i) {
 	return function(data, textStatus, jqXHR) {
-		TMF.publishImage(i, $("#content"+i),data[0]["@imageURL"]);
+		TMF.publishImage(i, $("#content"+i),data.Result.imageURL);
 	}
 }
 
@@ -353,7 +353,7 @@ TMF.publishImage = function(i, box, url) {
 		TMF.log("L'url dell'immagine è: "+url+" e si colloca nella posizione");
 		box.css('background-image','url('+url+')');
 		$('#imglink'+i).attr('href',url);
-		$('#imglink'+i).attr('title',TMF.data.Resources[i-1]['@label']+' - Image');
+		$('#imglink'+i).attr('title',TMF.data.Resources[i-1]['label']+' - Image');
 		TMF.loadedNewImage();
 	});
 	img.src = url;
@@ -448,9 +448,9 @@ TMF.getBetterImage = function (i, badImageUrl) {
 			action = TMF.setService()+"getBetterImage";
 		jQuery.ajax(action, {
 			type: 'GET',
-			data: {uri: TMF.data.Resources[i-1]["@uri"], label:TMF.data.Resources[i-1]['@label'], badImage: badImageUrl},
+			data: {uri: TMF.data.Resources[i-1]["uri"], label:TMF.data.Resources[i-1]['label'], badImage: badImageUrl},
 			success: function(data, textStatus, jqXHR) {
-				TMF.publishBetterImage(i,data[0]['@imageURL']);
+				TMF.publishBetterImage(i,data.Result.imageURL);
 			},
 			error: TMF.imageLoadError
 		});
@@ -473,7 +473,7 @@ TMF.publishBetterImage = function (i, url) {
 		}
 		box.css('background-image','url('+url+')');
 		$('#imglink'+i).attr('href',url);
-		$('#imglink'+i).attr('title',TMF.data.Resources[i-1]['@label']);
+		$('#imglink'+i).attr('title',TMF.data.Resources[i-1]['label']);
 		TMF.loadedNewImage();
 	});
 	img.src = url;
@@ -505,7 +505,7 @@ TMF.enhanceContents= function() {
 		TMF.getVideo(i);
 		//}
 		//Get Map is called for resources contained in list
-		if(TMF.needsMap(TMF.data.Resources[i]["@mergedTypes"])) {
+		if(TMF.needsMap(TMF.data.Resources[i]["mergedTypes"])) {
 			TMF.getMap(i);
 		}
 	}
@@ -541,13 +541,13 @@ TMF.needsMap = function(mergedTypes) {
 
 TMF.getText = function(i) {
 	TMF.log("getText called for resource "+i)
-	if(TMF.getDbpediaLanguage(TMF.data.Resources[i]["@uri"])=="it") {
+	if(TMF.getDbpediaLanguage(TMF.data.Resources[i]["uri"])=="it") {
 		//call directly wikipedia with "it"
-		TMF.queryWikipedia(TMF.data.Resources[i]["@title"],"it",i);
-	} else if (TMF.getDbpediaLanguage(TMF.data.Resources[i]["@uri"])=="en") {
+		TMF.queryWikipedia(TMF.data.Resources[i]["title"],"it",i);
+	} else if (TMF.getDbpediaLanguage(TMF.data.Resources[i]["uri"])=="en") {
 		//call directly wikipedia with "en"
-		TMF.queryWikipedia(TMF.data.Resources[i]["@title"],"en",i);
-	} else if (TMF.getDbpediaLanguage(TMF.data.Resources[i]["@uri"])=="en") {
+		TMF.queryWikipedia(TMF.data.Resources[i]["title"],"en",i);
+	} else if (TMF.getDbpediaLanguage(TMF.data.Resources[i]["uri"])=="en") {
 		//TODO: call getText services
 		TMF.getTextRemote(i);
 	} else {
@@ -566,9 +566,9 @@ TMF.getTextRemote = function(i) {
 			action = TMF.setService()+"getText";
 		jQuery.ajax(action, {
 			type: 'GET',
-				data: {uri: TMF.data.Resources[i]['@uri'], lang:"italian"}, //The lang should be italian
+				data: {uri: TMF.data.Resources[i]['uri'], lang:"italian"}, //The lang should be italian
 				success: function(data, textStatus, jqXHR) {
-					var titleResp = data[0]["@title"];
+					var titleResp = data.Result.title;
 					if (!titleResp) {
 						TMF.getAbstract(i);
 					} else {
@@ -617,9 +617,9 @@ TMF.getAbstract = function(i) {
 			action = TMF.setService()+"getAbstract";
 		jQuery.ajax(action, {
 			type: 'GET',
-				data: {uri: TMF.data.Resources[i]['@uri'], lang:"italian"}, //The lang should be italian
+				data: {uri: TMF.data.Resources[i]['uri'], lang:"italian"}, //The lang should be italian
 				success: function(data, textStatus, jqXHR) {
-					TMF.publishText(data[0]["@abstract"],i);
+					TMF.publishText(data[0]["abstract"],i);
 				},
 				error: TMF.showError
 			});
@@ -630,7 +630,7 @@ TMF.getAbstract = function(i) {
 
 TMF.publishText = function(text,i) {
 	TMF.initFancyBox();
-	$('div#box'+(i+1)+' .fancyboxtext').append('<a href="#wikiText'+(i+1)+'" class="group'+(i+1)+'" rel="group'+(i+1)+'" title="'+TMF.data.Resources[i]["@label"]+' - Text"></a>');
+	$('div#box'+(i+1)+' .fancyboxtext').append('<a href="#wikiText'+(i+1)+'" class="group'+(i+1)+'" rel="group'+(i+1)+'" title="'+TMF.data.Resources[i]["label"]+' - Text"></a>');
 	$('div#box'+(i+1)).append('<div id="wikiText'+(i+1)+'" class="wikiText" style="display:none;width:700px;color:black;padding-left: 25px; padding-right: 25px; padding-top: 10px; padding-bottom:10px; background-image:url(images/paper_texture.jpg);">'+text+'</div>');
 	//TMF.getMetadata(i);
 } 
@@ -644,7 +644,7 @@ TMF.getNews = function (i) {
 		action = TMF.setService()+"getNews";
 	jQuery.ajax(action, {
 		type: 'GET',
-		data: {uri: TMF.data.Resources[i]["@uri"]},
+		data: {uri: TMF.data.Resources[i]["uri"]},
 		success: function(data,textStatus,jqXHR) {
 			TMF.publishNews(data, i);
 		},
@@ -661,7 +661,7 @@ TMF.publishNews = function(data,i) {
 		//if($("input[name=lang]:checked").val() == "italian")
 		//	articlesDiv.append('<h1>Ultime notizie su '+TMF.data.Resources[i]["@label"]+'</h1>')
 		//else
-			articlesDiv.append('<h1>Latest News About '+TMF.data.Resources[i]["@label"]+'</h1>')
+			articlesDiv.append('<h1>Latest News About '+TMF.data.Resources[i]["label"]+'</h1>')
 		for(var k in data["results"]) {
 			var article = data["results"][k];
 			var newsTable = $("<table><table>");
@@ -669,7 +669,7 @@ TMF.publishNews = function(data,i) {
 			articlesDiv.append(newsTable.prop("outerHTML"));
 		}
 		$('div#box'+(i+1)).append(articlesDiv.prop('outerHTML'));
-		$('div#box'+(i+1)+' .fancyboxnews').append('<a href="#news'+(i+1)+'" class="group'+(i+1)+'" rel="group'+(i+1)+'" title="'+TMF.data.Resources[i]["@label"]+' - News"></a>');
+		$('div#box'+(i+1)+' .fancyboxnews').append('<a href="#news'+(i+1)+'" class="group'+(i+1)+'" rel="group'+(i+1)+'" title="'+TMF.data.Resources[i]["label"]+' - News"></a>');
 	}
 }
 
@@ -683,13 +683,13 @@ TMF.getVideo = function(i) {
 		action = TMF.setService()+"getVideo";
 	jQuery.ajax(action, {
 		 type: 'GET',
-		 data: {uri: TMF.data.Resources[i]["@uri"],
-		     label: TMF.data.Resources[i]["@label"],
+		 data: {uri: TMF.data.Resources[i]["uri"],
+		     label: TMF.data.Resources[i]["label"],
 		     //type: TMF.data.Resources[i]["@mergedTypesString"],
 			 //lang: $('input:radio:checked').val()
 	 }, 
 	 success: function(data,textStatus,jqXHR) {
-		  TMF.publishVideo(data[0]["@videoURL"],i)
+		  TMF.publishVideo(data.Result.videoURL,i)
 	 },
 	 error: TMF.showError
 });
@@ -699,8 +699,8 @@ TMF.publishVideo = function(video,i){
 	TMF.log(video);
 	if(video){
 		TMF.log('found video for resource '+i+": "+video);
-		TMF.data.Resources[i]["@videoURL"] = video;
-		$('#box'+(i+1)+' .fancyboxvideo').append('<a href="youtube/player.html?rand='+Math.random()+'&id='+i+'" class="group'+(i+1)+' fancybox.iframe video" content="video" rel="group'+(i+1)+'" title="'+TMF.data.Resources[i]["@label"]+' - Video"></a>');
+		TMF.data.Resources[i]["videoURL"] = video;
+		$('#box'+(i+1)+' .fancyboxvideo').append('<a href="youtube/player.html?rand='+Math.random()+'&id='+i+'" class="group'+(i+1)+' fancybox.iframe video" content="video" rel="group'+(i+1)+'" title="'+TMF.data.Resources[i]["label"]+' - Video"></a>');
 	} else {
 		 TMF.log("No video found for resource "+i);
 	}
@@ -708,7 +708,7 @@ TMF.publishVideo = function(video,i){
 
 TMF.retrieveVideoUrl = function(i) {
 	TMF.log("retrieveVideoURl called for resource: "+i);
-	return TMF.data.Resources[parseInt(i)]["@videoURL"].replace(/http:\/\/youtu.be\//i,"");
+	return TMF.data.Resources[parseInt(i)]["videoURL"].replace(/http:\/\/youtu.be\//i,"");
 }
 
 TMF.getMap = function(i) {
@@ -720,18 +720,18 @@ TMF.getMap = function(i) {
 		action = TMF.setService()+"getMap";
 	jQuery.ajax(action, {
 		type: 'GET',
-		data: {uri: TMF.data.Resources[i]["@uri"]},
+		data: {uri: TMF.data.Resources[i]["uri"]},
 		success: function(data, textStatus, jqXHR) {
-			TMF.publishMap(data[0],i)
+			TMF.publishMap(data.Map,i)
 		},
 		error: TMF.showError
 	});
 }
 
 TMF.publishMap = function(latLong, i) {
-	if(latLong["@lat"] && latLong["@long"]) {
-		TMF.data.Resources[i]["@latLong"] = latLong;
-		$('#box'+(i+1)+' .fancyboxmap').append('<a href="Leaflet/index.html?'+Math.random()+'&id='+i+'" class="group'+(i+1)+' fancybox.iframe video" content="map" rel="group'+(i+1)+'" title="'+TMF.data.Resources[i]["@label"]+' - Map"></a>');
+	if(latLong["lat"] && latLong["long"]) {
+		TMF.data.Resources[i]["latLong"] = latLong;
+		$('#box'+(i+1)+' .fancyboxmap').append('<a href="Leaflet/index.html?'+Math.random()+'&id='+i+'" class="group'+(i+1)+' fancybox.iframe video" content="map" rel="group'+(i+1)+'" title="'+TMF.data.Resources[i]["label"]+' - Map"></a>');
 	} else {
 		TMF.log("No map found for resource "+i);
 	}
@@ -739,7 +739,7 @@ TMF.publishMap = function(latLong, i) {
 
 TMF.retrieveCoordinates = function(i) {
 	TMF.log("retrieveCoordinates called for resource "+i);
-	return TMF.data.Resources[parseInt(i)]["@latLong"];
+	return TMF.data.Resources[parseInt(i)]["latLong"];
 }
 
 TMF.getMetadata = function(i) {
@@ -760,7 +760,7 @@ TMF.getMetadata = function(i) {
 	var endPoint;
 	var command;
 	var language;
-	var url = MDH.changeSpecialChars(TMF.data.Resources[i]["@uri"]);
+	var url = MDH.changeSpecialChars(TMF.data.Resources[i]["uri"]);
 	if(url.indexOf("http://dbpedia.org/resource")!= -1){
 		url = encodeURIComponent(url);
 		endPoint = MDH.dbpediaProfile.endpoint;
@@ -833,13 +833,13 @@ TMF.callIsPrimaryTopicOfQuery = function(queryObj, propertiesObj, i){
 
 TMF.checkForCreatingJson = function(propertiesObj,i){
 	var properties = propertiesObj.objectProperties.concat(propertiesObj.dataProperties, propertiesObj.subjectProperties, propertiesObj.isPrimaryTopicOfProperties);
-	var jsonData = MDH.createRgraphJson(properties,TMF.data.Resources[i]["@uri"],TMF.data.Resources[i]["@label"]);	
+	var jsonData = MDH.createRgraphJson(properties,TMF.data.Resources[i]["uri"],TMF.data.Resources[i]["label"]);	
 	TMF.publishMetadata(jsonData,i);
 }
 
 TMF.publishMetadata = function(jsonData,i){
 	if(jsonData){
-		TMF.data.Resources[i]["@metadata"] = jsonData;
+		TMF.data.Resources[i]["metadata"] = jsonData;
 		$('#box'+(i+1)+' .fancyboxmetadata').append('<a href="radialgraph/index.html?rand='+Math.random()+'&id='+i+'" class="group'+(i+1)+' fancybox.iframe" content="iconvis" rel="group'+(i+1)+'" title="'+TMF.data.Resources[i]["@label"]+' - Metadata"></a>');
 	} else {
 		TMF.log("Error for metadata "+i);
@@ -848,5 +848,5 @@ TMF.publishMetadata = function(jsonData,i){
 
 TMF.retrieveMetadata = function(i){
 	TMF.log("retrieveMetada called for resource "+i);
-	return TMF.data.Resources[parseInt(i)]["@metadata"];
+	return TMF.data.Resources[parseInt(i)]["metadata"];
 }
