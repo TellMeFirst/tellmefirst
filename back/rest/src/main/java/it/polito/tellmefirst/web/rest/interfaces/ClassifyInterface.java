@@ -44,6 +44,7 @@ import org.xml.sax.helpers.AttributesImpl;
 
 import static it.polito.tellmefirst.classify.Classifier.getOptionalFields;
 import static it.polito.tellmefirst.util.TMFUtils.*;
+import static it.polito.tellmefirst.util.TMFVariables.DEFAULT_IMAGE;
 
 /**
  * Created by IntelliJ IDEA.
@@ -56,7 +57,9 @@ public class ClassifyInterface extends AbsResponseInterface {
     public String getJSON(String textStr, int numTopics, String lang, boolean wikihtml, String optionalFieldsComma) throws Exception {
         LOG.debug("[getJSON] - BEGIN");
         
-        String result = produceJSON(callClassify(textStr, numTopics, lang, wikihtml));
+        String result = produceJSON(
+        					fixBrokenLink(
+        						callClassify(textStr, numTopics, lang, wikihtml)));
         
         //post-process result JSON string in order to add optional fields when required.
         if(hasContent(optionalFieldsComma))
@@ -78,6 +81,16 @@ public class ClassifyInterface extends AbsResponseInterface {
     			return topics;
     		}
 		}, "Classify failed ");
+    }
+    
+    public List<String[]> fixBrokenLink(List<String[]> topics){
+    	List<String[]> fixedResults = new ArrayList<String[]>(topics);
+    	for (String[] result : fixedResults) {
+			String image = result[5];
+			if(hasContent(image) && notExistsLink(image))
+				result[5] = DEFAULT_IMAGE;
+		}
+    	return fixedResults;
     }
 
     public static String produceJSON(List<String[]> topics){

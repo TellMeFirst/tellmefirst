@@ -59,6 +59,7 @@ public class TMFVariables {
     public static String ALTERNATIVE_IMAGE = "alternativeImage";
     public static String YOUTUBE_VIDEO	   = "youtubeVideo";
 
+    public final static String DEFAULT_IMAGE = "http://tellmefirst.polito.it/images/default_img.jpg";
 
     public TMFVariables(String confFile) throws TMFConfigurationException {
         LOG.debug("[constructor] - BEGIN");
