@@ -56,7 +56,6 @@ public class ClassifyInterface extends AbsResponseInterface {
 
     public String getJSON(String textStr, int numTopics, String lang, boolean wikihtml, String optionalFieldsComma) throws Exception {
         LOG.debug("[getJSON] - BEGIN");
-        
         String result = produceJSON(
         					fixBrokenLink(
         						callClassify(textStr, numTopics, lang, wikihtml)));
@@ -88,7 +87,7 @@ public class ClassifyInterface extends AbsResponseInterface {
     	for (String[] result : fixedResults) {
 			String image = result[5];
 			if(hasContent(image) && notExistsLink(image))
-				result[5] = DEFAULT_IMAGE;
+				result[5] = "";
 		}
     	return fixedResults;
     }
