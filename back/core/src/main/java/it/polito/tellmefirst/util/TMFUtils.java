@@ -24,6 +24,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.WebResource;
+
 import it.polito.tellmefirst.parsing.DOCparser;
 import it.polito.tellmefirst.parsing.PDFparser;
 import it.polito.tellmefirst.parsing.TMFTextParser;
@@ -188,6 +191,21 @@ public class TMFUtils {
     
     public static boolean hasContent (String string){
     	return string!=null && !string.isEmpty();
+    }
+    public static boolean hasNoContent (String string){
+    	return !hasContent(string);
+    }
+    
+    public static boolean existsLink(String url){
+    	Client client = Client.create();
+		WebResource webResource = client.resource(url);
+		Integer status = webResource.head().getStatus();
+		if(status==null) status = 0;
+		return status==200;
+    }
+    
+    public static boolean notExistsLink(String url){
+    	return !existsLink(url);
     }
     
 }

@@ -1,6 +1,7 @@
 package it.polito.tellmefirst.dao;
 
 import static it.polito.tellmefirst.util.TMFUtils.unchecked;
+import static it.polito.tellmefirst.util.TMFUtils.existsLink;
 import it.polito.tellmefirst.apimanager.RestManager;
 import it.polito.tellmefirst.util.Ret;
 
@@ -69,11 +70,7 @@ public class DefaultWikiDAO implements WikiDAO {
      */
 	@Override
 	public Boolean existsImage(String url) {
-		Client client = Client.create();
-		WebResource webResource = client.resource(url);
-		Integer status = webResource.head().getStatus();
-		if(status==null) status = 0;
-		return status==200;
+		return existsLink(url);
 	}
 
 }

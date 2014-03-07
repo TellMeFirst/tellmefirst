@@ -47,6 +47,7 @@ import java.util.TreeSet;
 import static it.polito.tellmefirst.dao.DAOFactory.*;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static it.polito.tellmefirst.util.TMFUtils.*;
+import static it.polito.tellmefirst.util.TMFVariables.DEFAULT_IMAGE;
 
 /**
  * Created by IntelliJ IDEA.
@@ -62,8 +63,6 @@ public class Enhancer {
     private ArrayList<String> badWikiImages;
     private ArrayList<String> typesWhiteList;
     static Log LOG = LogFactory.getLog(Enhancer.class);
-    public final static String DEFAULT_IMAGE = "http://tellmefirst.polito.it/images/default_img.jpg";
-
 
     public Enhancer() {
         LOG.debug("[constructor] - BEGIN");

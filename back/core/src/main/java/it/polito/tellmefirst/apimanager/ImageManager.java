@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import static it.polito.tellmefirst.util.TMFVariables.DEFAULT_IMAGE;
 
 /**
  * Created by IntelliJ IDEA.
@@ -39,7 +40,7 @@ public class ImageManager {
         
         LOG.debug("[scrapeImageFromPage] - BEGIN url="+pageURL);
         long startTime = System.currentTimeMillis();
-        String result = Enhancer.DEFAULT_IMAGE;
+        String result = DEFAULT_IMAGE;
         try {
             Document doc = Jsoup.connect(pageURL).get();
             Element image = doc.select("img").first();
