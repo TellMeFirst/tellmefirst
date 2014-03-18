@@ -24,6 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import com.sun.jersey.api.client.Client;
@@ -219,6 +220,25 @@ public class TMFUtils {
         		return result;
     		}
 		}, "Not possible to retrieve a JSON Object list from JSONArray");
+    }
+    
+    public static Map<String,String> jsonObjToMap(JSONObject json , Map<String,String> out) throws JSONException{
+        Iterator<String> keys = json.keys();
+        while(keys.hasNext()){
+            String key = keys.next();
+            String val = null;
+            try{
+                 JSONObject value = json.getJSONObject(key);
+                 jsonObjToMap(value,out);
+            }catch(Exception e){
+                val = json.getString(key);
+            }
+
+            if(val != null){
+                out.put(key,val);
+            }
+        }
+        return out;
     }
     
 }
