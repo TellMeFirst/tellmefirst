@@ -19,33 +19,29 @@
 
 package it.polito.tellmefirst.web.rest.interfaces;
 
+import static it.polito.tellmefirst.classify.Classifier.getOptionalFields;
+import static it.polito.tellmefirst.util.TMFUtils.hasContent;
+import static it.polito.tellmefirst.util.TMFUtils.notExistsLink;
+import static it.polito.tellmefirst.util.TMFUtils.unchecked;
+import static it.polito.tellmefirst.web.rest.asynchronous.Parallel.parallelListMap;
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertFalse;
 import it.polito.tellmefirst.classify.Classifier;
-import it.polito.tellmefirst.exception.TMFOutputException;
-import it.polito.tellmefirst.exception.TMFVisibleException;
-import it.polito.tellmefirst.util.Behaviour;
+import it.polito.tellmefirst.util.PostProcess;
 import it.polito.tellmefirst.util.Ret;
 import it.polito.tellmefirst.web.rest.TMFListener;
-import it.polito.tellmefirst.web.rest.services.Classify;
+import it.polito.tellmefirst.web.rest.images.ImagePolicyDAO;
+import it.polito.tellmefirst.web.rest.images.ImagePolicyDAOImpl;
 import it.polito.tellmefirst.web.rest.services.Classify.ImagePolicy;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.transform.sax.TransformerHandler;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.xml.sax.helpers.AttributesImpl;
-
-import static it.polito.tellmefirst.classify.Classifier.getOptionalFields;
-import static it.polito.tellmefirst.util.TMFUtils.*;
-import static it.polito.tellmefirst.util.TMFVariables.DEFAULT_IMAGE;
 
 /**
  * Created by IntelliJ IDEA.
@@ -55,20 +51,45 @@ public class ClassifyInterface extends AbsResponseInterface {
 
     static Log LOG = LogFactory.getLog(ClassifyInterface.class);
 
-    public String getJSON(String textStr, int numTopics, String lang, boolean wikihtml, String optionalFieldsComma, ImagePolicy policy) throws Exception {
+    public static ImagePolicyDAO imgDAO = new ImagePolicyDAOImpl();
+    
+    public String getJSON(String textStr, int numTopics, String lang, boolean wikihtml, final String optionalFieldsComma,final ImagePolicy policy) throws Exception {
         LOG.debug("[getJSON] - BEGIN");
-        String result = produceJSON(
-        					fixBrokenLink(
-        						callClassify(textStr, numTopics, lang, wikihtml)));
         
-        //post-process result JSON string in order to add optional fields when required.
-        if(hasContent(optionalFieldsComma))
-        	result = addOptionalFields(result, optionalFieldsComma);
+        List<JSONObject> baseJsonResult = getJSONObjectList( callClassify(textStr, numTopics, lang, wikihtml) ); 
+        List<JSONObject> completedResult = parallelListMap( baseJsonResult, new PostProcess<JSONObject>() { public JSONObject process(JSONObject entry) throws Exception {
+        	String image = entry.getString("image");
+        	Double ratio = 0.0;
+        	switch(policy){
+        		case CHECK:
+        			image = fixBrokenLink(image);
+        			break;
+        		case RATIO:
+        			ratio = imgDAO.getAspectRatio( getTitleFromWikiLink( entry.getString("wikilink") ) );
+        			image = (ratio > 0.0 && hasContent(image) )? image: "";
+        			break;
+        		case BASIC:
+        		default:
+        			
+        			break;
+        	}
+        	entry.put("image", image);
+        	entry.put("ratio", ratio);
+        	
+            //post-process result JSON string in order to add optional fields when required.
+        	if(hasContent(optionalFieldsComma))
+        		entry = addOptionalFieldsInASingleObject(entry, optionalFieldsComma);
+        	return entry;
+		}});
         
         //no prod
         LOG.info("--------Result from Classify--------");
         LOG.debug("[getJSON] - END");
-        return result;
+        return produceJSON(completedResult);
+    }
+    
+    public String getTitleFromWikiLink(String wikilink){
+    	return wikilink.substring(wikilink.lastIndexOf('/') + 1);
     }
     
     public List<String[]> callClassify(final String textStr,final int numTopics,final String lang,final boolean wikihtml){
@@ -80,43 +101,45 @@ public class ClassifyInterface extends AbsResponseInterface {
     			LOG.debug("[callClassify] - END");
     			return topics;
     		}
-		}, "Classify failed ");
+		}, "Classify failed");
     }
     
-    public List<String[]> fixBrokenLink(List<String[]> topics){
-    	List<String[]> fixedResults = new ArrayList<String[]>(topics);
-    	for (String[] result : fixedResults) {
-			String image = result[5];
-			if(hasContent(image) && notExistsLink(image))
-				result[5] = "";
-		}
-    	return fixedResults;
+    public String fixBrokenLink(String image){
+		if(hasContent(image) && imgDAO.existImage(image))
+			return "";
+    	return image;
     }
 
-    public static String produceJSON(List<String[]> topics){
-    	String result = "";
-    	JSONObject classifyResult = new JSONObject();
-    	try {
-			classifyResult.put("service", "Classify");
-			
-			JSONArray resources = new JSONArray();
-			for (String[] topic : topics) {
-				JSONObject resource = new JSONObject();
-				resource.put("uri"			,topic[0]);
-				resource.put("label"		,topic[1]);
-				resource.put("title"		,topic[2]);
-				resource.put("score"		,topic[3]);
-				resource.put("mergedTypes"  ,topic[4]);
-				resource.put("image"		,topic[5]);
-				resource.put("wikilink"		,topic[6]);
-				resources.put(resource);
-			}
-			classifyResult.put("Resources", resources);
-			result = classifyResult.toString();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-    	return result;
+    public static List<JSONObject> getJSONObjectList(final List<String[]> topics){
+    	return unchecked(new Ret<List<JSONObject>>() {
+    		public List<JSONObject> ret() throws Exception {
+    			List<JSONObject> resources = new ArrayList<JSONObject>();
+    			for (String[] topic : topics) {
+    				JSONObject resource = new JSONObject();
+    				resource.put("uri"			,topic[0]);
+    				resource.put("label"		,topic[1]);
+    				resource.put("title"		,topic[2]);
+    				resource.put("score"		,topic[3]);
+    				resource.put("mergedTypes"  ,topic[4]);
+    				resource.put("image"		,topic[5]);
+    				resource.put("wikilink"		,topic[6]);
+    				resources.add(resource);
+    			}
+    			return resources;
+    		}
+    	}, "Single json object entry creation failed");
+    }
+    
+    public static String produceJSON(final List<JSONObject> topics){
+    	return unchecked(new Ret<String>() {
+    		public String ret() throws Exception {
+    			JSONObject classifyResult = new JSONObject();
+    			classifyResult.put("service", "Classify");
+    			JSONArray resources = new JSONArray(topics);
+    			classifyResult.put("Resources", resources);
+    			return classifyResult.toString();
+    		}
+    	}, "JSON composition failed");
     }
     
     private String addOptionalFields(final String result, final String optionalFieldsComma){
