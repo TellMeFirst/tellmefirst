@@ -60,7 +60,7 @@ public class LangDetectUtils {
 			String dirname = "profiles/";
 			Enumeration<URL> en = Detector.class.getClassLoader().getResources(
 					dirname);
-			List<String> profiles = new ArrayList();
+			List<String> profiles = new ArrayList<String>();
 			if (en.hasMoreElements()) {
 				URL url = en.nextElement();
 				JarURLConnection urlcon = (JarURLConnection) url
@@ -73,7 +73,6 @@ public class LangDetectUtils {
 						InputStream in = Detector.class.getClassLoader()
 								.getResourceAsStream(entry);
 						profiles.add(IOUtils.toString(in));
-
 					}
 				}
 

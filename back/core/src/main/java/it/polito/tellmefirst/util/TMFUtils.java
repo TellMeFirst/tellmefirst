@@ -23,6 +23,8 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONObject;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
@@ -206,6 +208,17 @@ public class TMFUtils {
     
     public static boolean notExistsLink(String url){
     	return !existsLink(url);
+    }
+    
+    public static List<JSONObject> jsonArrayToList(final JSONArray array){
+    	return unchecked(new Ret<List<JSONObject>>() {
+    		public List<JSONObject> ret() throws Exception {
+    			List<JSONObject> result = new ArrayList<JSONObject>();
+            	for (int i = 0; i < array.length(); i++)
+        			result.add( array.getJSONObject(i) );
+        		return result;
+    		}
+		}, "Not possible to retrieve a JSON Object list from JSONArray");
     }
     
 }

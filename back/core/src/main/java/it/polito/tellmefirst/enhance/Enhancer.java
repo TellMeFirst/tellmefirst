@@ -19,35 +19,30 @@
 
 package it.polito.tellmefirst.enhance;
 
-import com.aliasi.spell.JaroWinklerDistance;
+import static it.polito.tellmefirst.dao.DAOFactory.getDAO;
+import static it.polito.tellmefirst.util.TMFUtils.filter;
+import static it.polito.tellmefirst.util.TMFUtils.getWikiURL;
+import static it.polito.tellmefirst.util.TMFUtils.processWikiFileLabelForHashComputation;
+import static it.polito.tellmefirst.util.TMFVariables.DEFAULT_IMAGE;
+import static org.apache.commons.lang.StringUtils.isEmpty;
 import it.polito.tellmefirst.apimanager.ImageManager;
+import it.polito.tellmefirst.apimanager.RestManager;
 import it.polito.tellmefirst.apimanager.VideoManager;
+import it.polito.tellmefirst.dao.WikiDAO;
 import it.polito.tellmefirst.lodmanager.DBpediaManager;
 import it.polito.tellmefirst.lodmanager.NewYorkTimesLODManager;
-import it.polito.tellmefirst.apimanager.RestManager;
-import it.polito.tellmefirst.dao.WikiDAO;
 import it.polito.tellmefirst.lucene.IndexesUtil;
-import it.polito.tellmefirst.util.TMFUtils;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
-import static it.polito.tellmefirst.dao.DAOFactory.*;
-import static org.apache.commons.lang.StringUtils.isEmpty;
-import static it.polito.tellmefirst.util.TMFUtils.*;
-import static it.polito.tellmefirst.util.TMFVariables.DEFAULT_IMAGE;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.aliasi.spell.JaroWinklerDistance;
 
 /**
  * Created by IntelliJ IDEA.
@@ -76,6 +71,7 @@ public class Enhancer {
         LOG.debug("[constructor] - END");
     }
     
+    //XXX should be on REST module
     public String getImageFromMediaWiki2(String searchText){
     	LOG.debug("Looking images for label => "+searchText);
     	WikiDAO wikidao = getDAO(WikiDAO.class);

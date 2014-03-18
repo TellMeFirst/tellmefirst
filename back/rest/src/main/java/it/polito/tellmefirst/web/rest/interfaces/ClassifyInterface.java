@@ -26,6 +26,7 @@ import it.polito.tellmefirst.util.Behaviour;
 import it.polito.tellmefirst.util.Ret;
 import it.polito.tellmefirst.web.rest.TMFListener;
 import it.polito.tellmefirst.web.rest.services.Classify;
+import it.polito.tellmefirst.web.rest.services.Classify.ImagePolicy;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -54,7 +55,7 @@ public class ClassifyInterface extends AbsResponseInterface {
 
     static Log LOG = LogFactory.getLog(ClassifyInterface.class);
 
-    public String getJSON(String textStr, int numTopics, String lang, boolean wikihtml, String optionalFieldsComma) throws Exception {
+    public String getJSON(String textStr, int numTopics, String lang, boolean wikihtml, String optionalFieldsComma, ImagePolicy policy) throws Exception {
         LOG.debug("[getJSON] - BEGIN");
         String result = produceJSON(
         					fixBrokenLink(

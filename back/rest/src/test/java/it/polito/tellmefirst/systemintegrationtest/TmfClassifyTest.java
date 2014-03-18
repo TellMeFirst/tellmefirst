@@ -17,9 +17,9 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
+import org.junit.Assert;
 
-import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
+
 
 //@RunWith(JUnit4.class)
 public class TmfClassifyTest {
@@ -92,7 +92,7 @@ public class TmfClassifyTest {
 			JSONObject jsonObj = new JSONObject(writer.toString());
 
 			Assert.assertNotNull(jsonObj);
-			String service = jsonObj.getString("@service");
+			String service = jsonObj.getString("service");
 			Assert.assertNotNull(service);
 			Assert.assertTrue(service.equals("Classify"));
 

@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.FileInputStream;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -69,6 +70,7 @@ public class Classify {
 			@FormDataParam("numTopics") int numTopics,
 			@FormDataParam("lang") String lang,
 			@FormDataParam("wikihtml") boolean wikihtml,
+			@QueryParam("image_policy") @DefaultValue("BASIC") String imagePolicy,
 			@QueryParam("optional_fields") String optionalFields) {
 		LOG.debug("[postJSON] - BEGIN");
 		LOG.info("Classify REST Service called with lang=" + lang);
@@ -100,19 +102,16 @@ public class Classify {
 			// automatically detect lang using langDetect library
 			LOG.debug("auto-detecting lang");
 			String detectLang = null;
-			if (langDetectUtils != null) {
-
-				try {
+			try {
 					detectLang = langDetectUtils.detect(textString);
-				} catch (LangDetectException e1) {
-					LOG.debug("Error detecting lang " + e1.getMessage(), e1);
-					detectLang = LangDetectUtils.defaultLang;
-				}
-
+			} catch (LangDetectException e1) {
+				LOG.debug("Error detecting lang " + e1.getMessage(), e1);
+				detectLang = LangDetectUtils.defaultLang;
 			}
 			LOG.debug("detected lang=" + detectLang);
-
-			String response = classifyInterface.getJSON(textString, numTopics,detectLang, wikihtml, optionalFields);
+			ImagePolicy policy = ImagePolicy.valueOf(imagePolicy);
+			LOG.debug("image policy: " + policy);
+			String response = classifyInterface.getJSON(textString, numTopics,detectLang, wikihtml, optionalFields, policy);
 			long endTime = System.currentTimeMillis();
 			long duration = (endTime - startTime) / 1000;
 			// no prod
@@ -127,4 +126,12 @@ public class Classify {
 		}
 	}
 
+	public static enum ImagePolicy { 
+		BASIC, 
+		CHECK, 
+		RATIO, 
+		ALTERNATIVE, 
+		ALTERNATIVE_WITH_RATIO
+	};
+	
 }
