@@ -21,11 +21,8 @@ package it.polito.tellmefirst.web.rest.interfaces;
 
 import static it.polito.tellmefirst.classify.Classifier.getOptionalFields;
 import static it.polito.tellmefirst.util.TMFUtils.hasContent;
-import static it.polito.tellmefirst.util.TMFUtils.notExistsLink;
 import static it.polito.tellmefirst.util.TMFUtils.unchecked;
 import static it.polito.tellmefirst.web.rest.asynchronous.Parallel.parallelListMap;
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertFalse;
 import it.polito.tellmefirst.classify.Classifier;
 import it.polito.tellmefirst.util.PostProcess;
 import it.polito.tellmefirst.util.Ret;
@@ -67,6 +64,9 @@ public class ClassifyInterface extends AbsResponseInterface {
         		case RATIO:
         			ratio = imgDAO.getAspectRatio( getTitleFromWikiLink( entry.getString("wikilink") ) );
         			image = (ratio > 0.0 && hasContent(image) )? image: "";
+        			
+        			//To be insert only with this policy
+                	entry.put("ratio", ratio);
         			break;
         		case BASIC:
         		default:
@@ -74,7 +74,6 @@ public class ClassifyInterface extends AbsResponseInterface {
         			break;
         	}
         	entry.put("image", image);
-        	entry.put("ratio", ratio);
         	
             //post-process result JSON string in order to add optional fields when required.
         	if(hasContent(optionalFieldsComma))
@@ -105,7 +104,7 @@ public class ClassifyInterface extends AbsResponseInterface {
     }
     
     public String fixBrokenLink(String image){
-		if(hasContent(image) && imgDAO.existImage(image))
+		if(hasContent(image) && !imgDAO.existImage(image))
 			return "";
     	return image;
     }
