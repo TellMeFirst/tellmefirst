@@ -169,21 +169,15 @@ public class TMFUtils {
     
     public static String getWikiURL(final String file){
     	String wikiBase = "http://upload.wikimedia.org/wikipedia/commons";
-    	String md5 = unchecked(new Ret<String>() {
-			public String ret() throws Exception {
-				final MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-				messageDigest.reset();
-				messageDigest.update(file.getBytes(Charset.forName("UTF8")));
-				final byte[] resultByte = messageDigest.digest();
-				return new String(Hex.encodeHex(resultByte));
-			}
-		}, "Wiki img URL not found");
+    	String md5 = unchecked(()-> {
+    					final MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+						messageDigest.reset();
+						messageDigest.update(file.getBytes(Charset.forName("UTF8")));
+						final byte[] resultByte = messageDigest.digest();
+						return new String(Hex.encodeHex(resultByte));
+					}, "Wiki img URL not found MD5 not calculated");
     	String finalURL = wikiBase+"/"+md5.charAt(0)+"/"+md5.charAt(0)+md5.charAt(1)+"/";
-    	String encodedFileLabel = unchecked(new Ret<String>() {
-			public String ret() throws Exception {
-				return URLDecoder.decode(file, "UTF-8");
-			}
-		}, "Wiki img URL not found");
+    	String encodedFileLabel = unchecked( ()->URLDecoder.decode(file, "UTF-8"), "Wiki img URL not found");
     	return finalURL+=encodedFileLabel;
     }
     
@@ -212,13 +206,11 @@ public class TMFUtils {
     }
     
     public static List<JSONObject> jsonArrayToList(final JSONArray array){
-    	return unchecked(new Ret<List<JSONObject>>() {
-    		public List<JSONObject> ret() throws Exception {
+    	return unchecked(()-> {
     			List<JSONObject> result = new ArrayList<JSONObject>();
             	for (int i = 0; i < array.length(); i++)
         			result.add( array.getJSONObject(i) );
         		return result;
-    		}
 		}, "Not possible to retrieve a JSON Object list from JSONArray");
     }
     

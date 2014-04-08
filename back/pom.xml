@@ -7,7 +7,7 @@
 		<tellmefirst.version>1.04</tellmefirst.version>
 		<heapspace.Xmx.compiler>-Xmx2g</heapspace.Xmx.compiler>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.compiler.version>1.6</java.compiler.version>
+		<java.compiler.version>1.8</java.compiler.version>
 		<maven.test.skip>true</maven.test.skip>
 	</properties>
 

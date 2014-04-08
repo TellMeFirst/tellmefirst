@@ -19,8 +19,7 @@ public class Parallel {
 	static ExecutorService es = Executors.newFixedThreadPool(14);
 	
 	public static <T> List<T> parallelListMap(final List<T> baseList, final PostProcess<T> proc){
-		return unchecked(new Ret<List<T>>() {
-			public List<T> ret() throws Exception {
+		return unchecked( ()-> {
 				List<Callable<T>> callableList = new ArrayList<Callable<T>>();
 				for (T t : baseList)
 					callableList.add(new PostProcessCallable<T>(proc, t));
@@ -31,11 +30,10 @@ public class Parallel {
 				
 				return processResult;
 			}
-		}, "failed concurrent post processing");
+		, "failed concurrent post processing");
 	}
 	
 	static class PostProcessCallable<T> implements Callable<T> {
-
 		PostProcess<T> proc;
 		T preProcess;
 		public PostProcessCallable(PostProcess<T> proc, T preProcess) {

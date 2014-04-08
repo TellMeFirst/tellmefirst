@@ -60,15 +60,10 @@ public class DOCparser extends TMFTextParser{
         //XWPFWordExtractor extractor = new XWPFWordExtractor(new XWPFDocument(stream));
         String testo = extractor.getText();
         System.out.println(testo);
-
     }
 
 	@Override
-	public String parse(final File file) {
-		return unchecked(new Ret<String>() {
-			public String ret() throws Exception {
-				return docToText(file);
-			}
-		}, "doc not parsed");
+	public String parse(File file) {
+		return unchecked(()->docToText(file) , "doc not parsed");
 	}
 }

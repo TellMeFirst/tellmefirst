@@ -34,11 +34,14 @@ import it.polito.tellmefirst.web.rest.services.Classify.ImagePolicy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
+
+import scala.actors.threadpool.Arrays;
 
 /**
  * Created by IntelliJ IDEA.
@@ -54,7 +57,7 @@ public class ClassifyInterface extends AbsResponseInterface {
         LOG.debug("[getJSON] - BEGIN");
         
         List<JSONObject> baseJsonResult = getJSONObjectList( callClassify(textStr, numTopics, lang, wikihtml) ); 
-        List<JSONObject> completedResult = parallelListMap( baseJsonResult, new PostProcess<JSONObject>() { public JSONObject process(JSONObject entry) throws Exception {
+        List<JSONObject> completedResult = parallelListMap( baseJsonResult, (entry)->{
         	String image = entry.getString("image");
         	Double ratio = 0.0;
         	switch(policy){
@@ -79,8 +82,7 @@ public class ClassifyInterface extends AbsResponseInterface {
         	if(hasContent(optionalFieldsComma))
         		entry = addOptionalFieldsInASingleObject(entry, optionalFieldsComma);
         	return entry;
-		}});
-        
+		});
         //no prod
         LOG.info("--------Result from Classify--------");
         LOG.debug("[getJSON] - END");
@@ -92,14 +94,12 @@ public class ClassifyInterface extends AbsResponseInterface {
     }
     
     public List<String[]> callClassify(final String textStr,final int numTopics,final String lang,final boolean wikihtml){
-    	return unchecked(new Ret<List<String[]>>() {
-    		public List<String[]> ret() throws Exception {
+    	return unchecked(()-> {
     			LOG.debug("[callClassify] - BEGIN");
     			Classifier classifier = (lang.equals("italian")) ? TMFListener.getItalianClassifier() : TMFListener.getEnglishClassifier();  
     			List<String[]> topics = classifier.classify(textStr, numTopics, lang, wikihtml);
     			LOG.debug("[callClassify] - END");
     			return topics;
-    		}
 		}, "Classify failed");
     }
     
@@ -110,53 +110,49 @@ public class ClassifyInterface extends AbsResponseInterface {
     }
 
     public static List<JSONObject> getJSONObjectList(final List<String[]> topics){
-    	return unchecked(new Ret<List<JSONObject>>() {
-    		public List<JSONObject> ret() throws Exception {
-    			List<JSONObject> resources = new ArrayList<JSONObject>();
-    			for (String[] topic : topics) {
-    				JSONObject resource = new JSONObject();
-    				resource.put("uri"			,topic[0]);
-    				resource.put("label"		,topic[1]);
-    				resource.put("title"		,topic[2]);
-    				resource.put("score"		,topic[3]);
-    				resource.put("mergedTypes"  ,topic[4]);
-    				resource.put("image"		,topic[5]);
-    				resource.put("wikilink"		,topic[6]);
-    				resources.add(resource);
-    			}
-    			return resources;
-    		}
-    	}, "Single json object entry creation failed");
+    	List<JSONObject> resources = new ArrayList<JSONObject>();
+    	topics.forEach((topic)->{
+	    	unchecked(()->{
+		    	JSONObject resource = new JSONObject();
+		    	resource.put("uri"			,topic[0]);
+		    	resource.put("label"		,topic[1]);
+		    	resource.put("title"		,topic[2]);
+		    	resource.put("score"		,topic[3]);
+		    	resource.put("mergedTypes"  ,topic[4]);
+		    	resource.put("image"		,topic[5]);
+		    	resource.put("wikilink"		,topic[6]);
+		    	resources.add(resource);
+	    	},"Single json object entry creation failed");
+    	});
+    	return resources;
     }
     
     public static String produceJSON(final List<JSONObject> topics){
-    	return unchecked(new Ret<String>() {
-    		public String ret() throws Exception {
+    	return unchecked(()-> {
     			JSONObject classifyResult = new JSONObject();
     			classifyResult.put("service", "Classify");
     			JSONArray resources = new JSONArray(topics);
     			classifyResult.put("Resources", resources);
     			return classifyResult.toString();
-    		}
     	}, "JSON composition failed");
     }
     
-    private String addOptionalFields(final String result, final String optionalFieldsComma){
-    	try{
-			JSONObject classifyJSONResult = new JSONObject(result);
-			JSONArray resourcesArray = classifyJSONResult.getJSONArray("Resources");
-			JSONArray resultArray = new JSONArray();
-			for (int i=0; i<resourcesArray.length() ;i++){
-				LOG.debug("\n\n\nAdding optional fields: "+optionalFieldsComma+" for "+i+" object, where max length is "+resourcesArray.length()+" \n\n\n");
-				resultArray.put(addOptionalFieldsInASingleObject(resourcesArray.getJSONObject(i), optionalFieldsComma));
-			}
-			classifyJSONResult.put("Resources", resultArray);
-		    return classifyJSONResult.toString();
-    	} catch (Exception e) {
-    		LOG.error("Optional fields not added",e);
-    		return result;
-		}
-    }
+//    private String addOptionalFields(final String result, final String optionalFieldsComma){
+//    	try{
+//			JSONObject classifyJSONResult = new JSONObject(result);
+//			JSONArray resourcesArray = classifyJSONResult.getJSONArray("Resources");
+//			JSONArray resultArray = new JSONArray();
+//			for (int i=0; i<resourcesArray.length(); i++){
+//				LOG.debug("\n\n\nAdding optional fields: "+optionalFieldsComma+" for "+i+" object, where max length is "+resourcesArray.length()+" \n\n\n");
+//				resultArray.put(addOptionalFieldsInASingleObject(resourcesArray.getJSONObject(i), optionalFieldsComma));
+//			}
+//			classifyJSONResult.put("Resources", resultArray);
+//		    return classifyJSONResult.toString();
+//    	} catch (Exception e) {
+//    		LOG.error("Optional fields not added",e);
+//    		return result;
+//		}
+//    }
     
     private JSONObject addOptionalFieldsInASingleObject(JSONObject singleResult, final String optionalFieldsComma){
     	try{
