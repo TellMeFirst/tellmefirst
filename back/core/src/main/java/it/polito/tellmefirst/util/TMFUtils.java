@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.jsoup.nodes.Element;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
@@ -120,32 +121,38 @@ public class TMFUtils {
 		}
 	}
     
-    public static void unchecked(Behaviour b, String warning){
-		try{
-			b.behaviour();
-		}catch(Exception e){
-			throw new RuntimeException(e);
-		}
-	}
-    
-    public static <T> T optional(Ret<T> ret, String warning){
+    public static <T> T optional(Ret<T> ret, T defaultValue){
     	T returnValue=null;
     	try{
 			returnValue = ret.ret();
 		}catch(Exception e){
-			LOG.warn(warning, e);
+			LOG.warn(e);
 		}
+    	if(returnValue == null) returnValue = defaultValue;
     	return returnValue;
     }
     
-    public static <T> T unchecked(Ret<T> ret, String warning){
+    public static <T> T unchecked(Ret<T> ret, T defaultValue){
     	T returnValue=null;
     	try{
 			returnValue = ret.ret();
 		}catch(Exception e){
 			throw new RuntimeException(e);
 		}
+    	if(returnValue == null) returnValue = defaultValue;
     	return returnValue;
+    }
+    
+    public static <T> T optional(Ret<T> ret){
+    	return optional(ret, null);
+    }
+    
+    public static <T> T unchecked(Ret<T> ret){
+    	return unchecked(ret, null);
+    }
+    
+    public static <T> T uncheck(Ret<T> ret, T defaultValue){
+    	return unchecked(ret, defaultValue);
     }
     
     public static Collection<String> filter(Collection<String> c, String ... patterns){
@@ -211,7 +218,7 @@ public class TMFUtils {
             	for (int i = 0; i < array.length(); i++)
         			result.add( array.getJSONObject(i) );
         		return result;
-		}, "Not possible to retrieve a JSON Object list from JSONArray");
+		});
     }
     
     public static Map<String,String> jsonObjToMap(JSONObject json , Map<String,String> out) throws JSONException{
@@ -231,6 +238,13 @@ public class TMFUtils {
             }
         }
         return out;
+    }
+    
+    public static boolean isEmpty(Element e){
+    	return e.tag().getName().isEmpty();
+    }
+    public static boolean isNotEmpty(Element e){
+    	return !isEmpty(e);
     }
     
 }

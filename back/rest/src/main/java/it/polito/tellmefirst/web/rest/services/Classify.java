@@ -130,6 +130,7 @@ public class Classify {
 		BASIC, 
 		CHECK, 
 		RATIO, 
+		WIKIPARSE,
 		ALTERNATIVE, 
 		ALTERNATIVE_WITH_RATIO
 	};

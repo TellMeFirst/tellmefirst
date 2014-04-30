@@ -54,17 +54,17 @@ public class GetImage {
             return ok(response);
         } catch (Exception e) {
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage())
-                    .header("TMF-error",e.getMessage()).build());
+                    	.header("TMF-error",e.getMessage()).build());
         }
     }
     
     @GET
     @Path("new")
     public Response getImg(@QueryParam("label") String label) {
-        LOG.debug("[postJSON] - BEGIN");
-        return ok(new Enhancer().getImageFromMediaWiki2(label));
+        return ok(ImageInterface.getImageFromWikiHTML(label).toString());
     }
 
+    
 
 }
 

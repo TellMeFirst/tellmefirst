@@ -29,8 +29,7 @@ public class Parallel {
 					processResult.add(future.get());
 				
 				return processResult;
-			}
-		, "failed concurrent post processing");
+		});
 	}
 	
 	static class PostProcessCallable<T> implements Callable<T> {

@@ -27,8 +27,10 @@ import it.polito.tellmefirst.classify.Classifier;
 import it.polito.tellmefirst.util.PostProcess;
 import it.polito.tellmefirst.util.Ret;
 import it.polito.tellmefirst.web.rest.TMFListener;
+import it.polito.tellmefirst.web.rest.guice.GuiceEnv;
 import it.polito.tellmefirst.web.rest.images.ImagePolicyDAO;
 import it.polito.tellmefirst.web.rest.images.ImagePolicyDAOImpl;
+import it.polito.tellmefirst.web.rest.interfaces.ImageInterface.ImgResponse;
 import it.polito.tellmefirst.web.rest.services.Classify.ImagePolicy;
 
 import java.util.ArrayList;
@@ -51,7 +53,7 @@ public class ClassifyInterface extends AbsResponseInterface {
 
     static Log LOG = LogFactory.getLog(ClassifyInterface.class);
 
-    public static ImagePolicyDAO imgDAO = new ImagePolicyDAOImpl();
+    public static ImagePolicyDAO imgDAO = GuiceEnv.instance(ImagePolicyDAO.class);
     
     public String getJSON(String textStr, int numTopics, String lang, boolean wikihtml, final String optionalFieldsComma,final ImagePolicy policy) throws Exception {
         LOG.debug("[getJSON] - BEGIN");
@@ -67,9 +69,12 @@ public class ClassifyInterface extends AbsResponseInterface {
         		case RATIO:
         			ratio = imgDAO.getAspectRatio( getTitleFromWikiLink( entry.getString("wikilink") ) );
         			image = (ratio > 0.0 && hasContent(image) )? image: "";
-        			
-        			//To be insert only with this policy
                 	entry.put("ratio", ratio);
+        			break;
+        		case WIKIPARSE:
+        			ImgResponse imgResp = imgDAO.getMobileWikiImg( getTitleFromWikiLink( entry.getString("wikilink") ));
+        			image = imgResp.getSrc().isEmpty()?"":"http:"+imgResp.getSrc();
+        			entry.put("ratio", imgDAO.getRatioFromImgResponse(imgResp) );
         			break;
         		case BASIC:
         		default:
@@ -83,6 +88,7 @@ public class ClassifyInterface extends AbsResponseInterface {
         		entry = addOptionalFieldsInASingleObject(entry, optionalFieldsComma);
         	return entry;
 		});
+        
         //no prod
         LOG.info("--------Result from Classify--------");
         LOG.debug("[getJSON] - END");
@@ -100,7 +106,7 @@ public class ClassifyInterface extends AbsResponseInterface {
     			List<String[]> topics = classifier.classify(textStr, numTopics, lang, wikihtml);
     			LOG.debug("[callClassify] - END");
     			return topics;
-		}, "Classify failed");
+		});
     }
     
     public String fixBrokenLink(String image){
@@ -112,7 +118,7 @@ public class ClassifyInterface extends AbsResponseInterface {
     public static List<JSONObject> getJSONObjectList(final List<String[]> topics){
     	List<JSONObject> resources = new ArrayList<JSONObject>();
     	topics.forEach((topic)->{
-	    	unchecked(()->{
+	    	resources.add(unchecked(()->{
 		    	JSONObject resource = new JSONObject();
 		    	resource.put("uri"			,topic[0]);
 		    	resource.put("label"		,topic[1]);
@@ -121,8 +127,8 @@ public class ClassifyInterface extends AbsResponseInterface {
 		    	resource.put("mergedTypes"  ,topic[4]);
 		    	resource.put("image"		,topic[5]);
 		    	resource.put("wikilink"		,topic[6]);
-		    	resources.add(resource);
-	    	},"Single json object entry creation failed");
+		    	return resource;
+	    	}));
     	});
     	return resources;
     }

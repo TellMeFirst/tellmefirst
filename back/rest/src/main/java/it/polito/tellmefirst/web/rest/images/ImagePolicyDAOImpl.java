@@ -9,11 +9,12 @@ import java.util.Map;
 import it.polito.tellmefirst.apimanager.RestManager;
 import it.polito.tellmefirst.util.Ret;
 import it.polito.tellmefirst.util.TMFUtils;
+import it.polito.tellmefirst.web.rest.interfaces.ImageInterface.ImgResponse;
 
 import org.codehaus.jettison.json.JSONObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import static it.polito.tellmefirst.web.rest.interfaces.ImageInterface.*;
 
 public class ImagePolicyDAOImpl implements ImagePolicyDAO {
 	
@@ -75,5 +76,20 @@ public class ImagePolicyDAOImpl implements ImagePolicyDAO {
 			}
 		}, "Wikipedia Ratio URL not resolved!");
     }
+
+	@Override
+	public ImgResponse getMobileWikiImg(String title) {
+		String label = unchecked( ()-> URLEncoder.encode(title, "UTF-8") );
+		ImgResponse link = getFilteredImgFrom("http://it.m.wikipedia.org/wiki/", label);
+		if(!link.getSrc().isEmpty()){
+			LOG.debug("img found from it : "+link);
+			return link;
+		} else {
+			//TODO label to be Url encoded
+	    	link 	= getFilteredImgFrom("http://en.m.wikipedia.org/wiki/", label);
+	    	LOG.debug("img found from en : "+link);
+			return link;
+		}
+	}
 
 }
