@@ -1,5 +1,5 @@
 Corpus Index
-###########
+============
 
 The Lucene Documents of the Corpus Index is composed of the following Lucene Fields:
 * **URI**: the DBpedia entity URI;
