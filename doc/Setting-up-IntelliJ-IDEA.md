@@ -1,3 +1,6 @@
+Setting up IntelliJ IDEA
+========================
+
 For developing the TellMeFirst Indexes Builder based on a customized version of DBpedia Spotlight.
 
 ## Download IDEA

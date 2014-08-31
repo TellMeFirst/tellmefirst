@@ -1,3 +1,6 @@
+Corpus Index
+###########
+
 The Lucene Documents of the Corpus Index is composed of the following Lucene Fields:
 * **URI**: the DBpedia entity URI;
 * **URI COUNT**: number of times that an entity appears as a [wikilink] (http://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Linking) within the Wikipedia corpus;
