@@ -109,7 +109,11 @@ public class Classifier {
             } else if(fileName.endsWith(".txt") || fileName.endsWith(".TXT")){
                 TXTparser parser = new TXTparser();
                 text = new Text(parser.txtToText(file));
-            } else {
+            } else if(fileName.endsWith(".pub") || fileName.endsWith(".TXT")){
+                // ToDO EPub Parser implementation
+                text = new Text("Something");
+            }
+            else {
                 throw new TMFVisibleException("File extension not valid: only 'pdf', 'doc' and 'txt' allowed.");
             }
         } else {
@@ -120,27 +124,10 @@ public class Classifier {
         int totalNumWords = TMFUtils.countWords(textString);
         //no prod
         LOG.debug("TOTAL WORDS: "+totalNumWords);
-        if(totalNumWords>30000){
-            throw new TMFVisibleException("This is just a demo. Try with a text containing less than 30.000 words!");
-        }
-        try{
-            if(totalNumWords>1000){
-                //no prod
-                LOG.debug("Text contains "+totalNumWords+" words. We'll use Classify for long texts.");
-                result = classifyLongText(text, numOfTopics, lang);
-            }   else {
-                //no prod
-                LOG.debug("Text contains "+totalNumWords+" words. We'll use Classify for short texts.");
-                result = classifyShortText(text, numOfTopics, lang);
-            }
-        }catch (Exception e){
-            LOG.error("[classify] - EXCEPTION: ", e);
-            throw new TMFVisibleException("Unable to extract topics from specified text.");
-        }
+        result = manageTextLength(text, totalNumWords, numOfTopics, lang);
         LOG.debug("[classify] - END");
         return  result;
     }
-
 
     public ArrayList<String[]> classifyLongText(Text text, int numOfTopics, String lang) throws InterruptedException,
             IOException {
@@ -229,6 +216,27 @@ public class Classifier {
         return result;
     }
 
+    public ArrayList<String[]> manageTextLength(Text text, int totalNumWords, int numOfTopics, String lang) throws TMFVisibleException {
+        ArrayList<String[]> result;
+        if(totalNumWords>30000){
+            throw new TMFVisibleException("This is just a demo. Try with a text containing less than 30.000 words!");
+        }
+        try{
+            if(totalNumWords>1000){
+                //no prod
+                LOG.debug("Text contains "+totalNumWords+" words. We'll use Classify for long texts.");
+                result = classifyLongText(text, numOfTopics, lang);
+            }   else {
+                //no prod
+                LOG.debug("Text contains "+totalNumWords+" words. We'll use Classify for short texts.");
+                result = classifyShortText(text, numOfTopics, lang);
+            }
+        }catch (Exception e){
+            LOG.error("[classify] - EXCEPTION: ", e);
+            throw new TMFVisibleException("Unable to extract topics from specified text.");
+        }
+        return result;
+    }
 
     public ArrayList<String[]> classifyCore(ScoreDoc[] hits, int numOfTopics, String lang) throws IOException {
         LOG.debug("[classifyCore] - BEGIN");
