@@ -226,24 +226,29 @@ public class Classifier {
     public  ArrayList<String[]> manageFileClassification(File file, String fileName, int numOfTopics, String lang) throws TMFVisibleException {
         Text text;
         ArrayList<String[]> result;
-
         if(fileName.endsWith(".pdf") || fileName.endsWith(".PDF")){
             PDFparser parser = new PDFparser();
             text = new Text(parser.pdfToText(file));
+            result = classifyText(text, numOfTopics, lang);
         } else if(fileName.endsWith(".doc") || fileName.endsWith(".DOC")){
             DOCparser parser = new DOCparser();
             text = new Text(parser.docToText(file));
+            result = classifyText(text, numOfTopics, lang);
         } else if(fileName.endsWith(".txt") || fileName.endsWith(".TXT")){
             TXTparser parser = new TXTparser();
             text = new Text(parser.txtToText(file));
+            result = classifyText(text, numOfTopics, lang);
         } else if(fileName.endsWith(".pub") || fileName.endsWith(".")){
             // ToDO EPub Parser implementation
+            // Launch parse() method of EPubParser
+            // Launch classification
+            // Aggregate the results
             text = new Text("Something");
+            result = classifyText(text, numOfTopics, lang);
         }
         else {
             throw new TMFVisibleException("File extension not valid: only 'pdf', 'doc' and 'txt' allowed.");
         }
-        result = classifyText(text, numOfTopics, lang);
         return  result;
     }
 
