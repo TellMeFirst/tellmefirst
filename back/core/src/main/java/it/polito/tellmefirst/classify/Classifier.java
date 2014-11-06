@@ -99,7 +99,7 @@ public class Classifier {
             int totalNumWords = TMFUtils.countWords(textString);
             //no prod
             LOG.debug("TOTAL WORDS: "+totalNumWords);
-            result = manageTextLength(text, totalNumWords, numOfTopics, lang);
+            result = classifyText(text, totalNumWords, numOfTopics, lang);
         } else if (url != null){
             HTMLparser parser = new HTMLparser();
             text = new Text(parser.htmlToTextGoose(url));
@@ -107,7 +107,7 @@ public class Classifier {
             int totalNumWords = TMFUtils.countWords(textString);
             //no prod
             LOG.debug("TOTAL WORDS: "+totalNumWords);
-            result = manageTextLength(text, totalNumWords, numOfTopics, lang);
+            result = classifyText(text, totalNumWords, numOfTopics, lang);
         } else if(file != null){
              //text = chooseParser(file, fileName);
             text = new Text ("Test for file parser");
@@ -115,7 +115,7 @@ public class Classifier {
             int totalNumWords = TMFUtils.countWords(textString);
             //no prod
             LOG.debug("TOTAL WORDS: "+totalNumWords);
-            result = manageTextLength(text, totalNumWords, numOfTopics, lang);
+            result = classifyText(text, totalNumWords, numOfTopics, lang);
         } else {
             throw new TMFVisibleException("No valid parameters in your request: both 'text' and 'url' and 'file'" +
                     " are null.");
@@ -210,7 +210,7 @@ public class Classifier {
         return result;
     }
 
-    public ArrayList<String[]> manageTextLength(Text text, int totalNumWords, int numOfTopics, String lang) throws TMFVisibleException {
+    public ArrayList<String[]> classifyText(Text text, int totalNumWords, int numOfTopics, String lang) throws TMFVisibleException {
         ArrayList<String[]> result;
         if(totalNumWords>30000){
             throw new TMFVisibleException("This is just a demo. Try with a text containing less than 30.000 words!");
