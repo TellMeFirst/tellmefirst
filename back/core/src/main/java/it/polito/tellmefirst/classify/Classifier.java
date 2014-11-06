@@ -76,7 +76,7 @@ public class Classifier {
     }
 
     public ArrayList<String[]> classify(String inputText, File file, String url, String fileName, int numOfTopics,
-                                        String lang) throws TMFVisibleException {
+                                        String lang) throws TMFVisibleException, IOException {
         LOG.debug("[classify] - BEGIN");
         // check if DBpedia endpoints are up
         dBpediaManager = new DBpediaManager();
@@ -97,13 +97,15 @@ public class Classifier {
         if (inputText != null && !inputText.equals("")){
             text = new Text(inputText);
             ScoreDoc[] hits = classifyText(text, numOfTopics);
+            result = classifyCore(hits, numOfTopics, lang);
         } else if (url != null){
             HTMLparser parser = new HTMLparser();
             text = new Text(parser.htmlToTextGoose(url));
             ScoreDoc[] hits = classifyText(text, numOfTopics);
+            result = classifyCore(hits, numOfTopics, lang);
         } else if(file != null){
-            text = new Text ("Test for file parser");
             ScoreDoc[] hits = manageFileClassification(file, fileName, numOfTopics, lang);
+            result = classifyCore(hits, numOfTopics, lang);
         } else {
             throw new TMFVisibleException("No valid parameters in your request: both 'text' and 'url' and 'file'" +
                     " are null.");
@@ -242,7 +244,8 @@ public class Classifier {
             // ToDO EPub Parser implementation
             // Launch parse() method of EPubParser
             // Launch classification
-            // Aggregate the results
+            // Launch aggregation() method of EPubParser
+            // Return hits
             text = new Text("Something");
             hits = classifyText(text, numOfTopics);
         }
