@@ -29,6 +29,7 @@ import org.xml.sax.helpers.AttributesImpl;
 import javax.xml.transform.sax.TransformerHandler;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -51,7 +52,7 @@ public class ClassifyInterface extends AbsResponseInterface {
         return result;
     }
 
-    public String getXML(String text, File file, String url, String fileName, int numTopics, String lang) throws TMFVisibleException, TMFOutputException {
+    public String getXML(String text, File file, String url, String fileName, int numTopics, String lang) throws TMFVisibleException, TMFOutputException, IOException {
         LOG.debug("[getXML] - BEGIN");
         String result;
         Classifier classifier = (lang.equals("italian")) ? TMFServer.getItalianClassifier() : TMFServer.getEnglishClassifier();
