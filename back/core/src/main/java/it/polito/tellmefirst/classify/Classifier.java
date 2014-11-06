@@ -101,7 +101,6 @@ public class Classifier {
             text = new Text(parser.htmlToTextGoose(url));
             result = classifyText(text, numOfTopics, lang);
         } else if(file != null){
-             //text = chooseParser(file, fileName);
             text = new Text ("Test for file parser");
             result = classifyText(text, numOfTopics, lang);
         } else {
@@ -190,7 +189,7 @@ public class Classifier {
         LOG.debug("[classifyShortText] - BEGIN");
         ArrayList<String[]> result;
         //no prod
-        LOG.debug("[classifyLongText] - We're using as analyzer: "+contextLuceneManager.getLuceneDefaultAnalyzer());
+        LOG.debug("[classifyShortText] - We're using as analyzer: "+contextLuceneManager.getLuceneDefaultAnalyzer());
         Query query = contextLuceneManager.getQueryForContext(text);
         ScoreDoc[] hits = searcher.getHits(query);
         result = classifyCore(hits, numOfTopics, lang);
