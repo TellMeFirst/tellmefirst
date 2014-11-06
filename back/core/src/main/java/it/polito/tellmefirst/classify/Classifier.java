@@ -93,28 +93,28 @@ public class Classifier {
         }
         ArrayList<String[]> result;
         Text text;
+
         if (inputText != null && !inputText.equals("")){
             text = new Text(inputText);
-            result = classifyText(text, numOfTopics, lang);
+            ScoreDoc[] hits = classifyText(text, numOfTopics);
         } else if (url != null){
             HTMLparser parser = new HTMLparser();
             text = new Text(parser.htmlToTextGoose(url));
-            result = classifyText(text, numOfTopics, lang);
+            ScoreDoc[] hits = classifyText(text, numOfTopics);
         } else if(file != null){
             text = new Text ("Test for file parser");
-            result = manageFileClassification(file, fileName, numOfTopics, lang);
+            ScoreDoc[] hits = manageFileClassification(file, fileName, numOfTopics, lang);
         } else {
             throw new TMFVisibleException("No valid parameters in your request: both 'text' and 'url' and 'file'" +
                     " are null.");
         }
         LOG.debug("[classify] - END");
-        return  result;
+        return result;
     }
 
-    public ArrayList<String[]> classifyLongText(Text text, int numOfTopics, String lang) throws InterruptedException,
+    public ScoreDoc[] classifyLongText(Text text, int numOfTopics) throws InterruptedException,
             IOException {
         LOG.debug("[classifyLongText] - BEGIN");
-        ArrayList<String[]> result;
         //no prod
         LOG.debug("[classifyLongText] - We're using as analyzer: "+contextLuceneManager.getLuceneDefaultAnalyzer());
         String longText = text.getText();
@@ -152,6 +152,8 @@ public class Classifier {
             thread.join();
             ScoreDoc[] hits = thread.getHits();
             ArrayList<ScoreDoc> hitList = new ArrayList<ScoreDoc>();
+            // numOfTopics is necessary in this method to classify each text chunk
+            // in a manner consistent with the classification
             for(int b=0; b<numOfTopics; b++){
                 hitList.add(hits[b]);
             }
@@ -179,26 +181,24 @@ public class Classifier {
         for (int i = 0 ; i<finalHitsList.size(); i++){
             hits[i] = finalHitsList.get(i);
         }
-        result = classifyCore(hits, numOfTopics, lang);
         LOG.debug("[classifyLongText] - END");
-        return result;
+        return hits;
     }
 
-    public ArrayList<String[]> classifyShortText(Text text, int numOfTopics, String lang) throws ParseException,
+    public ScoreDoc[] classifyShortText(Text text) throws ParseException,
             IOException {
         LOG.debug("[classifyShortText] - BEGIN");
-        ArrayList<String[]> result;
+        ScoreDoc[] hits;
         //no prod
         LOG.debug("[classifyShortText] - We're using as analyzer: "+contextLuceneManager.getLuceneDefaultAnalyzer());
         Query query = contextLuceneManager.getQueryForContext(text);
-        ScoreDoc[] hits = searcher.getHits(query);
-        result = classifyCore(hits, numOfTopics, lang);
+        hits = searcher.getHits(query);
         LOG.debug("[classifyShortText] - END");
-        return result;
+        return hits;
     }
 
-    public ArrayList<String[]> classifyText(Text text, int numOfTopics, String lang) throws TMFVisibleException {
-        ArrayList<String[]> result;
+    public ScoreDoc[] classifyText(Text text, int numOfTopics) throws TMFVisibleException {
+        ScoreDoc[] hits;
         String textString = text.getText();
         int totalNumWords = TMFUtils.countWords(textString);
         //no prod
@@ -210,46 +210,46 @@ public class Classifier {
             if(totalNumWords>1000){
                 //no prod
                 LOG.debug("Text contains "+totalNumWords+" words. We'll use Classify for long texts.");
-                result = classifyLongText(text, numOfTopics, lang);
+                hits = classifyLongText(text, numOfTopics);
             }   else {
                 //no prod
                 LOG.debug("Text contains "+totalNumWords+" words. We'll use Classify for short texts.");
-                result = classifyShortText(text, numOfTopics, lang);
+                hits = classifyShortText(text);
             }
         }catch (Exception e){
             LOG.error("[classify] - EXCEPTION: ", e);
             throw new TMFVisibleException("Unable to extract topics from specified text.");
         }
-        return result;
+        return hits;
     }
 
-    public  ArrayList<String[]> manageFileClassification(File file, String fileName, int numOfTopics, String lang) throws TMFVisibleException {
+    public ScoreDoc[]  manageFileClassification(File file, String fileName, int numOfTopics, String lang) throws TMFVisibleException {
         Text text;
-        ArrayList<String[]> result;
+        ScoreDoc[] hits;
         if(fileName.endsWith(".pdf") || fileName.endsWith(".PDF")){
             PDFparser parser = new PDFparser();
             text = new Text(parser.pdfToText(file));
-            result = classifyText(text, numOfTopics, lang);
+            hits = classifyText(text, numOfTopics);
         } else if(fileName.endsWith(".doc") || fileName.endsWith(".DOC")){
             DOCparser parser = new DOCparser();
             text = new Text(parser.docToText(file));
-            result = classifyText(text, numOfTopics, lang);
+            hits = classifyText(text, numOfTopics);
         } else if(fileName.endsWith(".txt") || fileName.endsWith(".TXT")){
             TXTparser parser = new TXTparser();
             text = new Text(parser.txtToText(file));
-            result = classifyText(text, numOfTopics, lang);
+            hits = classifyText(text, numOfTopics);
         } else if(fileName.endsWith(".pub") || fileName.endsWith(".")){
             // ToDO EPub Parser implementation
             // Launch parse() method of EPubParser
             // Launch classification
             // Aggregate the results
             text = new Text("Something");
-            result = classifyText(text, numOfTopics, lang);
+            hits = classifyText(text, numOfTopics);
         }
         else {
             throw new TMFVisibleException("File extension not valid: only 'pdf', 'doc' and 'txt' allowed.");
         }
-        return  result;
+        return hits;
     }
 
     public ArrayList<String[]> classifyCore(ScoreDoc[] hits, int numOfTopics, String lang) throws IOException {
