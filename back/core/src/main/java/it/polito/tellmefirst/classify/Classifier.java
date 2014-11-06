@@ -75,7 +75,6 @@ public class Classifier {
         LOG.debug("[constructor] - END");
     }
 
-
     public ArrayList<String[]> classify(String inputText, File file, String url, String fileName, int numOfTopics,
                                         String lang) throws TMFVisibleException {
         LOG.debug("[classify] - BEGIN");
@@ -100,22 +99,7 @@ public class Classifier {
             HTMLparser parser = new HTMLparser();
             text = new Text(parser.htmlToTextGoose(url));
         } else if(file != null){
-            if(fileName.endsWith(".pdf") || fileName.endsWith(".PDF")){
-                PDFparser parser = new PDFparser();
-                text = new Text(parser.pdfToText(file));
-            } else if(fileName.endsWith(".doc") || fileName.endsWith(".DOC")){
-                DOCparser parser = new DOCparser();
-                text = new Text(parser.docToText(file));
-            } else if(fileName.endsWith(".txt") || fileName.endsWith(".TXT")){
-                TXTparser parser = new TXTparser();
-                text = new Text(parser.txtToText(file));
-            } else if(fileName.endsWith(".pub") || fileName.endsWith(".TXT")){
-                // ToDO EPub Parser implementation
-                text = new Text("Something");
-            }
-            else {
-                throw new TMFVisibleException("File extension not valid: only 'pdf', 'doc' and 'txt' allowed.");
-            }
+             text = chooseParser(file, fileName);
         } else {
             throw new TMFVisibleException("No valid parameters in your request: both 'text' and 'url' and 'file'" +
                     " are null.");
@@ -236,6 +220,27 @@ public class Classifier {
             throw new TMFVisibleException("Unable to extract topics from specified text.");
         }
         return result;
+    }
+
+    public Text chooseParser(File file, String fileName) throws TMFVisibleException {
+        Text text;
+        if(fileName.endsWith(".pdf") || fileName.endsWith(".PDF")){
+            PDFparser parser = new PDFparser();
+            text = new Text(parser.pdfToText(file));
+        } else if(fileName.endsWith(".doc") || fileName.endsWith(".DOC")){
+            DOCparser parser = new DOCparser();
+            text = new Text(parser.docToText(file));
+        } else if(fileName.endsWith(".txt") || fileName.endsWith(".TXT")){
+            TXTparser parser = new TXTparser();
+            text = new Text(parser.txtToText(file));
+        } else if(fileName.endsWith(".pub") || fileName.endsWith(".")){
+            // ToDO EPub Parser implementation
+            text = new Text("Something");
+        }
+        else {
+            throw new TMFVisibleException("File extension not valid: only 'pdf', 'doc' and 'txt' allowed.");
+        }
+        return text;
     }
 
     public ArrayList<String[]> classifyCore(ScoreDoc[] hits, int numOfTopics, String lang) throws IOException {
