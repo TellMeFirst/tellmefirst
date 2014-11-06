@@ -95,27 +95,15 @@ public class Classifier {
         Text text;
         if (inputText != null && !inputText.equals("")){
             text = new Text(inputText);
-            String textString = text.getText();
-            int totalNumWords = TMFUtils.countWords(textString);
-            //no prod
-            LOG.debug("TOTAL WORDS: "+totalNumWords);
-            result = classifyText(text, totalNumWords, numOfTopics, lang);
+            result = classifyText(text, numOfTopics, lang);
         } else if (url != null){
             HTMLparser parser = new HTMLparser();
             text = new Text(parser.htmlToTextGoose(url));
-            String textString = text.getText();
-            int totalNumWords = TMFUtils.countWords(textString);
-            //no prod
-            LOG.debug("TOTAL WORDS: "+totalNumWords);
-            result = classifyText(text, totalNumWords, numOfTopics, lang);
+            result = classifyText(text, numOfTopics, lang);
         } else if(file != null){
              //text = chooseParser(file, fileName);
             text = new Text ("Test for file parser");
-            String textString = text.getText();
-            int totalNumWords = TMFUtils.countWords(textString);
-            //no prod
-            LOG.debug("TOTAL WORDS: "+totalNumWords);
-            result = classifyText(text, totalNumWords, numOfTopics, lang);
+            result = classifyText(text, numOfTopics, lang);
         } else {
             throw new TMFVisibleException("No valid parameters in your request: both 'text' and 'url' and 'file'" +
                     " are null.");
@@ -210,8 +198,12 @@ public class Classifier {
         return result;
     }
 
-    public ArrayList<String[]> classifyText(Text text, int totalNumWords, int numOfTopics, String lang) throws TMFVisibleException {
+    public ArrayList<String[]> classifyText(Text text, int numOfTopics, String lang) throws TMFVisibleException {
         ArrayList<String[]> result;
+        String textString = text.getText();
+        int totalNumWords = TMFUtils.countWords(textString);
+        //no prod
+        LOG.debug("TOTAL WORDS: "+totalNumWords);
         if(totalNumWords>30000){
             throw new TMFVisibleException("This is just a demo. Try with a text containing less than 30.000 words!");
         }
