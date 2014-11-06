@@ -95,21 +95,31 @@ public class Classifier {
         Text text;
         if (inputText != null && !inputText.equals("")){
             text = new Text(inputText);
+            String textString = text.getText();
+            int totalNumWords = TMFUtils.countWords(textString);
+            //no prod
+            LOG.debug("TOTAL WORDS: "+totalNumWords);
+            result = manageTextLength(text, totalNumWords, numOfTopics, lang);
         } else if (url != null){
             HTMLparser parser = new HTMLparser();
             text = new Text(parser.htmlToTextGoose(url));
+            String textString = text.getText();
+            int totalNumWords = TMFUtils.countWords(textString);
+            //no prod
+            LOG.debug("TOTAL WORDS: "+totalNumWords);
+            result = manageTextLength(text, totalNumWords, numOfTopics, lang);
         } else if(file != null){
              //text = chooseParser(file, fileName);
             text = new Text ("Test for file parser");
+            String textString = text.getText();
+            int totalNumWords = TMFUtils.countWords(textString);
+            //no prod
+            LOG.debug("TOTAL WORDS: "+totalNumWords);
+            result = manageTextLength(text, totalNumWords, numOfTopics, lang);
         } else {
             throw new TMFVisibleException("No valid parameters in your request: both 'text' and 'url' and 'file'" +
                     " are null.");
         }
-        String textString = text.getText();
-        int totalNumWords = TMFUtils.countWords(textString);
-        //no prod
-        LOG.debug("TOTAL WORDS: "+totalNumWords);
-        result = manageTextLength(text, totalNumWords, numOfTopics, lang);
         LOG.debug("[classify] - END");
         return  result;
     }
@@ -186,7 +196,6 @@ public class Classifier {
         LOG.debug("[classifyLongText] - END");
         return result;
     }
-
 
     public ArrayList<String[]> classifyShortText(Text text, int numOfTopics, String lang) throws ParseException,
             IOException {
