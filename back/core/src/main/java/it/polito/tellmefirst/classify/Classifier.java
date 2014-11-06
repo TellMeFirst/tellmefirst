@@ -102,7 +102,7 @@ public class Classifier {
             result = classifyText(text, numOfTopics, lang);
         } else if(file != null){
             text = new Text ("Test for file parser");
-            result = classifyText(text, numOfTopics, lang);
+            result = manageFileClassification(file, fileName, numOfTopics, lang);
         } else {
             throw new TMFVisibleException("No valid parameters in your request: both 'text' and 'url' and 'file'" +
                     " are null.");
@@ -223,8 +223,10 @@ public class Classifier {
         return result;
     }
 
-    public void manageFileClassification(File file, String fileName) throws TMFVisibleException {
+    public  ArrayList<String[]> manageFileClassification(File file, String fileName, int numOfTopics, String lang) throws TMFVisibleException {
         Text text;
+        ArrayList<String[]> result;
+
         if(fileName.endsWith(".pdf") || fileName.endsWith(".PDF")){
             PDFparser parser = new PDFparser();
             text = new Text(parser.pdfToText(file));
@@ -241,6 +243,8 @@ public class Classifier {
         else {
             throw new TMFVisibleException("File extension not valid: only 'pdf', 'doc' and 'txt' allowed.");
         }
+        result = classifyText(text, numOfTopics, lang);
+        return  result;
     }
 
     public ArrayList<String[]> classifyCore(ScoreDoc[] hits, int numOfTopics, String lang) throws IOException {
