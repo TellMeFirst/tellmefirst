@@ -1,7 +1,7 @@
 /**
  * TellMeFirst - A Knowledge Discovery Application
  *
- * Copyright (C) 2012 Federico Cairo, Giuseppe Futia, Federico Benedetto
+ * Copyright (C) 2012, 2014 Federico Cairo, Giuseppe Futia, Federico Benedetto
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -22,6 +22,7 @@ package it.polito.tellmefirst.classify;
 import it.polito.tellmefirst.exception.TMFVisibleException;
 import it.polito.tellmefirst.lucene.SimpleSearcher;
 import it.polito.tellmefirst.lucene.IndexesUtil;
+import it.polito.tellmefirst.parsing.*;
 import it.polito.tellmefirst.util.TMFUtils;
 import org.apache.commons.collections.map.LinkedMap;
 import org.apache.commons.lang.StringUtils;
@@ -35,10 +36,6 @@ import org.apache.lucene.search.ScoreDoc;
 import it.polito.tellmefirst.apimanager.ImageManager;
 import it.polito.tellmefirst.classify.threads.ClassiThread;
 import it.polito.tellmefirst.lodmanager.DBpediaManager;
-import it.polito.tellmefirst.parsing.DOCparser;
-import it.polito.tellmefirst.parsing.HTMLparser;
-import it.polito.tellmefirst.parsing.PDFparser;
-import it.polito.tellmefirst.parsing.TXTparser;
 import it.polito.tellmefirst.lucene.LuceneManager;
 import java.io.File;
 import java.io.IOException;
@@ -155,34 +152,13 @@ public class Classifier {
             ScoreDoc[] hits = thread.getHits();
             ArrayList<ScoreDoc> hitList = new ArrayList<ScoreDoc>();
             // numOfTopics is necessary in this method to classify each text chunk
-            // in a manner consistent with the classification
+            // in a consistent manner with the general classification process
             for(int b=0; b<numOfTopics; b++){
                 hitList.add(hits[b]);
             }
             mergedHitList.addAll(hitList);
         }
-        HashMap<Integer, Integer> scoreDocCount = new HashMap<Integer, Integer>();
-        for (ScoreDoc scoreDoc : mergedHitList) {
-            Integer count = scoreDocCount.get(scoreDoc.doc);
-            scoreDocCount.put(scoreDoc.doc, (count == null) ? 1 : count + 1);
-        }
-        HashMap<Integer,Integer> sortedMap = TMFUtils.sortHashMapIntegers(scoreDocCount);
-        LinkedHashMap<ScoreDoc, Integer> sortedMapWithScore = new LinkedHashMap<ScoreDoc, Integer>();
-        for(int docnum : sortedMap.keySet()){
-            Document doc = searcher.getFullDocument(docnum);
-            boolean flag = true;
-            for(ScoreDoc sdoc : mergedHitList){
-                if(flag && sdoc.doc == docnum){
-                    sortedMapWithScore.put(sdoc, sortedMap.get(docnum));
-                    flag = false;
-                }
-            }
-        }
-        ArrayList<ScoreDoc> finalHitsList = sortByRank(sortedMapWithScore);
-        ScoreDoc[] hits = new ScoreDoc[finalHitsList.size()];
-        for (int i = 0 ; i<finalHitsList.size(); i++){
-            hits[i] = finalHitsList.get(i);
-        }
+        ScoreDoc[] hits = sortChunkResults(mergedHitList);
         LOG.debug("[classifyLongText] - END");
         return hits;
     }
@@ -225,7 +201,7 @@ public class Classifier {
         return hits;
     }
 
-    public ScoreDoc[]  manageFileClassification(File file, String fileName, int numOfTopics, String lang) throws TMFVisibleException {
+    public ScoreDoc[] manageFileClassification(File file, String fileName, int numOfTopics, String lang) throws TMFVisibleException, IOException {
         Text text;
         ScoreDoc[] hits;
         if(fileName.endsWith(".pdf") || fileName.endsWith(".PDF")){
@@ -240,17 +216,22 @@ public class Classifier {
             TXTparser parser = new TXTparser();
             text = new Text(parser.txtToText(file));
             hits = classifyText(text, numOfTopics);
-        } else if(fileName.endsWith(".pub") || fileName.endsWith(".")){
-            // ToDO EPub Parser implementation
-            // Launch parse() method of EPubParser
-            // Launch classification
-            // Launch aggregation() method of EPubParser
-            // Return hits
-            text = new Text("Something");
-            hits = classifyText(text, numOfTopics);
+        } else if(fileName.endsWith(".epub") || fileName.endsWith(".EPUB")){
+            LOG.info("Parse the epub file");
+            EPUBparser parser = new EPUBparser();
+            LinkedHashMap parserResults = parser.parseEPUB(file);
+            LinkedHashMap<String, ScoreDoc[]> classificationResults = new LinkedHashMap<String, ScoreDoc[]>();
+            Iterator keyIterator = parserResults.keySet().iterator();
+            Iterator valueIterator = parserResults.entrySet().iterator();
+            while (keyIterator.hasNext()){
+                text = new Text((valueIterator.next().toString()));
+                classificationResults.put(keyIterator.next().toString(),classifyText(text, numOfTopics));
+            }
+            ArrayList<ScoreDoc> mergedHitList = parser.aggregateResults(classificationResults, numOfTopics);
+            hits = sortChunkResults(mergedHitList);
         }
         else {
-            throw new TMFVisibleException("File extension not valid: only 'pdf', 'doc' and 'txt' allowed.");
+            throw new TMFVisibleException("File extension not valid: only 'pdf', 'doc', 'epub' and 'txt' allowed.");
         }
         return hits;
     }
@@ -340,7 +321,6 @@ public class Classifier {
         return result;
     }
 
-
     public ArrayList<ScoreDoc> sortByRank(LinkedHashMap<ScoreDoc, Integer> inputList){
         LOG.debug("[sortByRank] - BEGIN");
         ArrayList<ScoreDoc> result = new ArrayList<ScoreDoc>();
@@ -358,5 +338,34 @@ public class Classifier {
         LOG.debug("[sortByRank] - END");
         return result;
     }
-}
 
+    public ScoreDoc[] sortChunkResults(ArrayList<ScoreDoc> mergedHitList) throws IOException {
+        LOG.debug("[simpleAggregation] - BEGIN");
+        // The final results are ordered according to the occurrences of each entity and the Lucene Score
+
+        HashMap<Integer, Integer> scoreDocCount = new HashMap<Integer, Integer>();
+        for (ScoreDoc scoreDoc : mergedHitList) {
+            Integer count = scoreDocCount.get(scoreDoc.doc);
+            scoreDocCount.put(scoreDoc.doc, (count == null) ? 1 : count + 1);
+        }
+        HashMap<Integer,Integer> sortedMap = TMFUtils.sortHashMapIntegers(scoreDocCount);
+        LinkedHashMap<ScoreDoc, Integer> sortedMapWithScore = new LinkedHashMap<ScoreDoc, Integer>();
+        for(int docnum : sortedMap.keySet()){
+            Document doc = searcher.getFullDocument(docnum);
+            boolean flag = true;
+            for(ScoreDoc sdoc : mergedHitList){
+                if(flag && sdoc.doc == docnum){
+                    sortedMapWithScore.put(sdoc, sortedMap.get(docnum));
+                    flag = false;
+                }
+            }
+        }
+        ArrayList<ScoreDoc> finalHitsList = sortByRank(sortedMapWithScore);
+        ScoreDoc[] hits = new ScoreDoc[finalHitsList.size()];
+        for (int i = 0 ; i<finalHitsList.size(); i++){
+            hits[i] = finalHitsList.get(i);
+        }
+        LOG.debug("[simpleAggregation] - END");
+        return hits;
+    }
+}
