@@ -1,7 +1,7 @@
 /**
  * TellMeFirst - A Knowledge Discovery Application
  *
- * Copyright (C) 2012, 2014 Federico Cairo, Giuseppe Futia, Federico Benedetto
+ * Copyright (C) 2012, 2014 Federico Cairo, Giuseppe Futia, Federico Benedetto, Alessio Melandri
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -73,18 +73,18 @@ public class Classifier {
     }
 
     public ArrayList<String[]> classify(String inputText, File file, String url, String fileName, int numOfTopics,
-                                        String lang) throws TMFVisibleException, IOException {
+                                        String lang) throws TMFVisibleException, IOException, InterruptedException {
         LOG.debug("[classify] - BEGIN");
         // check if DBpedia endpoints are up
         dBpediaManager = new DBpediaManager();
-        if (!lang.equals("italian") && !dBpediaManager.isDBpediaEnglishUp()){
+        if (!lang.equals("english") && !dBpediaManager.isDBpediaEnglishUp()){
             //comment for local use
-            throw new TMFVisibleException("DBpedia English service seems to be down, so TellMeFirs can't work " +
+            throw new TMFVisibleException("DBpedia English service seems to be down, so TellMeFirst can't work " +
                     "properly. Please try later!");
         } else {
             if (lang.equals("italian") && !dBpediaManager.isDBpediaItalianUp()){
                 //comment for local use
-                throw new TMFVisibleException("DBpedia Italian service seems to be down, so TellMeFirs can't work" +
+                throw new TMFVisibleException("DBpedia Italian service seems to be down, so TellMeFirst can't work" +
                         " properly. Please try later!");
             }
         }
