@@ -111,6 +111,43 @@ public class Classifier {
         return result;
     }
 
+    public LinkedHashMap <String, ArrayList<String[]>> classifyEPubChapters(File file, String fileName, int numOfTopics,
+                                                                            String lang) throws TMFVisibleException, IOException {
+
+        LOG.debug("[classifyEPubChapters] - BEGIN"); // Il check di questa cosa forse va fatto in un altro metodo per controllare
+        if(!(fileName.endsWith(".epub") || fileName.endsWith(".EPUB"))){
+            throw new TMFVisibleException("File extension not valid: only 'epub' allowed.");
+        }
+        dBpediaManager = new DBpediaManager();
+        if (!lang.equals("english") && !dBpediaManager.isDBpediaEnglishUp()){
+            //comment for local use
+            throw new TMFVisibleException("DBpedia English service seems to be down, so TellMeFirst can't work " +
+                    "properly. Please try later!");
+        } else {
+            if (lang.equals("italian") && !dBpediaManager.isDBpediaItalianUp()){
+                //comment for local use
+                throw new TMFVisibleException("DBpedia Italian service seems to be down, so TellMeFirst can't work" +
+                        " properly. Please try later!");
+            }
+        }
+        LinkedHashMap <String, ArrayList<String[]>> results = new LinkedHashMap<>();
+        Text text;
+        EPUBparser parser = new EPUBparser();
+        LinkedHashMap<String, String> parserResults = new LinkedHashMap<String, String>();
+        parserResults = parser.parseEPUB(file);
+        Set set = parserResults.entrySet();
+        Iterator i = set.iterator();
+        while (i.hasNext()){
+            Map.Entry me = (Map.Entry)i.next();
+            text = new Text((me.getValue().toString()));
+            ScoreDoc[] hits = classifyText(text, numOfTopics);
+            ArrayList<String[]> classificationResults = classifyCore(hits, numOfTopics, lang);
+            results.put(me.getKey().toString(), classificationResults);
+        }
+        LOG.debug("[classifyEPubChapters] - END");
+        return results;
+    }
+
     public ScoreDoc[] classifyLongText(Text text, int numOfTopics) throws InterruptedException,
             IOException {
         LOG.debug("[classifyLongText] - BEGIN");
@@ -181,9 +218,9 @@ public class Classifier {
         int totalNumWords = TMFUtils.countWords(textString);
         //no prod
         LOG.debug("TOTAL WORDS: "+totalNumWords);
-        if(totalNumWords>30000){
+        /* if(totalNumWords>30000){
             throw new TMFVisibleException("This is just a demo. Try with a text containing less than 30.000 words!");
-        }
+        } */
         try{
             if(totalNumWords>1000){
                 //no prod
