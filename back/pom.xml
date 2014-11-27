@@ -11,7 +11,7 @@
         <heapspace.Xmx.compiler>-Xmx2g</heapspace.Xmx.compiler>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.compiler.version>1.6</java.compiler.version>
+        <java.compiler.version>1.7</java.compiler.version>
         <maven.install.plugin.version>2.3.1</maven.install.plugin.version>
     </properties>
 
