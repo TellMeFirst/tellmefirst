@@ -52,7 +52,7 @@ public class ClassifyInterface extends AbsResponseInterface {
         return result;
     }
 
-    public String getXML(String text, File file, String url, String fileName, int numTopics, String lang) throws TMFVisibleException, TMFOutputException, IOException {
+    public String getXML(String text, File file, String url, String fileName, int numTopics, String lang) throws TMFVisibleException, TMFOutputException, IOException, InterruptedException {
         LOG.debug("[getXML] - BEGIN");
         String result;
         Classifier classifier = (lang.equals("italian")) ? TMFServer.getItalianClassifier() : TMFServer.getEnglishClassifier();

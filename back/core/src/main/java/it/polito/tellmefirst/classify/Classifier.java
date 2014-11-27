@@ -201,7 +201,7 @@ public class Classifier {
         return hits;
     }
 
-    public ScoreDoc[] manageFileClassification(File file, String fileName, int numOfTopics, String lang) throws TMFVisibleException, IOException {
+    public ScoreDoc[] manageFileClassification(File file, String fileName, int numOfTopics, String lang) throws TMFVisibleException, IOException, InterruptedException {
         Text text;
         ScoreDoc[] hits;
         if(fileName.endsWith(".pdf") || fileName.endsWith(".PDF")){
@@ -217,15 +217,16 @@ public class Classifier {
             text = new Text(parser.txtToText(file));
             hits = classifyText(text, numOfTopics);
         } else if(fileName.endsWith(".epub") || fileName.endsWith(".EPUB")){
-            LOG.info("Parse the epub file");
             EPUBparser parser = new EPUBparser();
-            LinkedHashMap parserResults = parser.parseEPUB(file);
+            LinkedHashMap<String, String> parserResults = new LinkedHashMap<String, String>();
+            parserResults = parser.parseEPUB(file);
             LinkedHashMap<String, ScoreDoc[]> classificationResults = new LinkedHashMap<String, ScoreDoc[]>();
-            Iterator keyIterator = parserResults.keySet().iterator();
-            Iterator valueIterator = parserResults.entrySet().iterator();
-            while (keyIterator.hasNext()){
-                text = new Text((valueIterator.next().toString()));
-                classificationResults.put(keyIterator.next().toString(),classifyText(text, numOfTopics));
+            Set set = parserResults.entrySet();
+            Iterator i = set.iterator();
+            while (i.hasNext()){
+                Map.Entry me = (Map.Entry)i.next();
+                text = new Text((me.getValue().toString()));
+                classificationResults.put(me.getKey().toString(),classifyText(text, numOfTopics));
             }
             ArrayList<ScoreDoc> mergedHitList = parser.aggregateResults(classificationResults, numOfTopics);
             hits = sortChunkResults(mergedHitList);
@@ -275,7 +276,7 @@ public class Classifier {
                     } else {
                         uri = doc.getField("SAMEAS").stringValue();
                         title = IndexesUtil.getTitle(uri, "en");
-                        visLabel = doc.getField("TITLE").stringValue().replaceAll("\\(.+?\\)", "").trim();;
+                        visLabel = doc.getField("TITLE").stringValue().replaceAll("\\(.+?\\)", "").trim();
                         String dirtyImage = IndexesUtil.getImage(uri, "en");
                         // we scrape anyway, even when the image URL is in DBpedia, to have always the right size
                         String[] fileNameSplit = dirtyImage.replace(" ","_").split("/");
