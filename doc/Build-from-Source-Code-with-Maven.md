@@ -1,4 +1,4 @@
-Build-from-Source-Code-with-Maven
+Build from Source Code with Maven
 =================================
 
 Requirements:
