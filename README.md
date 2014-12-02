@@ -37,4 +37,7 @@ TellMeFirst exploits [Lucene](http://lucene.apache.org/core/) Indexes for its cl
 ## Licenses
 This program can be used under the terms of the GNU Affero General Public License 3.0. Part of the code uses LingPipe under the Royalty Free License, and FancyBox under Creative Commons Attribution-NonCommercial 3.0 Unported.
 
+## Publications
+Futia, G., Cairo, F., Morando, F., & Leschiutta, L. Exploiting Linked Open Data and Natural Language Processing for Classification of Political Speech. *International Conference for E-Democracy and Open Government*. Krems, Austria, 21-23 May 2014
+
 
