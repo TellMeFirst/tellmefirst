@@ -378,7 +378,7 @@ public class Classifier {
     }
 
     public ScoreDoc[] sortChunkResults(ArrayList<ScoreDoc> mergedHitList) throws IOException {
-        LOG.debug("[simpleAggregation] - BEGIN");
+        LOG.debug("[sortChunkResults] - BEGIN");
         // The final results are ordered according to the occurrences of each entity and the Lucene Score
 
         HashMap<Integer, Integer> scoreDocCount = new HashMap<Integer, Integer>();
@@ -403,7 +403,7 @@ public class Classifier {
         for (int i = 0 ; i<finalHitsList.size(); i++){
             hits[i] = finalHitsList.get(i);
         }
-        LOG.debug("[simpleAggregation] - END");
+        LOG.debug("[sortChunkResults    ] - END");
         return hits;
     }
 }
