@@ -265,8 +265,10 @@ public class Classifier {
                 text = new Text((me.getValue().toString()));
                 classificationResults.put(me.getKey().toString(),classifyText(text, numOfTopics));
             }
+            LOG.info("****** Classification results: "+classificationResults);
             ArrayList<ScoreDoc> mergedHitList = parser.aggregateResults(classificationResults, numOfTopics);
             hits = sortChunkResults(mergedHitList);
+
         }
         else {
             throw new TMFVisibleException("File extension not valid: only 'pdf', 'doc', 'epub' and 'txt' allowed.");
