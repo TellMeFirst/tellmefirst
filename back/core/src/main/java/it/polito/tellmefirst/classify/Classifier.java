@@ -114,7 +114,7 @@ public class Classifier {
     public LinkedHashMap <String, ArrayList<String[]>> classifyEPubChapters(File file, String fileName, int numOfTopics,
                                                                             String lang) throws TMFVisibleException, IOException {
 
-        LOG.debug("[classifyEPubChapters] - BEGIN"); // Il check di questa cosa forse va fatto in un altro metodo per controllare
+        LOG.debug("[classifyEPubChapters] - BEGIN");
         if(!(fileName.endsWith(".epub") || fileName.endsWith(".EPUB"))){
             throw new TMFVisibleException("File extension not valid: only 'epub' allowed.");
         }
@@ -265,7 +265,7 @@ public class Classifier {
                 text = new Text((me.getValue().toString()));
                 classificationResults.put(me.getKey().toString(),classifyText(text, numOfTopics));
             }
-            LOG.info("****** Classification results: "+classificationResults);
+            //LOG.info("****** Classification results: "+classificationResults);
             ArrayList<ScoreDoc> mergedHitList = parser.aggregateResults(classificationResults, numOfTopics);
             hits = sortChunkResults(mergedHitList);
 

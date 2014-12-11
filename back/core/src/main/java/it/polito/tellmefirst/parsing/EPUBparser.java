@@ -23,10 +23,14 @@ import it.polito.tellmefirst.exception.TMFVisibleException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.tika.io.IOUtils;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.*;
+import org.apache.tika.parser.epub.EpubParser;
 import org.apache.tika.parser.html.HtmlParser;
 import org.apache.tika.sax.BodyContentHandler;
+import org.apache.tika.sax.LinkContentHandler;
+import org.apache.tika.sax.TeeContentHandler;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -64,8 +68,7 @@ public class EPUBparser {
                 tocMaybeDirty.close();
                 scanner.close();
 
-                String tocWithoutSpace = theString.replaceAll("(\\n|\\r|\\t|\\s\\s)", "");
-                String res = tocWithoutSpace.replaceAll("\'\'", "' '"); //XXX too much hack
+                String res = theString.replaceAll(">[\\s]*?<", "><");
 
                 InputStream toc = new ByteArrayInputStream(res.getBytes(StandardCharsets.UTF_8));
 
@@ -102,7 +105,7 @@ public class EPUBparser {
                 content.close();
                 scanner.close();
 
-                String filenameRegex = "href=\"(.*.html)\".*media-type=\"application/xhtml";
+                String filenameRegex = "href=\"(.*.htm(|l))\".*media-type=\"application/xhtml";
                 Pattern pattern = Pattern.compile(filenameRegex);
                 Matcher matcher = pattern.matcher(contentString);
 
@@ -114,13 +117,24 @@ public class EPUBparser {
                 //LOG.info("Show list in order");
                 //checkMap(files); //show files list in order
             }
-            if (entry.getName().endsWith("html")) {
+            if (entry.getName().endsWith("html") || entry.getName().endsWith("htm") || entry.getName().endsWith("xhtml")) {
                 InputStream htmlFile = fi.getInputStream(entry);
-                Scanner scanner = new Scanner(htmlFile,"UTF-8").useDelimiter("\\A");
+                /*Scanner scanner = new Scanner(htmlFile,"UTF-8").useDelimiter("\\A");
                 String htmlString = scanner.hasNext() ? scanner.next() : "";
                 String[] bits = entry.getName().split("/");
+                String fileName = bits[bits.length-1];*/
+
+                Scanner scanner = new Scanner(htmlFile,"UTF-8").useDelimiter("\\A");
+                String htmlString = scanner.hasNext() ? scanner.next() : "";
+
+                String regex1 = htmlString.replaceAll("^[^_]*?<body>", ""); //remove head
+                String regex2 = regex1.replaceAll("</body>.*$", ""); //remove tail
+                String htmlCleaned = regex2.replaceAll("<a.*?/>", ""); //anchor with one tag
+
+                String[] bits = entry.getName().split("/");
                 String fileName = bits[bits.length-1];
-                htmls.put(fileName, htmlString);
+
+                htmls.put(fileName, htmlCleaned);
             }
         }
         fi.close();
@@ -129,7 +143,7 @@ public class EPUBparser {
             stringBuilder.append("<p id=\"" + files.get(i) + "\"></p>"); // "anchor" also the heads of each files
             stringBuilder.append(htmls.get(files.get(i)));
         }
-        String htmlAll = stringBuilder.toString(); // XXX not a really valid html but Tika can parse it
+        String htmlAll = stringBuilder.toString();
 
         //We have all needed files, start to split
         //For each link -> made a chunk
@@ -142,7 +156,7 @@ public class EPUBparser {
         while (iter.hasPrevious()) {
             Map.Entry<String, String> me = iter.previous();
             try {
-                ContentHandler contenthandler = new BodyContentHandler(10*1024*1024);
+                ContentHandler contenthandler = new BodyContentHandler(10*htmlAll.length());
                 Scanner sc = new Scanner(htmlAll);
                 sc.useDelimiter("id=\""+ me.getValue().toString() + "\"");
                 htmlAll = sc.next();
@@ -158,6 +172,29 @@ public class EPUBparser {
         return epub;
     }
 
+    private static void autoParseAll() {
+        InputStream is = null;
+        String path = "";
+        try {
+            InputStream input = new FileInputStream(new File(path));
+            ContentHandler text = new BodyContentHandler(10*1024*1024);
+            LinkContentHandler links = new LinkContentHandler();
+            ContentHandler handler = new TeeContentHandler(links,text);
+            Metadata metadata = new Metadata();
+            EpubParser parser2 = new EpubParser();
+            ParseContext context = new ParseContext();
+            parser2.parse(input,handler,metadata,context);
+            LOG.debug("Body: " + text.toString()); //all text in one
+        }
+        catch (Exception el) {
+            el.printStackTrace();
+        }
+        finally {
+            if (is != null)
+                IOUtils.closeQuietly(is);
+        }
+    }
+
     public ArrayList<ScoreDoc> aggregateResults(LinkedHashMap<String, ScoreDoc[]> tocResults, int numOfTopics) throws IOException {
         LOG.debug("[aggregateResults] - BEGIN");
         ArrayList<ScoreDoc> mergedHitList = new ArrayList<ScoreDoc>();
@@ -166,6 +203,7 @@ public class EPUBparser {
             for (int i = 0; i < numOfTopics; i++){
                 hitList.add(tocResults.get(key)[i]);
             }
+            LOG.info(key);
             mergedHitList.addAll(hitList);
         }
         LOG.debug("[aggregateResults] - END");
