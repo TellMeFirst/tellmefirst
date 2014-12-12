@@ -266,7 +266,7 @@ public class Classifier {
                 classificationResults.put(me.getKey().toString(),classifyText(text, numOfTopics));
             }
             //LOG.info("****** Classification results: "+classificationResults);
-            ArrayList<ScoreDoc> mergedHitList = parser.aggregateResults(classificationResults, numOfTopics);
+            ArrayList<ScoreDoc> mergedHitList = parser.aggregateChapterResults(classificationResults, numOfTopics);
             hits = sortChunkResults(mergedHitList);
 
         }

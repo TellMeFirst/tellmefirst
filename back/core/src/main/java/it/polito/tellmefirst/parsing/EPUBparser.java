@@ -1,4 +1,4 @@
-/**
+/*
  * TellMeFirst - A Knowledge Discovery Application
  *
  * Copyright (C) 2014 Giuseppe Futia, Alessio Melandri
@@ -19,7 +19,6 @@
 
 package it.polito.tellmefirst.parsing;
 
-import it.polito.tellmefirst.exception.TMFVisibleException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.search.ScoreDoc;
@@ -54,7 +53,7 @@ public class EPUBparser {
     private LinkedHashMap<Integer, String> files = new LinkedHashMap<Integer, String>();
     private LinkedHashMap<String, String> htmls = new LinkedHashMap<String, String>();
 
-    public LinkedHashMap<String, String> parseEPUB(File file) throws IOException, TMFVisibleException {
+    public LinkedHashMap<String, String> parseEPUB(File file) throws IOException {
         LOG.debug("[parseEPUB] - BEGIN");
 
         ZipFile fi = new ZipFile(file);
@@ -83,8 +82,10 @@ public class EPUBparser {
                 }
                 catch (Exception ex) {
                     LOG.error("Unable to navigate the TOC");
-                    throw new TMFVisibleException("Problem parsing the file: the Epub file you uploaded seems malformed.");
                 }
+
+                removeEmptyTOC(epub);
+
                 //search anchors in links and split
                 Set set = epub.entrySet();
                 Iterator i = set.iterator();
@@ -158,25 +159,28 @@ public class EPUBparser {
             try {
                 ContentHandler contenthandler = new BodyContentHandler(10*htmlAll.length());
                 Scanner sc = new Scanner(htmlAll);
-                sc.useDelimiter("id=\""+ me.getValue().toString() + "\"");
+                sc.useDelimiter("id=\""+ me.getValue().toString() + "\">");
                 htmlAll = sc.next();
                 InputStream stream = new ByteArrayInputStream(sc.next().getBytes(StandardCharsets.UTF_8));
                 parser.parse(stream, contenthandler, metadata, new ParseContext());
                 epub.put(me.getKey().toString(), contenthandler.toString());
 
             } catch (Exception ex) {
-                LOG.error("Unable to parse content for index: "+me.getKey());
+                LOG.error("Unable to parse content for index: "+me.getKey()+", this chapter will be deleted");
             }
-        };
+        }
+
+        removeEmptyItems(epub);
+
         LOG.debug("[parseEPUB] - END");
         return epub;
     }
 
-    private static void autoParseAll() {
+    public String autoParseAll(File file) {
         InputStream is = null;
-        String path = "";
+        String textBody = "";
         try {
-            InputStream input = new FileInputStream(new File(path));
+            InputStream input = new FileInputStream(file);
             ContentHandler text = new BodyContentHandler(10*1024*1024);
             LinkContentHandler links = new LinkContentHandler();
             ContentHandler handler = new TeeContentHandler(links,text);
@@ -184,7 +188,8 @@ public class EPUBparser {
             EpubParser parser2 = new EpubParser();
             ParseContext context = new ParseContext();
             parser2.parse(input,handler,metadata,context);
-            LOG.debug("Body: " + text.toString()); //all text in one
+            textBody = text.toString();
+            LOG.debug("Body: " + textBody); //all text in one
         }
         catch (Exception el) {
             el.printStackTrace();
@@ -193,10 +198,11 @@ public class EPUBparser {
             if (is != null)
                 IOUtils.closeQuietly(is);
         }
+        return textBody;
     }
 
-    public ArrayList<ScoreDoc> aggregateResults(LinkedHashMap<String, ScoreDoc[]> tocResults, int numOfTopics) throws IOException {
-        LOG.debug("[aggregateResults] - BEGIN");
+    public ArrayList<ScoreDoc> aggregateChapterResults(LinkedHashMap<String, ScoreDoc[]> tocResults, int numOfTopics) throws IOException {
+        LOG.debug("[aggregateChapterResults] - BEGIN");
         ArrayList<ScoreDoc> mergedHitList = new ArrayList<ScoreDoc>();
         for(String key : tocResults.keySet()){
             ArrayList<ScoreDoc> hitList = new ArrayList<ScoreDoc>();
@@ -206,7 +212,7 @@ public class EPUBparser {
             LOG.info(key);
             mergedHitList.addAll(hitList);
         }
-        LOG.debug("[aggregateResults] - END");
+        LOG.debug("[aggregateChapterResults] - END");
         return mergedHitList;
     }
 
@@ -231,11 +237,9 @@ public class EPUBparser {
             if (navPoint.getNodeType() == Node.ELEMENT_NODE) {
                 Node navLabel = navPoint.getFirstChild();
                 Node text = navLabel.getFirstChild();
-                //System.out.println(text.getTextContent());
                 String title = text.getTextContent().toString();
 
                 Node content = navLabel.getNextSibling();
-                //System.out.println(content.getAttributes().getNamedItem("src").getNodeValue());
                 String link = content.getAttributes().getNamedItem("src").getNodeValue().toString();
 
                 epub.put(title, link);
@@ -253,4 +257,33 @@ public class EPUBparser {
             LOG.debug(me.getValue());
         }
     }
+
+    public static void removeEmptyItems(LinkedHashMap lhm) {
+
+        Set set = lhm.entrySet();
+        Iterator i = set.iterator();
+        Pattern pattern = Pattern.compile("\\s"); //check if at least one space
+
+        while(i.hasNext()) {
+            Map.Entry me = (Map.Entry)i.next();
+            Matcher matcher = pattern.matcher(me.getValue().toString());
+            if (!matcher.find()) {
+                i.remove();
+            }
+        }
+    }
+
+    public static void removeEmptyTOC(LinkedHashMap lhm) {
+
+        Set set = lhm.entrySet();
+        Iterator i = set.iterator();
+
+        while(i.hasNext()) {
+            Map.Entry me = (Map.Entry)i.next();
+            if (me.getValue().toString().equals("")) {
+                i.remove();
+            }
+        }
+    }
 }
+
