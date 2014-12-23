@@ -22,16 +22,14 @@ package it.polito.tellmefirst.client;
 import it.polito.tellmefirst.classify.Classifier;
 import it.polito.tellmefirst.classify.Text;
 import it.polito.tellmefirst.exception.TMFVisibleException;
-import it.polito.tellmefirst.lucene.SimpleSearcher;
+import it.polito.tellmefirst.lodmanager.DBpediaManager;
 import it.polito.tellmefirst.util.TMFUtils;
-import it.polito.tellmefirst.web.rest.TMFServer;
 import it.polito.tellmefirst.jaxrs.ClassifyOutput;
 import static java.util.stream.Collectors.toList;
 
 import org.apache.commons.collections.map.LinkedMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.search.ScoreDoc;
 import org.apache.tika.io.IOUtils;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.*;
@@ -54,46 +52,128 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.Map.Entry;
 
 public class Client {
 
+    /*
+
+      The Client manages different classification policies, according to type of document, the length of text,
+      and ad hoc choices for specific needs.
+
+      Currently, the Epub classifier is implemented in the Client class in order to simplify the merge of its
+      features in other TellMeFirst forks. In the future the classification policy for Epub files will be
+      defined in a different class.
+
+     */
     static Log LOG = LogFactory.getLog(Client.class);
-    public SimpleSearcher searcher;
-    private LinkedHashMap<String, String> epub = new LinkedHashMap<String, String>();
+    private HashMap<String, String> epub = new LinkedHashMap<>();
     private StringBuilder stringBuilder = new StringBuilder();
-    private LinkedHashMap<Integer, String> files = new LinkedHashMap<Integer, String>();
-    private LinkedHashMap<String, String> htmls = new LinkedHashMap<String, String>();
+    private HashMap<Integer, String> files = new LinkedHashMap<>();
+    private HashMap<String, String> htmls = new LinkedHashMap<>();
+    private Classifier classifier;
+    private DBpediaManager dBpediaManager;
+
+    public Client(Classifier c){
+        this.classifier = c;
+    }
 
     public ArrayList<String[]> classify(String inputText, File file, String url, String fileName,
-                                        int numOfTopics, String lang) throws TMFVisibleException, IOException {
+                                        int numOfTopics, String lang) throws TMFVisibleException {
 
-        Classifier classifier = (lang.equals("italian")) ? TMFServer.getItalianClassifier() : TMFServer.getEnglishClassifier();
+        LOG.debug("[classify] - BEGIN");
+
         ArrayList<String[]> results;
-
-        if (fileName.endsWith(".epub")) {
-            LinkedHashMap <String, String> parserResults = new LinkedHashMap<String, String>();
-            parserResults = parseEPUB(file);
-            LinkedHashMap<String, List<ClassifyOutput>> classificationResults = new LinkedHashMap<String, List<ClassifyOutput>>();
-            Set set = parserResults.entrySet();
-            Iterator i = set.iterator();
-            while (i.hasNext()){
-                Map.Entry me = (Map.Entry)i.next();
-                Text text = new Text((me.getValue().toString()));
-                ArrayList<String[]> chapterResult = classifier.classify(inputText, file, url, fileName, numOfTopics,lang);
-                classificationResults.put(me.getKey().toString(), jsonAdapter(chapterResult));
-            }
-            //LOG.info("****** Classification results: "+classificationResults);
-            List<ClassifyOutput> mergedHitList = aggregateChapterResults(classificationResults, numOfTopics);
-            //results = sortChunkResults(mergedHitList);
-            results = new ArrayList<>();
+        if (file != null && fileName.endsWith("epub")) {
+            LOG.info("Launch the Epub Classifier");
+            results = classifyEpub(inputText, file, url, fileName, numOfTopics,lang);
         } else {
+            LOG.info("Launch the usual Classifier");
             results = classifier.classify(inputText, file, url, fileName, numOfTopics,lang);
         }
+
+        LOG.debug("[classify] - END");
+
         return results;
     }
 
-    private LinkedHashMap<String, String> parseEPUB(File file) throws IOException {
-        LOG.debug("[parseEPUB] - BEGIN");
+    private ArrayList<String[]> classifyEpub(String inputText, File file, String url, String fileName,
+                                             int numOfTopics, String lang)
+                                                               throws TMFVisibleException {
+
+        LOG.debug("[classifyEpub] - BEGIN");
+
+        dBpediaManager = new DBpediaManager();
+        if (!lang.equals("english") && !dBpediaManager.isDBpediaEnglishUp()){
+            throw new TMFVisibleException("DBpedia English service seems to be down, so TellMeFirst can't work " +
+                    "properly. Please try later!");
+        } else {
+            if (lang.equals("italian") && !dBpediaManager.isDBpediaItalianUp()){
+                throw new TMFVisibleException("DBpedia Italian service seems to be down, so TellMeFirst can't work" +
+                        " properly. Please try later!");
+            }
+        }
+
+        ArrayList<String[]> results;
+        results = new ArrayList<>();
+
+        HashMap <String, String> parserResults = new LinkedHashMap<>();
+        try {
+            parserResults = parseEpub(file);
+        } catch (IOException e) {
+            LOG.error("[classifyEpub] - EXCEPTION: ", e);
+            throw new TMFVisibleException("The Epub parser cannot read the file.");
+        }
+        HashMap<String, List<ClassifyOutput>> classificationResults = new LinkedHashMap<>();
+        Set set = parserResults.entrySet();
+        Iterator i = set.iterator();
+        while (i.hasNext()) {
+            Map.Entry me = (Map.Entry)i.next();
+            Text text = new Text((me.getValue().toString()));
+            LOG.debug("* Title of the chapter");
+            LOG.debug(me.getKey().toString());
+            LOG.debug("* Text of the chapter");
+            LOG.debug(me.getValue().toString().substring(0, 100));
+            String textString = text.getText();
+            int totalNumWords = TMFUtils.countWords(textString);
+            LOG.debug("TOTAL WORDS: "+totalNumWords);
+            try {
+                if(totalNumWords>1000){
+                    LOG.debug("Text contains "+totalNumWords+" words. We'll use Classify for long texts.");
+                    ArrayList<String[]> chapterResults = classifier.classifyLongText(text, numOfTopics, lang);
+                    classificationResults.put(me.getKey().toString(), jsonAdapter(chapterResults));
+                } else {
+                    LOG.debug("Text contains "+totalNumWords+" words. We'll use Classify for short texts.");
+                    ArrayList<String[]> chapterResults = classifier.classifyShortText(text, numOfTopics, lang);
+                    classificationResults.put(me.getKey().toString(), jsonAdapter(chapterResults));
+                }
+            }catch (Exception e){
+                LOG.error("[classifyEpub] - EXCEPTION: ", e);
+                throw new TMFVisibleException("Unable to extract topics from specified text.");
+            }
+        }
+
+        ArrayList<ClassifyOutput> classifyOutputListSorted = sortResults(classificationResults);
+
+        for (int k = 0 ; k < numOfTopics; k++) {
+            String[] arrayOfFields = new String[6];
+            arrayOfFields[0] = classifyOutputListSorted.get(k).getUri();
+            arrayOfFields[1] = classifyOutputListSorted.get(k).getLabel();
+            arrayOfFields[2] = classifyOutputListSorted.get(k).getTitle();
+            arrayOfFields[3] = classifyOutputListSorted.get(k).getScore();
+            arrayOfFields[4] = classifyOutputListSorted.get(k).getMergedTypes();
+            arrayOfFields[5] = classifyOutputListSorted.get(k).getImage();
+            results.add(arrayOfFields);
+        }
+
+        LOG.debug("[classifyEpub] - END");
+
+        return results;
+    }
+
+    private HashMap<String, String> parseEpub(File file) throws IOException {
+
+        LOG.debug("[parseEpub] - BEGIN");
 
         ZipFile fi = new ZipFile(file);
 
@@ -154,15 +234,9 @@ public class Client {
                     files.put(count, matcher.group(1));
                     count++;
                 }
-                //LOG.info("Show list in order");
-                //checkMap(files); //show files list in order
             }
             if (entry.getName().endsWith("html") || entry.getName().endsWith("htm") || entry.getName().endsWith("xhtml")) {
                 InputStream htmlFile = fi.getInputStream(entry);
-                /*Scanner scanner = new Scanner(htmlFile,"UTF-8").useDelimiter("\\A");
-                String htmlString = scanner.hasNext() ? scanner.next() : "";
-                String[] bits = entry.getName().split("/");
-                String fileName = bits[bits.length-1];*/
 
                 Scanner scanner = new Scanner(htmlFile,"UTF-8").useDelimiter("\\A");
                 String htmlString = scanner.hasNext() ? scanner.next() : "";
@@ -179,19 +253,23 @@ public class Client {
         }
         fi.close();
         Integer i;
-        for (i = 0; i<files.size(); i++) {
+        for (i = 0; i < files.size(); i++) {
             stringBuilder.append("<p id=\"" + files.get(i) + "\"></p>"); // "anchor" also the heads of each files
             stringBuilder.append(htmls.get(files.get(i)));
         }
         String htmlAll = stringBuilder.toString();
 
-        //We have all needed files, start to split
-        //For each link -> made a chunk
-        //Start from the bottom
+        /*
+
+        We have all needed files, start to split
+        For each link -> made a chunk
+        Start from the bottom
+
+         */
 
         Metadata metadata = new Metadata();
         Parser parser = new HtmlParser();
-        ListIterator<Map.Entry<String, String>> iter = new ArrayList<Map.Entry<String, String>>(epub.entrySet()).listIterator(epub.size());
+        ListIterator<Map.Entry<String, String>> iter = new ArrayList<>(epub.entrySet()).listIterator(epub.size());
 
         while (iter.hasPrevious()) {
             Map.Entry<String, String> me = iter.previous();
@@ -206,16 +284,40 @@ public class Client {
 
             } catch (Exception ex) {
                 LOG.error("Unable to parse content for index: "+me.getKey()+", this chapter will be deleted");
+                removeChapter(epub, me.getKey().toString());
             }
         }
 
+        /*
+
+          If the Epub file has a bad structure, I try to use the epub extractor of Tika.
+
+         */
+        if (epub.size() == 0) {
+            LOG.info("The Epub file has a bad structure. Try to use the Tika extractor");
+            epub.put("All text", autoParseAll(file));
+        }
+
+        /*
+
+          I remove the Project Gutenberg license chapter from the Map, because it is useless
+          for the classification and it generates a Lucene Exception in case of Italian language
+          (the license text is always in English).
+
+          You can use this function in order to remove each chapter that you useless for classifying
+          your Epub files.
+
+         */
+        removeChapter(epub, "A Word from Project Gutenberg");
+        removeChapterFromString(epub, "End of the Project Gutenberg EBook");
         removeEmptyItems(epub);
 
-        LOG.debug("[parseEPUB] - END");
+        LOG.debug("[parseEpub] - END");
         return epub;
     }
 
     private String autoParseAll(File file) {
+
         InputStream is = null;
         String textBody = "";
         try {
@@ -227,7 +329,7 @@ public class Client {
             EpubParser parser2 = new EpubParser();
             ParseContext context = new ParseContext();
             parser2.parse(input,handler,metadata,context);
-            textBody = text.toString();
+            textBody = text.toString().replaceAll(">[\\s]*?<", "><");;
             LOG.debug("Body: " + textBody); //all text in one
         }
         catch (Exception el) {
@@ -240,22 +342,11 @@ public class Client {
         return textBody;
     }
 
-    private List<ClassifyOutput> aggregateChapterResults(LinkedHashMap<String, List<ClassifyOutput>> tocResults, int numOfTopics) throws IOException {
-        LOG.debug("[aggregateChapterResults] - BEGIN");
-        List<ClassifyOutput> mergedHitList = new ArrayList<>();
-        for(String key : tocResults.keySet()){
-            List<ClassifyOutput> hitList = new ArrayList<>();
-            for (int i = 0; i < numOfTopics; i++){
-                hitList.add(tocResults.get(key).get(i));
-            }
-            LOG.info(key);
-            mergedHitList.addAll(hitList);
-        }
-        LOG.debug("[aggregateChapterResults] - END");
-        return mergedHitList;
-    }
 
     private void findNavMap(NodeList nodeList) {
+
+        LOG.debug("[findNavMap] - BEGIN");
+
         for (int count = 0; count < nodeList.getLength(); count++) {
             Node tempNode = nodeList.item(count);
             if (tempNode.getNodeType() == Node.ELEMENT_NODE) {
@@ -268,9 +359,14 @@ public class Client {
                 }
             }
         }
+
+        LOG.debug("[findNavMap] - END");
     }
 
     private void getFirstChildElement(Node navMap) {
+
+        LOG.debug("[getFirstChildElement] - BEGIN");
+
         Node navPoint = navMap.getFirstChild();
         while (navPoint != null) {
             if (navPoint.getNodeType() == Node.ELEMENT_NODE) {
@@ -285,23 +381,17 @@ public class Client {
             }
             navPoint = navPoint.getNextSibling();
         }
+
+        LOG.debug("[getFirstChildElement] - END");
     }
 
-    private void checkMap(LinkedHashMap lhm) {
-        Set set = lhm.entrySet();
-        Iterator i = set.iterator();
-        while(i.hasNext()) {
-            Map.Entry me = (Map.Entry)i.next();
-            LOG.debug(me.getKey() + ": ");
-            LOG.debug(me.getValue());
-        }
-    }
+    private void removeEmptyItems(HashMap lhm) {
 
-    private void removeEmptyItems(LinkedHashMap lhm) {
+        LOG.debug("[removeEmptyItems] - BEGIN");
 
         Set set = lhm.entrySet();
         Iterator i = set.iterator();
-        Pattern pattern = Pattern.compile("\\s"); //check if at least one space
+        Pattern pattern = Pattern.compile("([a-zA-Z0-9]{1,}\\s){15,}"); //check if at least 15 words
 
         while(i.hasNext()) {
             Map.Entry me = (Map.Entry)i.next();
@@ -310,9 +400,13 @@ public class Client {
                 i.remove();
             }
         }
+
+        LOG.debug("[removeEmptyItems] - END");
     }
 
-    private void removeEmptyTOC(LinkedHashMap lhm) {
+    private void removeEmptyTOC(HashMap lhm) {
+
+        LOG.debug("[removeEmptyTOC] - BEGIN");
 
         Set set = lhm.entrySet();
         Iterator i = set.iterator();
@@ -323,69 +417,86 @@ public class Client {
                 i.remove();
             }
         }
+
+        LOG.debug("[removeEmptyTOC] - END");
     }
 
-    public void sortChunkResults(List<ClassifyOutput> mergedHitList) throws IOException {
-        LOG.debug("[sortChunkResults] - BEGIN");
-        LOG.info("***************");
-        LOG.info(mergedHitList);
+    private void removeChapter(HashMap lhm, String chapterTitle) {
 
-        // The final results are ordered according to the occurrences of each entity and the Lucene Score
+        LOG.debug("[removeChapter] - BEGIN");
 
-        //Array<ScoreDoc> hits = new ArrayList<ScoreDoc>();
+        Set set = lhm.entrySet();
+        Iterator i = set.iterator();
 
-
-        /*
-        HashMap<ClassifyOutput, Integer> scoreDocCount = new HashMap<>();
-        for (ClassifyOutput classifyOutput: mergedHitList){
-            Integer count = scoreDocCount.get(classifyOutput);
-            scoreDocCount.put(classifyOutput,(count == null) ? 1 : count + 1);
+        while(i.hasNext()) {
+            Map.Entry me = (Map.Entry)i.next();
+            if (me.getKey().toString().equals(chapterTitle)) {
+                i.remove();
+            }
         }
 
-        HashMap<ClassifyOutput,Integer> sortedMap = TMFUtils.sortHashMapIntegers(scoreDocCount);
-        LinkedHashMap sortedMapWithScore = new LinkedHashMap<ScoreDoc, Integer>();
+        LOG.debug("[removeChapter] - END");
 
-        for(ClassifyOutput classifyOutput: sortedMap.keySet()){
+    }
 
-            boolean flag = true;
-            for(ClassifyOutput classifyOutput1 : mergedHitList){
-                if(flag && classifyOutput.getUri() == classifyOutput1.getUri()){
-                    sortedMapWithScore.put(classifyOutput, sortedMap.get(classifyOutput1));
-                    flag = false;
+    private void removeChapterFromString(HashMap lhm, String uselessText) {
+
+        LOG.debug("[removeChapter] - BEGIN");
+
+        Set set = lhm.entrySet();
+        Iterator i = set.iterator();
+
+        while(i.hasNext()) {
+            Map.Entry me = (Map.Entry)i.next();
+            if (me.getValue().toString().contains(uselessText)) {
+                i.remove();
+            }
+        }
+
+        LOG.debug("[removeChapter] - END");
+
+    }
+
+
+    public ArrayList<ClassifyOutput> sortResults(HashMap<String, List<ClassifyOutput>> classifiedChapters) {
+
+        LOG.debug("[sortOccurrences] - BEGIN");
+
+        HashMap<String, Integer> classifyOutputOcc = new LinkedHashMap<>();
+        Set set = classifiedChapters.entrySet();
+        Iterator i = set.iterator();
+
+        while(i.hasNext()) {
+            Map.Entry me = (Map.Entry)i.next();
+            List<ClassifyOutput> classifyOutputList = (List<ClassifyOutput>) me.getValue();
+
+            for (ClassifyOutput classifyOutput: classifyOutputList) {
+                if (classifyOutputOcc.get(classifyOutput.getUri()) == null) {
+                    classifyOutputOcc.put(classifyOutput.getUri(), 1);
+                }
+                else {
+                    Integer oldValue = classifyOutputOcc.get(classifyOutput.getUri());
+                    classifyOutputOcc.put(classifyOutput.getUri(), oldValue + 1);
                 }
             }
         }
-        ArrayList<ScoreDoc> finalHitsList = sortByRank(sortedMapWithScore);
-        ScoreDoc[] hits = new ScoreDoc[finalHitsList.size()];
-        for (int i = 0 ; i<finalHitsList.size(); i++){
-            hits[i] = finalHitsList.get(i);
-        }
-        LOG.debug("[sortChunkResults] - END");
-                   */
 
-        LOG.debug("[sortChunkResults] - END");
-        //return hits;
-    }
+        HashMap<String, Integer> sortedMapByOcc = sortMapByValues(classifyOutputOcc, false);
+        HashMap<ClassifyOutput, Integer> sortedMapWithScore = createMapWithScore(sortedMapByOcc, classifiedChapters);
+        ArrayList<ClassifyOutput> classifyOutputList = sortByRank(sortedMapWithScore);
 
-    public ArrayList<ScoreDoc> sortByRank(LinkedHashMap<ScoreDoc, Integer> inputList){
-        LOG.debug("[sortByRank] - BEGIN");
-        ArrayList<ScoreDoc> result = new ArrayList<ScoreDoc>();
-        LinkedMap apacheMap = new LinkedMap(inputList);
-        for (int i=0; i<apacheMap.size()-1; i++){
-            TreeMap<Float, ScoreDoc> treeMap = new TreeMap<Float, ScoreDoc>(Collections.reverseOrder());
-            do{ i++;
-                treeMap.put(((ScoreDoc)apacheMap.get(i-1)).score,(ScoreDoc)apacheMap.get(i-1) );
-            }while (i<apacheMap.size() && apacheMap.getValue(i) == apacheMap.getValue(i-1));
-            i--;
-            for(Float score : treeMap.keySet()){
-                result.add(treeMap.get(score));
-            }
-        }
-        LOG.debug("[sortByRank] - END");
-        return result;
+        LOG.debug("[sortOccurrences] - END");
+        return classifyOutputList;
     }
 
     private List<ClassifyOutput> jsonAdapter(List<String[]> list) {
+        /*
+
+          The TellMeFirst legacy instance of the Politecnico doesn't use the wikilink,
+          so I comment this line "output.setWikilink(strings[6])", in order
+          to avoid the following exception: java.lang.ArrayIndexOutOfBoundsException
+
+         */
         return list.stream().map(strings -> {
             ClassifyOutput output = new ClassifyOutput();
             output.setUri(strings[0]);
@@ -394,9 +505,110 @@ public class Client {
             output.setScore(strings[3]);
             output.setMergedTypes(strings[4]);
             output.setImage(strings[5]);
-            output.setWikilink(strings[6]);
+            // output.setWikilink(strings[6]);
             return output;
         }).collect(toList());
+    }
+
+    private HashMap<String, Integer> sortMapByValues(Map<String, Integer> unsortMap, final boolean order) {
+
+        LOG.debug("[sortMapByValues] - BEGIN");
+
+        List<Entry<String, Integer>> list = new LinkedList<Entry<String, Integer>>(unsortMap.entrySet());
+
+        // Sorting the list based on values
+        Collections.sort(list, new Comparator<Entry<String, Integer>>() {
+            public int compare(Entry<String, Integer> o1,
+                               Entry<String, Integer> o2) {
+                if (order) {
+                    return o1.getValue().compareTo(o2.getValue());
+                }
+                return o2.getValue().compareTo(o1.getValue());
+            }
+        });
+
+        // Maintaining insertion order with the help of LinkedList
+        HashMap<String, Integer> sortedMap = new LinkedHashMap<>();
+        for (Entry<String, Integer> entry : list) {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+
+        LOG.debug("[sortMapByValues] - END");
+
+        return sortedMap;
+    }
+
+    private HashMap<ClassifyOutput, Integer> createMapWithScore(HashMap<String, Integer> sortedMapByOcc,
+                                                                      HashMap<String, List<ClassifyOutput>>
+                                                                              classifiedChapters) {
+
+        LOG.debug("[createMapWithScore] - BEGIN");
+
+        HashMap<ClassifyOutput, Integer> sortedMapWithScore = new LinkedHashMap<>();
+        ArrayList<ClassifyOutput> classifyOutputList = new ArrayList<>();
+
+        for (Entry<String, List<ClassifyOutput>> chapterEntry :  classifiedChapters.entrySet()) {
+            for (int i = 0; i < chapterEntry.getValue().size(); i++) {
+                classifyOutputList.add(chapterEntry.getValue().get(i));
+            }
+        }
+
+        for (Entry<String, Integer> sortedMapEntry : sortedMapByOcc.entrySet()) {
+            boolean flag = true;
+            for (int k = 0; k < classifyOutputList.size(); k++) {
+                if(flag && sortedMapEntry.getKey() == classifyOutputList.get(k).getUri()) {
+                    sortedMapWithScore.put(classifyOutputList.get(k), sortedMapEntry.getValue());
+                    flag = false;
+                }
+            }
+        }
+
+        LOG.debug("[createMapWithScore] - END");
+
+        return sortedMapWithScore;
+    }
+
+    public ArrayList<ClassifyOutput> sortByRank(HashMap<ClassifyOutput, Integer> inputList){
+
+        LOG.debug("[sortByRank] - BEGIN");
+
+        ArrayList<ClassifyOutput> result = new ArrayList<>();
+        LinkedMap apacheMap = new LinkedMap(inputList);
+        for (int i = 0; i< apacheMap.size()-1; i++){
+            TreeMap<Float, ClassifyOutput> treeMap = new TreeMap<>(Collections.reverseOrder());
+            do{ i++;
+                treeMap.put(Float.valueOf(((ClassifyOutput)apacheMap.get(i-1)).getScore()),(ClassifyOutput)apacheMap.get(i-1) );
+            }while (i<apacheMap.size() && apacheMap.getValue(i) == apacheMap.getValue(i-1));
+            i--;
+            for(Float score : treeMap.keySet()){
+                result.add(treeMap.get(score));
+            }
+        }
+
+        LOG.debug("[sortByRank] - END");
+        return result;
+    }
+
+    private void printMap(Map<String, Integer> map) {
+
+        for (Entry<String, Integer> entry : map.entrySet()) {
+            LOG.info("Key : " + entry.getKey() + " Value : " + entry.getValue());
+        }
+    }
+
+    private void printClassifyOutputMap(Map<ClassifyOutput, Integer> map) {
+
+        for (Entry<ClassifyOutput, Integer> entry : map.entrySet()) {
+            LOG.info("Key : " + entry.getKey().getUri() + " Value : " + entry.getValue());
+        }
+    }
+
+    private void printEpub(Map<String, String> map) {
+
+        for (Entry<String, String> entry : map.entrySet()) {
+            LOG.info("Key : " + entry.getKey() + " Value : " + entry.getValue());
+        }
+
     }
 
 }
