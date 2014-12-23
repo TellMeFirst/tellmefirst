@@ -286,11 +286,11 @@ public class Client {
         }
 
         /* I remove the Project Gutenberg license chapter from the Map, because it is useless
-           for the classification and it generates a Lucene Exception in case of Italian language
+           for the classification and it generates a Lucene Exception in case of the Italian language
            (the license text is always in English).
 
-           You can use this function in order to remove each chapter that you useless for classifying
-           your Epub files. */
+           You can use this function in order to remove each chapter that is useless for classifying
+           your Epub document. */
         removeChapter(epub, "A Word from Project Gutenberg");
         removeChapterFromString(epub, "End of the Project Gutenberg EBook");
         removeEmptyItems(epub);
