@@ -56,16 +56,12 @@ import java.util.Map.Entry;
 
 public class Client {
 
-    /*
+    /* The Client manages different classification policies, according to type of document, the length of text,
+       and ad hoc choices for specific needs.
 
-      The Client manages different classification policies, according to type of document, the length of text,
-      and ad hoc choices for specific needs.
-
-      Currently, the Epub classifier is implemented in the Client class in order to simplify the merge of its
-      features in other TellMeFirst forks. In the future the classification policy for Epub files will be
-      defined in a different class.
-
-     */
+       Currently, the Epub classifier is implemented in the Client class in order to simplify the merge of its
+       features in other TellMeFirst forks. In the future the classification policy for Epub files will be
+       defined in a different class. */
     static Log LOG = LogFactory.getLog(Client.class);
     private HashMap<String, String> epub = new LinkedHashMap<>();
     private StringBuilder stringBuilder = new StringBuilder();
@@ -259,14 +255,9 @@ public class Client {
         }
         String htmlAll = stringBuilder.toString();
 
-        /*
-
-        We have all needed files, start to split
-        For each link -> made a chunk
-        Start from the bottom
-
-         */
-
+        /* We have all needed files, start to split
+           For each link -> made a chunk
+           Start from the bottom */
         Metadata metadata = new Metadata();
         Parser parser = new HtmlParser();
         ListIterator<Map.Entry<String, String>> iter = new ArrayList<>(epub.entrySet()).listIterator(epub.size());
@@ -288,26 +279,18 @@ public class Client {
             }
         }
 
-        /*
-
-          If the Epub file has a bad structure, I try to use the epub extractor of Tika.
-
-         */
+        //If the Epub file has a bad structure, I try to use the epub extractor of Tika.
         if (epub.size() == 0) {
             LOG.info("The Epub file has a bad structure. Try to use the Tika extractor");
             epub.put("All text", autoParseAll(file));
         }
 
-        /*
+        /* I remove the Project Gutenberg license chapter from the Map, because it is useless
+           for the classification and it generates a Lucene Exception in case of Italian language
+           (the license text is always in English).
 
-          I remove the Project Gutenberg license chapter from the Map, because it is useless
-          for the classification and it generates a Lucene Exception in case of Italian language
-          (the license text is always in English).
-
-          You can use this function in order to remove each chapter that you useless for classifying
-          your Epub files.
-
-         */
+           You can use this function in order to remove each chapter that you useless for classifying
+           your Epub files. */
         removeChapter(epub, "A Word from Project Gutenberg");
         removeChapterFromString(epub, "End of the Project Gutenberg EBook");
         removeEmptyItems(epub);
@@ -490,13 +473,10 @@ public class Client {
     }
 
     private List<ClassifyOutput> jsonAdapter(List<String[]> list) {
-        /*
 
-          The TellMeFirst legacy instance of the Politecnico doesn't use the wikilink,
-          so I comment this line "output.setWikilink(strings[6])", in order
-          to avoid the following exception: java.lang.ArrayIndexOutOfBoundsException
-
-         */
+        /* The TellMeFirst legacy instance of the Politecnico doesn't use the wikilink,
+           so I comment this line "output.setWikilink(strings[6])", in order
+           to avoid the following exception: java.lang.ArrayIndexOutOfBoundsException */
         return list.stream().map(strings -> {
             ClassifyOutput output = new ClassifyOutput();
             output.setUri(strings[0]);

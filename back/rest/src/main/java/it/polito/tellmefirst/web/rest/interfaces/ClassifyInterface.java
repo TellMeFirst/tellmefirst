@@ -53,20 +53,18 @@ public class ClassifyInterface extends AbsResponseInterface {
     }
 
     public String getXML(String text, File file, String url, String fileName, int numTopics, String lang) throws TMFVisibleException, TMFOutputException {
-        /*
 
-          We create an instance of the Client in order to manage different classification policies.
-
-          A better implementation of this proxy class would wrap the Classifier. Nevertheless,
-          importing the TMFServer in the Client implies a cyclic reference between the "rest" and the "core"
-          Maven modules and causes a building error.
-
-          This issue will be resolved in the future, subdividing TellMeFirst features in different modules.
-
-        */
         LOG.debug("[getXML] - BEGIN");
         String result;
         Classifier classifier = (lang.equals("italian")) ? TMFServer.getItalianClassifier() : TMFServer.getEnglishClassifier();
+
+        /* We create an instance of the Client in order to manage different classification policies.
+
+           A better implementation of this proxy class would wrap the Classifier. Nevertheless,
+           importing the TMFServer in the Client implies a cyclic reference between the "rest" and the "core"
+           Maven modules and causes a building error.
+
+          This issue will be resolved in the future, subdividing TellMeFirst features in different modules. */
         Client client = new Client(classifier);
         ArrayList<String[]> topics = client.classify(text, file, url, fileName, numTopics, lang);
         result = produceXML(topics);
