@@ -25,4 +25,4 @@ The new [Client](https://github.com/TellMeFirst/tellmefirst/blob/ebook-telecom/b
         return results;
     }
 
-The Epub extractor is based on the [Apache Tika](http://tika.apache.org/) toolkit and exploits the structure of the Epub document shown in the [Toc](http://www.idpf.org/accessibility/guidelines/content/nav/toc.php) (Table of Content) file. This implementation allow you to develope more advanced classification policies, compared to the simple classification of the whole text.
+The Epub extractor is based on the [Apache Tika](http://tika.apache.org/) toolkit and exploits the structure of the Epub document shown in the [Toc](http://www.idpf.org/accessibility/guidelines/content/nav/toc.php) (Table of Content) file. This implementation allow you to develop more advanced classification policies, compared to the simple classification of the whole text.
