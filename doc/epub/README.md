@@ -33,9 +33,9 @@ Below you find the first implementation of the classify method to manage differe
 
 The Epub extractor is based on the [Apache Tika](https://www.gutenberg.org/) toolkit and exploits the structure of the Epub document defined in the [Toc](http://www.idpf.org/accessibility/guidelines/content/nav/toc.php) (Table of Content) file. This implementation allow you to develop more advanced classification policies, compared to the simple classification of the whole text.
 
-For these reasons, beside the usual classification system we have also implemented a new REST API called */rest/classifyEpubChapters* that provides results of the classification process for each chapter (the top-level section defined in the Toc) of an Epub file.
+For these reasons, beside the usual classification system, we have also implemented a new REST API called */rest/classifyEpubChapters* that provides results of the classification process for each chapter (the top-level section defined in the Toc) of an Epub file.
 
-Here you find part of the classifyEpubChapters response on the "Siddartha by Hermann Hesse" ebook. It is available on the Project Gutenberg website: [http://www.gutenberg.org/ebooks/2500](http://www.gutenberg.org/ebooks/2500). These results are obtained with [DBpedia 3.9](http://wiki.dbpedia.org/Downloads39?show_files=1). 
+Here you find part of the classifyEpubChapters response on the "Siddartha by Hermann Hesse" ebook, available on the Project Gutenberg website: [http://www.gutenberg.org/ebooks/2500](http://www.gutenberg.org/ebooks/2500). These results are obtained with [DBpedia 3.9](http://wiki.dbpedia.org/Downloads39?show_files=1). 
 
 	{
 	  "@service": "ClassifyEpubChapters",
@@ -163,4 +163,4 @@ Here you find part of the classifyEpubChapters response on the "Siddartha by Her
 	      ]
 	    }, *** TRUNCATION ***
 
-As anticipated in the previous example, to test the Epub Classifier we use ebooks from the [Project Gutenberg website](https://www.gutenberg.org/). Nevertheless, we notice that in some ebooks of this repository the Toc file is not well-structured, so it is difficult to perform a classification for each chapter. For these reasons, we combine different techniques to make more robust the process of extraction and classification of text. See the [*parseEpub()*](https://github.com/TellMeFirst/tellmefirst/blob/ebook-telecom/back/core/src/main/java/it/polito/tellmefirst/client/Client.java) method.
+As anticipated in the previous example, to test the Epub Classifier we use ebooks from the [Project Gutenberg website](https://www.gutenberg.org/). Nevertheless, we notice that in some ebooks of this repository the Toc file is not well-structured, so it is difficult to perform a classification for each chapter. For these reasons, we combine different techniques to make more robust the process of extraction and classification of text. See the *parseEpub()* method implemented in the [Client](https://github.com/TellMeFirst/tellmefirst/blob/ebook-telecom/back/core/src/main/java/it/polito/tellmefirst/client/Client.java).
