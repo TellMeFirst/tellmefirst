@@ -345,23 +345,31 @@ public class Client {
             }
         }
 
-        //If the Epub file has a bad structure, I try to use the epub extractor of Tika.
-        if (epub.size() == 0) {
-            LOG.info("The Epub file has a bad structure. Try to use the Tika extractor");
-            epub.put("All text", autoParseAll(file));
-        }
-
-        /* I remove the Project Gutenberg license chapter from the Map, because it is useless
+         /* I remove the Project Gutenberg license chapter from the Map, because it is useless
            for the classification and it generates a Lucene Exception in case of the Italian language
            (the license text is always in English).
 
-           You can use this function in order to remove each chapter that is useless for classifying
+           You can use this method in order to remove each chapter that is useless for classifying
            your Epub document. */
         removeChapter(epub, "A Word from Project Gutenberg");
         removeChapterFromString(epub, "End of the Project Gutenberg EBook");
         removeEmptyItems(epub);
 
+        //If the Epub file has a bad structure, I try to use the basic Epub extractor of Tika.
+        if (epub.size() == 0) {
+            LOG.info("The Epub file has a bad structure. Try to use the Tika extractor");
+            epub.put("All text", autoParseAll(file));
+        }
+
+        removeEmptyItems(epub);
+
+        if(epub.size() == 0) {
+            LOG.error("Unable to extract text from this Epub");
+            throw new TMFVisibleException("Unable to extract any text from this Epub.");
+        }
+
         LOG.debug("[parseEpub] - END");
+
         return epub;
     }
 
@@ -378,7 +386,9 @@ public class Client {
             EpubParser parser2 = new EpubParser();
             ParseContext context = new ParseContext();
             parser2.parse(input,handler,metadata,context);
-            textBody = text.toString().replaceAll(">[\\s]*?<", "><");;
+            textBody = text.toString().replaceAll(">[\\s]*?<", "><");
+            // Remove the Project Gutenberg meta information from the text
+            textBody = textBody.split("End of the Project Gutenberg EBook")[0];
             LOG.debug("Body: " + textBody); //all text in one
         }
         catch (Exception el) {
@@ -505,7 +515,6 @@ public class Client {
         LOG.debug("[removeChapter] - END");
 
     }
-
 
     public ArrayList<ClassifyOutput> sortResults(HashMap<String, List<ClassifyOutput>> classifiedChapters) {
 
@@ -635,6 +644,7 @@ public class Client {
         return result;
     }
 
+    // Print methods for checking the data structures
     private void printMap(Map<String, Integer> map) {
 
         for (Entry<String, Integer> entry : map.entrySet()) {
