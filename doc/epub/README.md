@@ -161,67 +161,6 @@ Here you find part of the classifyEpubChapters response on the "Siddartha by Her
 		  "@image": ""
 		}
 	      ]
-	    },
-		{
-	      "@toc": "GOTAMA",
-	      "Resources":       [
-		        {
-		  "@uri": "http://dbpedia.org/resource/Gautama_Buddha",
-		  "@label": "Gautama Buddha",
-		  "@title": "Gautama Buddha",
-		  "@score": "1.5224682",
-		  "@mergedTypes": "DBpedia:Person#DBpedia:Http://xmlns.com/foaf/0.1/Person#Schema:Person#DBpedia:Agent#",
-		  "@image": ""
-		},
-		        {
-		  "@uri": "http://dbpedia.org/resource/Sangha",
-		  "@label": "Sangha",
-		  "@title": "Sangha",
-		  "@score": "1.2267755",
-		  "@mergedTypes": "",
-		  "@image": ""
-		},
-		        {
-		  "@uri": "http://dbpedia.org/resource/Buddhahood",
-		  "@label": "Buddhahood",
-		  "@title": "Buddhahood",
-		  "@score": "1.1338243",
-		  "@mergedTypes": "",
-		  "@image": "http://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Mahayanabuddha.jpg/444px-Mahayanabuddha.jpg"
-		},
-		        {
-		  "@uri": "http://dbpedia.org/resource/Nirvana",
-		  "@label": "Nirvana",
-		  "@title": "Nirvana",
-		  "@score": "1.045",
-		  "@mergedTypes": "",
-		  "@image": ""
-		},
-		        {
-		  "@uri": "http://dbpedia.org/resource/Bodhi",
-		  "@label": "Bodhi",
-		  "@title": "Bodhi",
-		  "@score": "1.2666217",
-		  "@mergedTypes": "",
-		  "@image": "http://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Buddha_Meditating_Under_the_Bodhi_Tree%2C_800_C.E.jpg/444px-Buddha_Meditating_Under_the_Bodhi_Tree%2C_800_C.E.jpg"
-		},
-		        {
-		  "@uri": "http://dbpedia.org/resource/Four_Noble_Truths",
-		  "@label": "Four Noble Truths",
-		  "@title": "Four Noble Truths",
-		  "@score": "1.2657106",
-		  "@mergedTypes": "",
-		  "@image": "http://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Gandharan_-_Expounding_the_Law_-_Walters_2551.jpg/477px-Gandharan_-_Expounding_the_Law_-_Walters_2551.jpg"
-		},
-		        {
-		  "@uri": "http://dbpedia.org/resource/Enlightenment_in_Buddhism",
-		  "@label": "Enlightenment in Buddhism",
-		  "@title": "Enlightenment in Buddhism",
-		  "@score": "1.2248611",
-		  "@mergedTypes": "",
-		  "@image": ""
-		}
-	      ]
 	    }, *** TRUNCATION ***
 
 As anticipated in the previous example, to test the Epub Classifier we use ebooks from the [Project Gutenberg website](https://www.gutenberg.org/). Nevertheless, we notice that in some ebooks of this repository the Toc file is not well-structured, so it is difficult to perform a classification for each chapter. For these reasons, we combine different techniques to make more robust the process of extraction and classification of text. See the [*parseEpub()*](https://github.com/TellMeFirst/tellmefirst/blob/ebook-telecom/back/core/src/main/java/it/polito/tellmefirst/client/Client.java) method.
