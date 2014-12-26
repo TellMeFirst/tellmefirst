@@ -167,7 +167,73 @@ public class Client {
         return results;
     }
 
-    private HashMap<String, String> parseEpub(File file) throws IOException {
+    /**
+     * Classify each chapter (the top-level section defined in the Toc file) of an Epub document.
+     *
+     * @param file the input file
+     * @param fileName the input filename
+     * @param numOfTopics number of topics to be returned
+     * @param lang the language of the text to be classified ("italian" or "english")
+     * @return A HashMap in which the key is a string with the title of the chapter and the value
+     *         is a list of the results of the classification process
+     */
+    public HashMap <String, ArrayList<String[]>> classifyEPubChapters(File file, String fileName, int numOfTopics,
+                                                                            String lang) throws TMFVisibleException, IOException {
+
+        //The classfyEPubChapter method works when the Epub in case of a well-defined structure in the Toc file.
+        //Otherwise you can use the usual classify method.
+
+        LOG.debug("[classifyEPubChapters] - BEGIN");
+
+        if(!(fileName.endsWith(".epub") || fileName.endsWith(".EPUB"))){
+            throw new TMFVisibleException("File extension not valid: only 'epub' allowed.");
+        }
+        dBpediaManager = new DBpediaManager();
+        if (!lang.equals("english") && !dBpediaManager.isDBpediaEnglishUp()){
+            //comment for local use
+            throw new TMFVisibleException("DBpedia English service seems to be down, so TellMeFirst can't work " +
+                    "properly. Please try later!");
+        } else {
+            if (lang.equals("italian") && !dBpediaManager.isDBpediaItalianUp()){
+                //comment for local use
+                throw new TMFVisibleException("DBpedia Italian service seems to be down, so TellMeFirst can't work" +
+                        " properly. Please try later!");
+            }
+        }
+        HashMap <String, ArrayList<String[]>> results = new LinkedHashMap<>();
+        HashMap<String, String> parserResults = new LinkedHashMap<String, String>();
+        parserResults = parseEpub(file);
+        Set set = parserResults.entrySet();
+        Iterator i = set.iterator();
+        while (i.hasNext()){
+            Map.Entry me = (Map.Entry)i.next();
+            Text text = new Text((me.getValue().toString()));
+            String textString = text.getText();
+            int totalNumWords = TMFUtils.countWords(textString);
+            LOG.debug("TOTAL WORDS: "+totalNumWords);
+            try {
+                if(totalNumWords>1000){
+                    LOG.debug("Text contains "+totalNumWords+" words. We'll use Classify for long texts.");
+                    ArrayList<String[]> classificationResults = classifier.classifyLongText(text, numOfTopics, lang);
+                    results.put(me.getKey().toString(), classificationResults);
+                } else {
+                    LOG.debug("Text contains "+totalNumWords+" words. We'll use Classify for short texts.");
+                    ArrayList<String[]> classificationResults = classifier.classifyShortText(text, numOfTopics, lang);
+                    results.put(me.getKey().toString(), classificationResults);
+                }
+            }catch (Exception e){
+                LOG.error("[classifyEpub] - EXCEPTION: ", e);
+                throw new TMFVisibleException("Unable to extract topics from specified text.");
+            }
+        }
+
+        LOG.debug("[classifyEPubChapters] - END");
+
+        return results;
+    }
+
+
+    private HashMap<String, String> parseEpub(File file) throws IOException, TMFVisibleException {
 
         LOG.debug("[parseEpub] - BEGIN");
 
