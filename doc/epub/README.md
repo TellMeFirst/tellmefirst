@@ -33,7 +33,7 @@ Below you find the first implementation of the classify method to manage differe
 
 The Epub extractor is based on the [Apache Tika](https://www.gutenberg.org/) toolkit and exploits the structure of the Epub document defined in the [Toc](http://www.idpf.org/accessibility/guidelines/content/nav/toc.php) (Table of Content) file. This implementation allow you to develop more advanced classification policies, compared to the simple classification of the whole text.
 
-For these reasons, beside the usual classification system we have also implemented a new REST API called **/rest/classifyEPubChapters** that provides results of the classification process for each chapter (the top-level section defined in the Toc) of an Epub file.
+For these reasons, beside the usual classification system we have also implemented a new REST API called */rest/classifyEpubChapters* that provides results of the classification process for each chapter (the top-level section defined in the Toc) of an Epub file.
 
 Here you find part of the classifyEpubChapters response on the "Siddartha by Hermann Hesse" ebook. It is available on the Project Gutenberg website: [http://www.gutenberg.org/ebooks/2500](http://www.gutenberg.org/ebooks/2500). These results are obtained with [DBpedia 3.9](http://wiki.dbpedia.org/Downloads39?show_files=1). 
 
