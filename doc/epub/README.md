@@ -168,3 +168,6 @@ Here you find part of the classifyEpubChapters response on the "Siddartha by Her
 }
 ```
 As anticipated in the previous example, to test the Epub Classifier we use ebooks from the [Project Gutenberg website](https://www.gutenberg.org/). Nevertheless, we notice that in some ebooks of this repository the Toc file is not well-structured, so it is difficult to perform a classification for each chapter. For these reasons, we combine different techniques to make more robust the process of extraction and classification of text. See the *parseEpub()* method implemented in the [Client](https://github.com/TellMeFirst/tellmefirst/blob/ebook-telecom/back/core/src/main/java/it/polito/tellmefirst/client/Client.java).
+
+## Contributing
+Pull requests, feature requests and bug reports are welcome!
