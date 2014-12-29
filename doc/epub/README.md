@@ -37,7 +37,7 @@ The Epub extractor is based on the [Apache Tika](https://www.gutenberg.org/) too
 For these reasons, beside the usual classification system, we have also implemented a new REST API called */rest/classifyEpubChapters* that provides results of the classification process for each chapter (the top-level section defined in the Toc) of an Epub file.
 
 ### Request - POST
-   http://tellmefirst.polito.it:2222/rest/classifyEpubChapters
+    http://tellmefirst.polito.it:2222/rest/classifyEpubChapters
 
 |    HEADER    |                     DESCRIPTION                     |     VALID VALUES    |
 |:------------:|:---------------------------------------------------:|:-------------------:|
@@ -55,7 +55,7 @@ For these reasons, beside the usual classification system, we have also implemen
 
 ### Request example with curl
 
-   curl -F file={file_location} -F fileName=”{file_name}.epub” -F numTopics=3 -F lang=english http://tellmefirst.polito.it:2222/rest/classifyEpubChapters
+    curl -F file={file_location} -F fileName=”{file_name}.epub” -F numTopics=3 -F lang=english http://tellmefirst.polito.it:2222/rest/classifyEpubChapters
 
 
 Here you find part of the classifyEpubChapters response on the "Siddartha by Hermann Hesse" ebook, available on the Project Gutenberg website: [http://www.gutenberg.org/ebooks/2500](http://www.gutenberg.org/ebooks/2500). These results are obtained with [DBpedia 3.9](http://wiki.dbpedia.org/Downloads39?show_files=1). 
