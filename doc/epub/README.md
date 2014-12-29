@@ -42,7 +42,7 @@ For these reasons, beside the usual classification system, we have also implemen
 |    HEADER    |                     DESCRIPTION                     |     VALID VALUES    |
 |:------------:|:---------------------------------------------------:|:-------------------:|
 |    Accept    |   The MIME type of thereturned data format (JSON)   |   application/json  |
-| Content-Type | Used to encode the data forsubmission to the server | multipart/form-data |
+| Content-Type | Used to encode the data for submission to the server | multipart/form-data |
 
 ### Request URI parameters
 
