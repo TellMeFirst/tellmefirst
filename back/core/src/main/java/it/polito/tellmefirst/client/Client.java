@@ -337,7 +337,11 @@ public class Client {
                 htmlAll = sc.next();
                 InputStream stream = new ByteArrayInputStream(sc.next().getBytes(StandardCharsets.UTF_8));
                 parser.parse(stream, contenthandler, metadata, new ParseContext());
-                epub.put(me.getKey().toString(), contenthandler.toString());
+                String chapterText = contenthandler.toString().toLowerCase().replaceAll("\\d+.*", "");
+                String chapterTextWithoutNo = chapterText.replaceAll("\\d+.*", "");
+                // Remove the Project Gutenberg meta information from the text
+                String chapterTextCleaned = chapterTextWithoutNo.split("end of the project gutenberg ebook")[0];
+                epub.put(me.getKey().toString(), chapterTextCleaned);
 
             } catch (Exception ex) {
                 LOG.error("Unable to parse content for index: "+me.getKey()+", this chapter will be deleted");
@@ -352,7 +356,6 @@ public class Client {
            You can use this method in order to remove each chapter that is useless for classifying
            your Epub document. */
         removeChapter(epub, "A Word from Project Gutenberg");
-        removeChapterFromString(epub, "End of the Project Gutenberg EBook");
         removeEmptyItems(epub);
 
         //If the Epub file has a bad structure, I try to use the basic Epub extractor of Tika.
@@ -386,9 +389,9 @@ public class Client {
             EpubParser parser2 = new EpubParser();
             ParseContext context = new ParseContext();
             parser2.parse(input,handler,metadata,context);
-            textBody = text.toString().replaceAll(">[\\s]*?<", "><");
+            textBody = text.toString().replaceAll(">[\\s]*?<", "><").toLowerCase().replaceAll("\\d+.*", "");;
             // Remove the Project Gutenberg meta information from the text
-            textBody = textBody.split("End of the Project Gutenberg EBook")[0];
+            textBody = textBody.split("end of the project gutenberg ebook")[0].toLowerCase();
             LOG.debug("Body: " + textBody); //all text in one
         }
         catch (Exception el) {
@@ -456,6 +459,7 @@ public class Client {
             Map.Entry me = (Map.Entry)i.next();
             Matcher matcher = pattern.matcher(me.getValue().toString());
             if (!matcher.find()) {
+                LOG.info("Remove empty item: "+me.getKey().toString());
                 i.remove();
             }
         }
@@ -473,6 +477,7 @@ public class Client {
         while(i.hasNext()) {
             Map.Entry me = (Map.Entry)i.next();
             if (me.getValue().toString().equals("")) {
+                LOG.info("Remove empty TOC: "+me.getKey().toString());
                 i.remove();
             }
         }
@@ -490,6 +495,7 @@ public class Client {
         while(i.hasNext()) {
             Map.Entry me = (Map.Entry)i.next();
             if (me.getKey().toString().equals(chapterTitle)) {
+                LOG.info("Remove useless chapter: "+me.getKey().toString());
                 i.remove();
             }
         }
