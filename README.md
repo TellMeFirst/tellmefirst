@@ -32,7 +32,7 @@ mvn install
 
 ## How to create TellMeFirst Indexes
 
-TellMeFirst exploits [Lucene](http://lucene.apache.org/core/) Indexes for its classification and enrichment system. To build the TellMeFirst Indexes you can install and use our [fork of the DBpedia Spotlight project](https://github.com/TellMeFirst/dbpedia-spotlight/tree/tellmefirst).
+TellMeFirst exploits [Lucene](http://lucene.apache.org/core/) Indexes for its classification and enrichment system. To build the TellMeFirst Indexes you can install and use our [fork of the DBpedia Spotlight project](https://github.com/TellMeFirst/dbpedia-spotlight/tree/tellmefirst). Before creating the TellMeFirst Indexes, you can also test the software using sample indexes published on this [Git repository](https://github.com/TellMeFirst/test-indexes), and update this [property file](https://github.com/TellMeFirst/tellmefirst/blob/master/back/conf/server.properties) with the correct parameters.
 
 ## Publications
 Futia, G., Cairo, F., Morando, F., & Leschiutta, L. [Exploiting Linked Open Data and Natural Language Processing for Classification of Political Speech] (http://porto.polito.it/2540694/). *International Conference for E-Democracy and Open Government*. Krems, Austria, 21-23 May 2014
