@@ -81,14 +81,14 @@ public class Classifier {
         LOG.debug("[classify] - BEGIN");
         // check if DBpedia endpoints are up
         dBpediaManager = new DBpediaManager();
-        if (!lang.equals("italian") && !dBpediaManager.isDBpediaEnglishUp()){
+        if (!lang.equals("english") && !dBpediaManager.isDBpediaEnglishUp()){
             //comment for local use
-            throw new TMFVisibleException("DBpedia English service seems to be down, so TellMeFirs can't work " +
+            throw new TMFVisibleException("DBpedia English service seems to be down, so TellMeFirst can't work " +
                     "properly. Please try later!");
         } else {
             if (lang.equals("italian") && !dBpediaManager.isDBpediaItalianUp()){
                 //comment for local use
-                throw new TMFVisibleException("DBpedia Italian service seems to be down, so TellMeFirs can't work" +
+                throw new TMFVisibleException("DBpedia Italian service seems to be down, so TellMeFirst can't work" +
                         " properly. Please try later!");
             }
         }
