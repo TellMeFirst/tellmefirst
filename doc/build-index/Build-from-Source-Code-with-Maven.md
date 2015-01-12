@@ -22,4 +22,3 @@ mvn install
 ```
 
 This mvn install from the parent pom.xml is important because it runs install-file for some jars distributed alongside the source code.
-
