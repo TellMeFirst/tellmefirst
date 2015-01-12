@@ -33,7 +33,7 @@ The second step is to copy the downloaded files (the DBpedia datasets and the Wi
 /data/tellmefirst/dbpedia/it/original
 ```
 
-If you want to change the original path of these input datasets, you can modify the following configuration files: 
+If you want to change the original path of these input datasets, you can modify the following configuration files:
 
 ```
 /conf/indexing.tmf.en.properties
@@ -126,4 +126,3 @@ mvn scala:run -Dlauncher=AddSameAsToIndex "-DjavaOpts.Xmx=$JAVA_XMX" "-DaddArgs=
 ```
 
 Add the Lucene Field SAMEAS to the Corpus Index (required for the Italian version).
-
