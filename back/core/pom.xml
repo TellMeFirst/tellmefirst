@@ -182,18 +182,6 @@
             <version>4.1.2</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-core</artifactId>
-            <version>1.6</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-parsers</artifactId>
-            <version>1.6</version>
-        </dependency>
-
     </dependencies>
 
 </project>

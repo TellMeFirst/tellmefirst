@@ -14,6 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+//
+// XXX Copied from the tmfcore_buid_war repository.
+//
+// Here until we switch to use the API for tmfcore. When we'll do that,
+// the returned value will be a ClassifyOutput serialized as JSON.
+//
+
 package it.polito.tellmefirst.jaxrs;
 
 public class ClassifyOutput {
