@@ -22,7 +22,7 @@
 // the returned value will be a ClassifyOutput serialized as JSON.
 //
 
-package it.polito.tellmefirst.jaxrs;
+package it.polito.tellmefirst.web.rest.clients;
 
 public class ClassifyOutput {
     private String uri, label, title, score, mergedTypes, image, wikilink;
