@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package it.polito.tellmefirst.clients;
+package it.polito.tellmefirst.web.rest.clients;
 
 import it.polito.tellmefirst.classify.Classifier;
 import it.polito.tellmefirst.classify.Text;
 import it.polito.tellmefirst.exception.TMFVisibleException;
 import it.polito.tellmefirst.lodmanager.DBpediaManager;
 import it.polito.tellmefirst.util.TMFUtils;
-import it.polito.tellmefirst.jaxrs.ClassifyOutput;
+import it.polito.tellmefirst.web.rest.clients.ClassifyOutput;
 import static java.util.stream.Collectors.toList;
 
 import org.apache.commons.collections.map.LinkedMap;
@@ -58,12 +58,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.Map.Entry;
 
-public class Client {
+public class ClientEpub {
 
     /*
        The Epub classifier is currently implemented in the Client. In the future the classification policy
        for Epub files will be defined in a different class. */
-    static Log LOG = LogFactory.getLog(Client.class);
+    static Log LOG = LogFactory.getLog(ClientEpub.class);
     private static String TEMPORARY_PATH = "./epub-sample";
     private HashMap<String, String> epub = new LinkedHashMap<>();
     private StringBuilder stringBuilder = new StringBuilder();
@@ -72,7 +72,7 @@ public class Client {
     private Classifier classifier;
     private DBpediaManager dBpediaManager;
 
-    public Client(Classifier c){
+    public ClientEpub(Classifier c){
         this.classifier = c;
     }
 
