@@ -7,6 +7,6 @@ TellMeFirst exploits 3 [Lucene](http://lucene.apache.org/core/) Indexes for each
 
 To build TellMeFirst Indexes, you may want:
 
-* Install the project in your system: see the installation [guide with Maven](https://github.com/TellMeFirst/tellmefirst/tree/master/doc/Build-from-Source-Code-with-Maven.md).
-* Set up your environment: see how to import the project in [IntelliJ Idea](https://github.com/TellMeFirst/tellmefirst/tree/master/doc/Setting-up-IntelliJ-IDEA.md).
-* Build the [Corpus Index](https://github.com/TellMeFirst/tellmefirst/tree/master/doc/Corpus-Index.md).
+* Install the project in your system: see the installation [guide with Maven](https://github.com/TellMeFirst/tellmefirst/tree/master/doc/build-index/Build-from-Source-Code-with-Maven.md).
+* Set up your environment: see how to import the project in [IntelliJ Idea](https://github.com/TellMeFirst/tellmefirst/tree/master/doc/build-index/Setting-up-IntelliJ-IDEA.md).
+* Build the [Corpus Index](https://github.com/TellMeFirst/tellmefirst/tree/master/doc/build-index/Corpus-Index.md).
