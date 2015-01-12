@@ -12,10 +12,10 @@ A demo of the software can be explored at: [http://tellmefirst.polito.it/] (http
 
 Requirements:
 
-* Java 1.8+
+* Java 1.6+
 * Maven 2
 * Git
-* RAM 10 GiB (in a production environment)
+* RAM 10 GiB
 
 Checkout all code using the command:
 
@@ -32,12 +32,12 @@ mvn install
 
 ## How to create TellMeFirst Indexes
 
-TellMeFirst exploits [Lucene](http://lucene.apache.org/core/) Indexes for its classification and enrichment system. To build the TellMeFirst Indexes you can install and use our [fork of the DBpedia Spotlight project](https://github.com/TellMeFirst/dbpedia-spotlight/tree/tellmefirst). Before creating the TellMeFirst Indexes, you can also test the software using sample indexes published on this [Git repository](https://github.com/TellMeFirst/test-indexes), and update this [property file](https://github.com/TellMeFirst/tellmefirst/blob/master/back/conf/server.properties) with the correct parameters.
-
-## Publications
-Futia, G., Cairo, F., Morando, F., & Leschiutta, L. [Exploiting Linked Open Data and Natural Language Processing for Classification of Political Speech] (http://porto.polito.it/2540694/). *International Conference for E-Democracy and Open Government*. Krems, Austria, 21-23 May 2014
+TellMeFirst exploits [Lucene](http://lucene.apache.org/core/) Indexes for its classification and enrichment system. To build the TellMeFirst Indexes you can install and use our [fork of the DBpedia Spotlight project](https://github.com/TellMeFirst/dbpedia-spotlight/tree/tellmefirst).
 
 ## Licenses
 This program can be used under the terms of the GNU Affero General Public License 3.0. Part of the code uses LingPipe under the Royalty Free License, and FancyBox under Creative Commons Attribution-NonCommercial 3.0 Unported.
+
+## Publications
+Futia, G., Cairo, F., Morando, F., & Leschiutta, L. [Exploiting Linked Open Data and Natural Language Processing for Classification of Political Speech] (http://porto.polito.it/2540694/). *International Conference for E-Democracy and Open Government*. Krems, Austria, 21-23 May 2014
 
 
