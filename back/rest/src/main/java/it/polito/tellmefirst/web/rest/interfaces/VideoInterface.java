@@ -19,9 +19,13 @@
 
 package it.polito.tellmefirst.web.rest.interfaces;
 
+import static it.polito.tellmefirst.util.TMFUtils.unchecked;
 import it.polito.tellmefirst.exception.TMFOutputException;
+import it.polito.tellmefirst.util.Ret;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jettison.json.JSONObject;
 import org.xml.sax.helpers.AttributesImpl;
 import javax.xml.transform.sax.TransformerHandler;
 import java.io.ByteArrayOutputStream;
@@ -36,9 +40,7 @@ public class VideoInterface extends AbsResponseInterface{
 
     public String getJSON(String uri, String label) throws Exception {
         LOG.debug("[getJSON] - BEGIN");
-        String result;
-        String xml = getXML(uri, label);
-        result = xml2json(xml);
+        String result = produceJSON( enhancer.getVideoFromYouTube(uri, label) );
         LOG.debug("[getJSON] - END");
         return result;
     }
@@ -72,4 +74,14 @@ public class VideoInterface extends AbsResponseInterface{
         LOG.debug("[produceXML] - END");
         return xml;
     }
+    
+    public static String produceJSON(final String videoURL){
+    	return unchecked(new Ret<String>() {
+			public String ret() throws Exception {
+				LOG.debug("producingJSON");
+		    	return new JSONObject().put("Result", new JSONObject().put("videoURL",videoURL)).toString();
+			}
+		}, "Failure in producing JSON for getVideo");    	
+    }
+    
 }

@@ -20,16 +20,19 @@
 package it.polito.tellmefirst.parsing;
 
 import it.polito.tellmefirst.exception.TMFVisibleException;
+import it.polito.tellmefirst.util.Ret;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.hwpf.extractor.WordExtractor;
 import java.io.*;
+import static it.polito.tellmefirst.util.TMFUtils.unchecked;
 
 /**
  * Created by IntelliJ IDEA.
  * User: Federico Cairo
  */
-public class DOCparser {
+public class DOCparser extends TMFTextParser{
 
     static Log LOG = LogFactory.getLog(DOCparser.class);
 
@@ -49,7 +52,6 @@ public class DOCparser {
         return result;
     }
 
-
     // just for testing
     public static void main(String[] args) throws Exception {
         File file = new File("/home/federico/Scrivania/Progetto-Visual-Semantic-Library.doc");
@@ -58,6 +60,10 @@ public class DOCparser {
         //XWPFWordExtractor extractor = new XWPFWordExtractor(new XWPFDocument(stream));
         String testo = extractor.getText();
         System.out.println(testo);
-
     }
+
+	@Override
+	public String parse(File file) {
+		return unchecked(()->docToText(file) , "doc not parsed");
+	}
 }

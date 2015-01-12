@@ -19,6 +19,7 @@
 
 package it.polito.tellmefirst.web.rest.services;
 
+import it.polito.tellmefirst.enhance.Enhancer;
 import it.polito.tellmefirst.web.rest.interfaces.ImageInterface;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,16 +47,24 @@ public class GetImage {
         LOG.debug("[postJSON] - BEGIN");
         //no prod
         LOG.info("GetImage REST Service called for the resource: "+ uri);
+        LOG.info("GetImage REST Service called for the label: "+ label);
         try {
             String response = imageInterface.getJSON(uri, label);
             LOG.debug("[postJSON] - END");
             return ok(response);
         } catch (Exception e) {
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage())
-                    .header("TMF-error",e.getMessage()).build());
+                    	.header("TMF-error",e.getMessage()).build());
         }
     }
+    
+    @GET
+    @Path("new")
+    public Response getImg(@QueryParam("label") String label) {
+        return ok(ImageInterface.getImageFromWikiHTML(label).toString());
+    }
 
+    
 
 }
 

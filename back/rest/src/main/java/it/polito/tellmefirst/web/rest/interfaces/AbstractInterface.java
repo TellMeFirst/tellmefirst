@@ -66,11 +66,11 @@ public class AbstractInterface extends AbsResponseInterface {
             hd.endElement("","","Enhancement");
             hd.endDocument();
             xml = out.toString("utf-8");
-            System.out.println(xml);
+            //System.out.println(xml);
         } catch (Exception e) {
             throw new TMFOutputException("Error creating XML output.", e);
         }
-        LOG.debug("[produceXML] - END");
+        LOG.debug("[produceXML] - END 2");
         return xml;
     }
 }

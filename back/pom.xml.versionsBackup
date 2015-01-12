@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<properties>
+		<tellmefirst.version>1.04</tellmefirst.version>
+		<heapspace.Xmx.compiler>-Xmx2g</heapspace.Xmx.compiler>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.compiler.version>1.6</java.compiler.version>
+		<maven.test.skip>true</maven.test.skip>
+	</properties>
+
+	<groupId>it.polito.tellmefirst</groupId>
+	<artifactId>tellmefirst</artifactId>
+	<version>1.04</version>
+	<packaging>pom</packaging>
+	<name>TellMeFirst (parent POM)</name>
+
+	<modules>
+		<module>core</module>
+		<module>rest</module>
+	</modules>
+
+	<build>
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>${java.compiler.version}</source>
+					<target>${java.compiler.version}</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.12</version>
+				<configuration>
+					<skipTests>${maven.test.skip}</skipTests>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencyManagement>
+		<dependencies>
+
+			<dependency>
+				<groupId>it.polito.tellmefirst</groupId>
+				<artifactId>core</artifactId>
+				<version>1.04</version>
+			</dependency>
+
+			<dependency>
+				<groupId>it.polito.tellmefirst</groupId>
+				<artifactId>rest</artifactId>
+				<version>1.04</version>
+			</dependency>
+
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.google.inject</groupId>
+			<artifactId>guice</artifactId>
+			<version>3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-client</artifactId>
+			<version>1.17.1</version>
+		</dependency>
+	</dependencies>
+
+	<repositories>
+		<repository>
+			<!-- per ora si cerca il repo in ../ , vedere se riesce ad ottenere project.parent.basedir -->
+			<id>LocalRepo</id>
+			<name>Local Repository for custom jars</name>
+			<url>file://${basedir}/../lib</url>
+		</repository>
+
+		<repository>
+			<id>maven2-repository.dev.java.net</id>
+			<name>Java.net Repository for Maven</name>
+			<url>http://download.java.net/maven/2/</url>
+			<layout>default</layout>
+		</repository>
+
+		<repository>
+			<id>json-lib</id>
+			<url>http://json-lib.sourceforge.net</url>
+		</repository>
+
+		<repository>
+			<id>anonsvn</id>
+			<url>http://anonsvn.icefaces.org/repo/maven2/releases/</url>
+		</repository>
+
+		<repository>
+			<id>central</id>
+			<name>Maven Repository Switchboard</name>
+			<layout>default</layout>
+			<url>http://repo1.maven.org/maven2</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+
+		<repository>
+			<id>opennlp.sf.net</id>
+			<url>http://opennlp.sourceforge.net/maven2/</url>
+		</repository>
+
+	</repositories>
+
+</project>

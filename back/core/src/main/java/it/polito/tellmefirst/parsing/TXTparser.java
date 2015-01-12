@@ -19,7 +19,10 @@
 
 package it.polito.tellmefirst.parsing;
 
+import static it.polito.tellmefirst.util.TMFUtils.unchecked;
 import it.polito.tellmefirst.exception.TMFVisibleException;
+import it.polito.tellmefirst.util.Ret;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import java.io.File;
@@ -32,7 +35,7 @@ import java.nio.charset.Charset;
  * Created by IntelliJ IDEA.
  * User: Federico Cairo
  */
-public class TXTparser {
+public class TXTparser extends TMFTextParser{
 
     static Log LOG = LogFactory.getLog(TXTparser.class);
 
@@ -52,5 +55,14 @@ public class TXTparser {
         LOG.debug("[txtToText] - END");
         return result;
     }
+
+    @Override
+	public String parse(final File file) {
+		return unchecked(new Ret<String>() {
+			public String ret() throws Exception {
+				return txtToText(file);
+			}
+		}, "txt not parsed");
+	}
 
 }

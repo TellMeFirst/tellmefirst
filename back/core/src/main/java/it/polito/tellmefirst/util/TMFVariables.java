@@ -48,7 +48,18 @@ public class TMFVariables {
     public static String KB_EN;
     public static String RESIDUAL_KB_EN;
     public static Set<String> STOPWORDS_EN;
+    
+    public static int CACHE_TTL = 0;
+    
+    public static String EXT_LOWER_DOC = "doc";
+    public static String EXT_LOWER_PDF = "pdf";
+    public static String EXT_LOWER_TXT = "txt";
+    
+    //Constants for query params in classify
+    public static String ALTERNATIVE_IMAGE = "alternativeImage";
+    public static String YOUTUBE_VIDEO	   = "youtubeVideo";
 
+    public final static String DEFAULT_IMAGE = "http://tellmefirst.polito.it/images/default_img.jpg";
 
     public TMFVariables(String confFile) throws TMFConfigurationException {
         LOG.debug("[constructor] - BEGIN");
@@ -66,6 +77,11 @@ public class TMFVariables {
             KB_EN = config.getProperty("kb.en", "").trim();
             RESIDUAL_KB_EN = config.getProperty("residualkb.en", "").trim();
             STOPWORDS_EN = TMFUtils.getStopWords(config.getProperty("stopWords.en", "").trim());
+            
+            String cacheTTL = config.getProperty("cache.TTL");
+            if(cacheTTL!=null)
+            	CACHE_TTL = new Integer(cacheTTL);
+            
         } catch (IOException e) {
             //exceptions are not catched here, because we want to stop TMF server
             throw new TMFConfigurationException("Problem with configuring initial parameters: ", e);

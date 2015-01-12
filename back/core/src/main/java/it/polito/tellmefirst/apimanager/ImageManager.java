@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import static it.polito.tellmefirst.util.TMFVariables.DEFAULT_IMAGE;
 
 /**
  * Created by IntelliJ IDEA.
@@ -36,8 +37,10 @@ public class ImageManager {
 
     // used in enhancer
     public String scrapeImageFromPage(String pageURL) {
-        LOG.debug("[scrapeImageFromPage] - BEGIN");
-        String result = Enhancer.DEFAULT_IMAGE;
+        
+        LOG.debug("[scrapeImageFromPage] - BEGIN url="+pageURL);
+        long startTime = System.currentTimeMillis();
+        String result = DEFAULT_IMAGE;
         try {
             Document doc = Jsoup.connect(pageURL).get();
             Element image = doc.select("img").first();
@@ -45,22 +48,32 @@ public class ImageManager {
         } catch (Exception e) {
             LOG.error("[scrapeImageFromPage] - EXCEPTION: ", e);
         }
+        long endTime = System.currentTimeMillis();
+        long duration = (endTime - startTime) / 1000;
+        //no prod
+        LOG.debug("########### [scrapeImageFromPage] took "+duration+" seconds. ###########"); 
         LOG.debug("[scrapeImageFromPage] - END");
         return result;
     }
 
     // used in classifier
     public String scrapeDBpediaImageFromPage(String pageURL) {
-        LOG.debug("[scrapeDBpediaImageFromPage] - BEGIN");
+        LOG.debug("[scrapeDBpediaImageFromPage] - BEGIN url="+pageURL);
+        long startTime = System.currentTimeMillis();
         String result = "";
         try {
-            Document doc = Jsoup.connect(pageURL).get();
+            Document doc = Jsoup.connect(pageURL).timeout(10*1000).get();
             Element image = doc.select("img").first();
             result = "http:"+ image.attr("src");
         } catch (Exception e) {
             LOG.error("[scrapeDBpediaImageFromPage] - EXCEPTION: ", e);
         }
+        long endTime = System.currentTimeMillis();
+        long duration = (endTime - startTime) / 1000;
+        //no prod
+        LOG.debug("########### [scrapeDBpediaImageFromPage] took "+duration+" seconds. ###########"); 
         LOG.debug("[scrapeDBpediaImageFromPage] - END");
+     
         return result;
     }
 
@@ -68,7 +81,7 @@ public class ImageManager {
         LOG.debug("[scrapeImageSizeFromPage] - BEGIN");
         int[] result = {0,0};
         try {
-            Document doc = Jsoup.connect(pageURL).get();
+            Document doc = Jsoup.connect(pageURL).timeout(10*1000).get();
             Element image = doc.select("img").first();
             result[0] = Integer.valueOf(image.attr("width"));
             result[1] = Integer.valueOf(image.attr("height"));

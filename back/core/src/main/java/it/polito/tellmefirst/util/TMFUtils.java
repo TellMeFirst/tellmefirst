@@ -19,9 +19,28 @@
 
 package it.polito.tellmefirst.util;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+import org.jsoup.nodes.Element;
+
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.WebResource;
+
+import it.polito.tellmefirst.parsing.DOCparser;
+import it.polito.tellmefirst.parsing.PDFparser;
+import it.polito.tellmefirst.parsing.TMFTextParser;
+import it.polito.tellmefirst.parsing.TXTparser;
+
 import java.io.*;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.security.MessageDigest;
 import java.util.*;
 
 /**
@@ -86,4 +105,146 @@ public class TMFUtils {
         LOG.debug("[countWords] - END");
         return words.length;
     }
+    
+    public static final Map<String, TMFTextParser> parseAssociation = new HashMap<String, TMFTextParser>();
+    static {
+    	parseAssociation.put("pdf",new PDFparser());
+    	parseAssociation.put("doc",new DOCparser());
+    	parseAssociation.put("txt",new TXTparser());
+    }
+    
+    public static void optional(Behaviour b, String warning){
+		try{
+			b.behaviour();
+		}catch(Exception e){
+			LOG.warn(warning);
+		}
+	}
+    
+    public static <T> T optional(Ret<T> ret, T defaultValue){
+    	T returnValue=null;
+    	try{
+			returnValue = ret.ret();
+		}catch(Exception e){
+			LOG.warn(e);
+		}
+    	if(returnValue == null) returnValue = defaultValue;
+    	return returnValue;
+    }
+    
+    public static <T> T unchecked(Ret<T> ret, T defaultValue){
+    	T returnValue=null;
+    	try{
+			returnValue = ret.ret();
+		}catch(Exception e){
+			throw new RuntimeException(e);
+		}
+    	if(returnValue == null) returnValue = defaultValue;
+    	return returnValue;
+    }
+    
+    public static <T> T optional(Ret<T> ret){
+    	return optional(ret, null);
+    }
+    
+    public static <T> T unchecked(Ret<T> ret){
+    	return unchecked(ret, null);
+    }
+    
+    public static <T> T uncheck(Ret<T> ret, T defaultValue){
+    	return unchecked(ret, defaultValue);
+    }
+    
+    public static Collection<String> filter(Collection<String> c, String ... patterns){
+    	for (String pattern : patterns) {
+			for (Iterator<String> iterator = c.iterator(); iterator.hasNext();) {
+				String string = (String) iterator.next();
+				if(string.contains(pattern))
+					iterator.remove();
+			}
+		}
+    	return c;
+    }
+    
+    /**
+     * Remove the first "File:" and then replace whitespace characters with underscore '_'
+     * @return the {@link String} used to calculate hash.
+     */
+    public static String processWikiFileLabelForHashComputation(String original){
+    	return original.replaceFirst("File:", "").replaceAll(" ", "_");
+    }
+    
+    public static String getWikiURL(final String file){
+    	String wikiBase = "http://upload.wikimedia.org/wikipedia/commons";
+    	String md5 = unchecked(()-> {
+    					final MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+						messageDigest.reset();
+						messageDigest.update(file.getBytes(Charset.forName("UTF8")));
+						final byte[] resultByte = messageDigest.digest();
+						return new String(Hex.encodeHex(resultByte));
+					}, "Wiki img URL not found MD5 not calculated");
+    	String finalURL = wikiBase+"/"+md5.charAt(0)+"/"+md5.charAt(0)+md5.charAt(1)+"/";
+    	String encodedFileLabel = unchecked( ()->URLDecoder.decode(file, "UTF-8"), "Wiki img URL not found");
+    	return finalURL+=encodedFileLabel;
+    }
+    
+    public static String getFileExtension(String fileName){
+    	String [] splat = fileName.split(".");
+    	return splat[splat.length-1];
+    }
+    
+    public static boolean hasContent (String string){
+    	return string!=null && !string.isEmpty();
+    }
+    public static boolean hasNoContent (String string){
+    	return !hasContent(string);
+    }
+    
+    public static boolean existsLink(String url){
+    	Client client = Client.create();
+		WebResource webResource = client.resource(url);
+		Integer status = webResource.head().getStatus();
+		if(status==null) status = 0;
+		return status==200;
+    }
+    
+    public static boolean notExistsLink(String url){
+    	return !existsLink(url);
+    }
+    
+    public static List<JSONObject> jsonArrayToList(final JSONArray array){
+    	return unchecked(()-> {
+    			List<JSONObject> result = new ArrayList<JSONObject>();
+            	for (int i = 0; i < array.length(); i++)
+        			result.add( array.getJSONObject(i) );
+        		return result;
+		});
+    }
+    
+    public static Map<String,String> jsonObjToMap(JSONObject json , Map<String,String> out) throws JSONException{
+        Iterator<String> keys = json.keys();
+        while(keys.hasNext()){
+            String key = keys.next();
+            String val = null;
+            try{
+                 JSONObject value = json.getJSONObject(key);
+                 jsonObjToMap(value,out);
+            }catch(Exception e){
+                val = json.getString(key);
+            }
+
+            if(val != null){
+                out.put(key,val);
+            }
+        }
+        return out;
+    }
+    
+    public static boolean isEmpty(Element e){
+    	return e.tag().getName().isEmpty();
+    }
+    public static boolean isNotEmpty(Element e){
+    	return !isEmpty(e);
+    }
+    
 }

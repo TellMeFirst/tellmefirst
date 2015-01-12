@@ -19,9 +19,13 @@
 
 package it.polito.tellmefirst.parsing;
 
+import static it.polito.tellmefirst.util.TMFUtils.unchecked;
+
 import java.io.File;
 import java.io.FileInputStream;
 import it.polito.tellmefirst.exception.TMFVisibleException;
+import it.polito.tellmefirst.util.Ret;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.pdfbox.cos.COSDocument;
@@ -33,7 +37,7 @@ import org.apache.pdfbox.util.PDFTextStripper;
  * Created by IntelliJ IDEA.
  * User: Federico Cairo
  */
-public class PDFparser {
+public class PDFparser extends TMFTextParser{
 
     static Log LOG = LogFactory.getLog(PDFparser.class);
 
@@ -66,10 +70,21 @@ public class PDFparser {
         return result;
     }
 
+
     // just for testing
+    // XXX LOL
     public static void main(String args[]) throws TMFVisibleException {
         PDFparser pdfp = new PDFparser();
         System.out.println(pdfp.pdfToText(new File("/home/federico/Scrivania/Progetti/TellMeFirst/files/2011-iscc-paper.pdf")));
     }
+
+    @Override
+	public String parse(final File file) {
+		return unchecked(new Ret<String>() {
+			public String ret() throws Exception {
+				return pdfToText(file);
+			}
+		}, "pdf not parsed");
+	}
 
 }

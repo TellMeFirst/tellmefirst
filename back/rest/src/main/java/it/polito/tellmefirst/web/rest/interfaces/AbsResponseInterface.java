@@ -21,16 +21,20 @@ package it.polito.tellmefirst.web.rest.interfaces;
 
 import it.polito.tellmefirst.exception.TMFOutputException;
 import it.polito.tellmefirst.enhance.Enhancer;
-import it.polito.tellmefirst.web.rest.TMFServer;
+import it.polito.tellmefirst.web.rest.TMFListener;
 import net.sf.json.xml.XMLSerializer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONObject;
+
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -44,7 +48,7 @@ public abstract class AbsResponseInterface {
     protected Enhancer enhancer;
 
     public AbsResponseInterface(){
-        enhancer = TMFServer.getEnhancer();
+        enhancer = TMFListener.getEnhancer();
     }
 
     public String xml2json(String xmlDoc) throws TMFOutputException {

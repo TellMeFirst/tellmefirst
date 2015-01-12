@@ -19,21 +19,30 @@
 
 package it.polito.tellmefirst.enhance;
 
-import com.aliasi.spell.JaroWinklerDistance;
+import static it.polito.tellmefirst.dao.DAOFactory.getDAO;
+import static it.polito.tellmefirst.util.TMFUtils.filter;
+import static it.polito.tellmefirst.util.TMFUtils.getWikiURL;
+import static it.polito.tellmefirst.util.TMFUtils.processWikiFileLabelForHashComputation;
+import static it.polito.tellmefirst.util.TMFVariables.DEFAULT_IMAGE;
+import static org.apache.commons.lang.StringUtils.isEmpty;
 import it.polito.tellmefirst.apimanager.ImageManager;
+import it.polito.tellmefirst.apimanager.RestManager;
 import it.polito.tellmefirst.apimanager.VideoManager;
+import it.polito.tellmefirst.dao.WikiDAO;
 import it.polito.tellmefirst.lodmanager.DBpediaManager;
 import it.polito.tellmefirst.lodmanager.NewYorkTimesLODManager;
-import it.polito.tellmefirst.apimanager.RestManager;
 import it.polito.tellmefirst.lucene.IndexesUtil;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import java.util.ArrayList;
-import java.util.TreeMap;
+
+import com.aliasi.spell.JaroWinklerDistance;
 
 /**
  * Created by IntelliJ IDEA.
@@ -49,8 +58,6 @@ public class Enhancer {
     private ArrayList<String> badWikiImages;
     private ArrayList<String> typesWhiteList;
     static Log LOG = LogFactory.getLog(Enhancer.class);
-    public final static String DEFAULT_IMAGE = "http://tellmefirst.polito.it/images/default_img.jpg";
-
 
     public Enhancer() {
         LOG.debug("[constructor] - BEGIN");
@@ -63,175 +70,38 @@ public class Enhancer {
         videoManager = new VideoManager();
         LOG.debug("[constructor] - END");
     }
-
-    // TODO: this recursive stuff is quite tortuous, try simplifying
-    public String getImageFromMediaWiki(String uri, String label, ArrayList<String> oldResults) {
-        LOG.debug("[getImageFromMediaWiki] - BEGIN");
-        String result = "";
-        try{
-            String lang = (uri.startsWith("http://dbpedia")) ? "en" : "it";
-            String dbpediaPrefix = (uri.startsWith("http://dbpedia")) ? "http://dbpedia.org/resource/" :
-                    "http://it.dbpedia.org/resource/";
-            String queryStart = "http://"+lang+".wikipedia.org/w/api.php?action=query&titles=";
-            String filePageURL = "http://"+lang+".wikipedia.org/wiki/File:";
-
-            String queryEnd = "&prop=images&format=xml";
-            String query = queryStart + label.replace(" ", "+") + queryEnd;
-            //no prod
-            LOG.debug("Call to Wikimedia Commons service for the resource "+uri+": "+query);
-            String xml = restManager.getStringFromAPI(query);
-            Document doc = Jsoup.parse(xml);
-
-            Elements elementsFound = doc.getElementsByTag("im");
-
-            if(elementsFound == null || elementsFound.size() == 0){
-                //no prod
-                LOG.debug("No images at all from Wikimedia for the resource "+uri+". We'll search for its BOC.");
-                ArrayList<String> bagOfConcepts = IndexesUtil.getBagOfConcepts(uri.replace(dbpediaPrefix, ""), lang);
-                if (bagOfConcepts.size() == 0 ||(bagOfConcepts.size() == 1 && bagOfConcepts.get(0).equals(""))) {
-                    //no prod
-                    LOG.debug("No concepts retrieved from the BOC of "+uri+". We'll search for its residual BOC.");
-                    bagOfConcepts = IndexesUtil.getResidualBagOfConcepts(uri.replace(dbpediaPrefix, ""), lang);
-                }
-                if(bagOfConcepts.size() == 0){
-                    LOG.debug("No concepts in the residual BOC of: "+uri+". We'll return default image.");
-                    LOG.debug("[getImageFromMediaWiki] - END");
-                    return DEFAULT_IMAGE;
-                }
-                // this is for avoiding a circular search between related concepts
-                else if(!oldResults.contains(bagOfConcepts.get(0))){
-                    String conceptUri = bagOfConcepts.get(0);
-                    // no prod
-                    LOG.debug("Ok, we'll search an image for the concept "+conceptUri+" (related to the URI "+uri+")");
-                    oldResults.add(conceptUri);
-                    String conceptLabel = IndexesUtil.getTitle(conceptUri, lang);
-                    // recursive use of getImageFromMediaWiki()
-                    return getImageFromMediaWiki(dbpediaPrefix + conceptUri, conceptLabel, oldResults);
-                } else{
-                    // no prod
-                    LOG.debug("We found again the concept "+bagOfConcepts.get(0)+". We'll return default image.");
-                    LOG.debug("[getImageFromMediaWiki] - END");
-                    return DEFAULT_IMAGE;
-                }
-            }  else {
-                ArrayList<String> imagesFound = new ArrayList<String>();
-                for (Element e : elementsFound){
-                    if(!e.attr("title").contains(".ogg")){
-                        imagesFound.add(e.attr("title").replace("File:",""));
-                    }
-                }
-                if(imagesFound.size() == 0){
-                    //no prod
-                    LOG.debug("No good images from Wikimedia for the resource "+uri+". We'll search for its BOC.");
-                    ArrayList<String> bagOfConcepts = IndexesUtil.getBagOfConcepts(uri.replace(dbpediaPrefix, ""), lang);
-                    if (bagOfConcepts.size() == 0 ||(bagOfConcepts.size() == 1 && bagOfConcepts.get(0).equals(""))) {
-                        //no prod
-                        LOG.debug("No concepts retrieved from the BOC of "+uri+". We'll search for its residual BOC.");
-                        bagOfConcepts = IndexesUtil.getResidualBagOfConcepts(uri.replace(dbpediaPrefix, ""), lang);
-                    }
-                    if(bagOfConcepts.size() == 0){
-                        LOG.debug("No concepts in the residual BOC of: "+uri+". We'll return default image.");
-                        LOG.debug("[getImageFromMediaWiki] - END");
-                        return DEFAULT_IMAGE;
-                    }
-                    // this is for avoiding a circular search between related concepts
-                    else if(!oldResults.contains(bagOfConcepts.get(0))){
-                        String conceptUri = bagOfConcepts.get(0);
-                        // no prod
-                        LOG.debug("Ok, we'll search an image for the concept "+conceptUri+" (related to the URI "+uri+")");
-                        oldResults.add(conceptUri);
-                        String conceptLabel = IndexesUtil.getTitle(conceptUri, lang);
-                        // recursive use of getImageFromMediaWiki()
-                        return getImageFromMediaWiki(dbpediaPrefix + conceptUri, conceptLabel, oldResults);
-                    }else {
-                        // no prod
-                        LOG.debug("We found again the concept "+bagOfConcepts.get(0)+"(related to the URI "+uri+"). " +
-                                "We'll return default image.");
-                        LOG.debug("[getImageFromMediaWiki] - END");
-                        return DEFAULT_IMAGE;
-                    }
-                } else {
-                    TreeMap<Double,String> sortedMap = new TreeMap<Double, String>();
-                    JaroWinklerDistance jaroWinklerDistance = new JaroWinklerDistance();
-                    //no prod
-                    LOG.debug("Images available from Wikimedia for the resource "+uri+": ");
-                    for (String image : imagesFound){
-                        sortedMap.put(jaroWinklerDistance.distance(label,image),image);
-                        //no prod
-                        LOG.debug("* IMAGE: "+image+" - DISTANCE: "+jaroWinklerDistance.distance(label,image));
-                    }
-                    while (sortedMap.size()!=0 &&
-                            (sortedMap.firstEntry().getValue().endsWith(".png")
-                                    || sortedMap.firstEntry().getValue().endsWith(".svg")
-                                    || sortedMap.firstEntry().getValue().endsWith(".gif"))){
-                        String imageName = sortedMap.firstEntry().getValue();
-                        // this is a bit empirical, but to discard all .svg for preventing template images seems too prudent
-                        if(badWikiImages.contains(imageName) || imageName.startsWith("Flag of ") ||
-                                imageName.endsWith(" flag.svg")){
-                            sortedMap.remove(sortedMap.firstKey());
-                        }else{
-                            String imagePageURL = filePageURL + imageName.replace(" ", "_");
-                            int[] scrapedImageSize = imageManager.scrapeImageSizeFromPage(imagePageURL);
-                            // we don't want smaller images
-                            if(scrapedImageSize[0]< 150 && scrapedImageSize[1]< 150){
-                                sortedMap.remove(sortedMap.firstKey());
-                            } else break;
-                        }
-                    }
-                    if(sortedMap.size()!=0){
-                        String imageName = sortedMap.firstEntry().getValue();
-                        String imagePageURL = filePageURL + imageName.replace(" ", "_");
-                        //no prod
-                        LOG.debug("Winning image for "+uri+": "+imagePageURL+". Now try scraping it.");
-                        String scrapedImage = imageManager.scrapeImageFromPage(imagePageURL);
-                        result = "http:" + scrapedImage;
-                        LOG.debug("Final image for "+uri+": "+result);
-                    }else {
-                        //no prod
-                        LOG.debug("After filtering, there are not good images for the resource "+uri+
-                                ". We'll search for its BOC.");
-                        ArrayList<String> bagOfConcepts = IndexesUtil.getBagOfConcepts(uri.replace(dbpediaPrefix, ""), lang);
-                        if (bagOfConcepts.size() == 0 ||(bagOfConcepts.size() == 1 && bagOfConcepts.get(0).equals(""))) {
-                            //no prod
-                            LOG.debug("No concepts retrieved from the BOC of "+uri+
-                                    ". We'll search for its residual BOC.");
-                            bagOfConcepts = IndexesUtil.getResidualBagOfConcepts(uri.replace(dbpediaPrefix, ""), lang);
-                        }
-                        if(bagOfConcepts.size() == 0){
-                            LOG.debug("No concepts in the residual BOC of: "+uri+". We'll return default image.");
-                            LOG.debug("[getImageFromMediaWiki] - END");
-                            return DEFAULT_IMAGE;
-                        }
-                        // this is for avoiding a circular search between related concepts
-                        else if(!oldResults.contains(bagOfConcepts.get(0))){
-                            String conceptUri = bagOfConcepts.get(0);
-                            // no prod
-                            LOG.debug("Ok, we'll search an image for the concept "+conceptUri+" (related to the URI "+uri+")");
-                            oldResults.add(conceptUri);
-                            String conceptLabel = IndexesUtil.getTitle(conceptUri, lang);
-                            // recursive use of getImageFromMediaWiki()
-                            return getImageFromMediaWiki(dbpediaPrefix + conceptUri, conceptLabel, oldResults);
-                        }else {
-                            // no prod
-                            LOG.debug("We found again the concept "+bagOfConcepts.get(0)+"(related to the URI "+uri+
-                                    "). We'll return default image.");
-                            LOG.debug("[getImageFromMediaWiki] - END");
-                            return DEFAULT_IMAGE;
-                        }
-                    }
-                    LOG.debug("[getImageFromMediaWiki] - END");
-                    return result;
-                }
-            }
-        }catch (Exception e){
-            LOG.error("[getImageFromMediaWiki] - EXCEPTION: ", e);
-        } finally {
-            LOG.debug("[getImageFromMediaWiki] - END");
-        }
-        return result;
+    
+    //XXX should be on REST module
+    public String getImageFromMediaWiki2(String searchText){
+    	LOG.debug("Looking images for label => "+searchText);
+    	WikiDAO wikidao = getDAO(WikiDAO.class);
+    	List<String> fileLabel = wikidao.getFileLabels(searchText);
+    	filter(fileLabel, ".ogg", "Flag of ",".svg", ".gif");
+    	String imgLabel = mostSimilar(fileLabel, searchText);
+    	LOG.debug("imgLabelWinner - "+imgLabel);
+    	if(isEmpty(imgLabel))
+    		return DEFAULT_IMAGE;
+    	String url = getWikiURL(processWikiFileLabelForHashComputation(imgLabel));
+    	LOG.debug("hash computed URL => "+ url);
+    	if(!wikidao.existsImage(url)){
+    		url = url.replace("/commons/", "/en/");
+    		if(!wikidao.existsImage(url))
+    			return DEFAULT_IMAGE;
+    	}
+    	return url;
     }
-
-
+    
+    public String mostSimilar(List<String> images, String label){
+    	Map<Double,String> sortedMap = new TreeMap<Double, String>();
+        JaroWinklerDistance jaroWinklerDistance = new JaroWinklerDistance();
+        for (String image : images){
+            sortedMap.put(jaroWinklerDistance.distance(label,image),image);
+            LOG.debug("* IMAGE: "+image+" - DISTANCE: "+jaroWinklerDistance.distance(label,image));
+        }
+        Iterator<String> it = sortedMap.values().iterator();
+        return (it.hasNext())?it.next():"";
+    }
+    
     public String[] getCoordinatesFromDBpedia(String uri){
         LOG.debug("[getCoordinatesFromDBpedia] - BEGIN");
         String[] result = dBpediaManager.getCoordinatesForAPlace(uri);
@@ -350,6 +220,8 @@ public class Enhancer {
         badWords.add("Monitor padlock.svg");
         badWords.add("Wikisource-logo.svg");
         badWords.add("Wiktionary_small.svg");
+        badWords.add("Gnome-mime-sound-openclipart.svg");
+        badWords.add("File:Cscr-featured.svg");
         // TODO: test this one!
         badWords.add("Nuvola mimetypes charnotfound.PNG");
         return badWords;
