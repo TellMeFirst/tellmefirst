@@ -12,7 +12,7 @@ A demo of the software can be explored at: [http://tellmefirst.polito.it/] (http
 
 Requirements:
 
-* Java 1.6+
+* Java 1.8+
 * Maven 2
 * Git
 * RAM 10 GiB
