@@ -49,7 +49,7 @@ For these reasons we have implemented two REST API calls:
 
 Here you find part of the classifyEpub response on the "Siddartha by Hermann Hesse" ebook, available on the Project Gutenberg website: [http://www.gutenberg.org/ebooks/2500](http://www.gutenberg.org/ebooks/2500). These results are obtained with [DBpedia 3.9](http://wiki.dbpedia.org/Downloads39?show_files=1).
 
-''' javascript
+``` javascript
 {
     "@service": "ClassifyEpub",
     "Resources": [
@@ -111,7 +111,7 @@ Here you find part of the classifyEpub response on the "Siddartha by Hermann Hes
         }
     ]
 }
-'''
+```
 
 ### classifyEpubChapters
 
