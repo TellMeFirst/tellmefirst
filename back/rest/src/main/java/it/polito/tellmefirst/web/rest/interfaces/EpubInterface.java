@@ -19,7 +19,7 @@
 
 package it.polito.tellmefirst.web.rest.interfaces;
 
-import it.polito.tellmefirst.clients.Client;
+import it.polito.tellmefirst.web.rest.clients.ClientEpub;
 import it.polito.tellmefirst.exception.TMFOutputException;
 import it.polito.tellmefirst.classify.Classifier;
 import it.polito.tellmefirst.exception.TMFVisibleException;
@@ -53,7 +53,7 @@ public class EpubInterface extends AbsResponseInterface {
         LOG.debug("[getXML] - BEGIN");
         String result;
         Classifier classifier = (lang.equals("italian")) ? TMFServer.getItalianClassifier() : TMFServer.getEnglishClassifier();
-        Client client = new Client(classifier);
+        ClientEpub client = new ClientEpub(classifier);
         ArrayList<String[]> topics = client.classifyEpub(file, fileName, url, numTopics, lang);
         result = produceXML(topics);
         LOG.debug("[getXML] - END");
