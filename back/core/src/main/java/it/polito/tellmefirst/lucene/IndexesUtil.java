@@ -61,7 +61,7 @@ public class IndexesUtil {
             LOG.info("Corpus index used for english: "+contextIndexDirEN);
             LuceneManager contextLuceneManagerEN = new LuceneManager(contextIndexDirEN);
             contextLuceneManagerEN.setLuceneDefaultAnalyzer(new EnglishAnalyzer(Version.LUCENE_36, TMFVariables.STOPWORDS_EN));
-            ENGLISH_CORPUS_INDEX_SEARCHER = new SimpleSearcher(contextLuceneManagerEN);
+            ENGLISH_CORPUS_INDEX_SEARCHER = new SimpleSearcher(contextLuceneManagerIT);
         }catch (Exception e){
             //exceptions are not catched here, because we want to stop TMF server
             throw new TMFIndexesWarmUpException("Problem with setting up TMF indexes: ", e);

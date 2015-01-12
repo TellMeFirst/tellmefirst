@@ -11,7 +11,7 @@
         <heapspace.Xmx.compiler>-Xmx2g</heapspace.Xmx.compiler>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.compiler.version>1.8</java.compiler.version>
+        <java.compiler.version>1.6</java.compiler.version>
         <maven.install.plugin.version>2.3.1</maven.install.plugin.version>
     </properties>
 
@@ -150,31 +150,31 @@
             <dependency>
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-server</artifactId>
-                <version>1.18</version>
+                <version>1.8</version>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-client</artifactId>
-                <version>1.18</version>
+                <version>1.8</version>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-grizzly</artifactId>
-                <version>1.18</version>
+                <version>1.8</version>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-bundle</artifactId>
-                <version>1.18</version>
+                <version>1.8</version>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.jersey.contribs</groupId>
                 <artifactId>jersey-multipart</artifactId>
-                <version>1.18</version>
+                <version>1.8</version>
             </dependency>
 
             <dependency>
