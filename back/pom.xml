@@ -24,6 +24,7 @@
     <modules>
         <module>core</module>
         <module>rest</module>
+        <module>tmf_nyt</module>
     </modules>
 
     <build>
