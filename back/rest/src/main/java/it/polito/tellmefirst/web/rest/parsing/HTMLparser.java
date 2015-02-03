@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package it.polito.tellmefirst.parsing;
+package it.polito.tellmefirst.web.rest.parsing;
 
 import com.gravity.goose.Article;
 import com.gravity.goose.Configuration;

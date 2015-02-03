@@ -15,6 +15,48 @@
     <packaging>jar</packaging>
     <name>TellMeFirst RESTful API</name>
 
+    <build>
+        <plugins>
+            <plugin>
+
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>${maven.install.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>install-goose-jar</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <groupId>com.gravity</groupId>
+                            <artifactId>goose</artifactId>
+                            <version>2.1.22</version>
+                            <packaging>jar</packaging>
+                            <file>${basedir}/../lib/goose-2.1.22.jar</file>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>install-lingpipe-jar</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <groupId>com.aliasi</groupId>
+                            <artifactId>lingpipe</artifactId>
+                            <version>4.0.0</version>
+                            <packaging>jar</packaging>
+                            <file>${basedir}/../lib/lingpipe-4.0.0.jar</file>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
 
     <dependencies>
         <dependency>
@@ -113,7 +155,7 @@
             <artifactId>goose</artifactId>
             <version>2.1.22</version>
         </dependency>
-        
+
     </dependencies>
 
 </project>

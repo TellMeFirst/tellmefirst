@@ -21,6 +21,7 @@ package it.polito.tellmefirst.web.rest.services;
 
 import com.sun.jersey.multipart.FormDataParam;
 import it.polito.tellmefirst.web.rest.interfaces.ClassifyInterface;
+import it.polito.tellmefirst.classify.Text;
 import it.polito.tellmefirst.web.rest.lodmanager.DBpediaManager;
 import it.polito.tellmefirst.web.rest.parsing.DOCparser;
 import it.polito.tellmefirst.web.rest.parsing.HTMLparser;
@@ -73,7 +74,35 @@ public class Classify {
 
         try {
             long startTime = System.currentTimeMillis();
-            String response = classifyInterface.getJSON(text, file, url, fileName, numTopics, lang);
+            // retrieving input text/url/file as text string
+            Text text;
+
+            if (inputText != null && !inputText.equals("")){
+                text = new Text(inputText);
+            } else if (url != null){
+                HTMLparser parser = new HTMLparser();
+                text = new Text(parser.htmlToTextGoose(url));
+            } else if(file != null){
+                if(fileName.endsWith(".pdf") || fileName.endsWith(".PDF")){
+                    PDFparser parser = new PDFparser();
+                    text = new Text(parser.pdfToText(file));
+                } else if(fileName.endsWith(".doc") || fileName.endsWith(".DOC")){
+                    DOCparser parser = new DOCparser();
+                    text = new Text(parser.docToText(file));
+                } else if(fileName.endsWith(".txt") || fileName.endsWith(".TXT")){
+                    TXTparser parser = new TXTparser();
+                    text = new Text(parser.txtToText(file));
+                } else {
+                    throw new TMFVisibleException("File extension not valid: only 'pdf', 'doc' and 'txt' allowed.");
+                }
+            } else {
+                throw new TMFVisibleException("No valid parameters in your request: both 'text' and 'url' and 'file'" +
+                        " are null.");
+            }
+
+            String textString = text.getText();
+
+            String response = classifyInterface.getJSON(textString, file, url, fileName, numTopics, lang);
             long endTime = System.currentTimeMillis();
             long duration = (endTime - startTime) / 1000;
             //no prod

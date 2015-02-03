@@ -17,9 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package it.polito.tellmefirst.parsing;
+package it.polito.tellmefirst.web.rest.parsing;
 
-import java.io.File;
 import java.io.FileInputStream;
 import it.polito.tellmefirst.web.rest.exception.TMFVisibleException;
 import org.apache.commons.logging.Log;
@@ -28,6 +27,9 @@ import org.apache.pdfbox.cos.COSDocument;
 import org.apache.pdfbox.pdfparser.PDFParser;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
+
+import java.io.File;
+import java.io.FileInputStream;
 
 /**
  * Created by IntelliJ IDEA.
