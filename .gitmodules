@@ -1,3 +1,6 @@
 [submodule "back/tmf_nyt"]
 	path = back/tmf_nyt
 	url = https://github.com/giuseppefutia/tmf_nyt.git
+[submodule "back/data"]
+	path = back/data
+	url = https://github.com/TellMeFirst/test-indexes
