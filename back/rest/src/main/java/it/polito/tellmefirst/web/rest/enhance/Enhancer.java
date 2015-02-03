@@ -17,14 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package it.polito.tellmefirst.enhance;
+package it.polito.tellmefirst.web.rest.enhance;
 
 import com.aliasi.spell.JaroWinklerDistance;
-import it.polito.tellmefirst.apimanager.ImageManager;
-import it.polito.tellmefirst.apimanager.VideoManager;
-import it.polito.tellmefirst.lodmanager.DBpediaManager;
-import it.polito.tellmefirst.lodmanager.NewYorkTimesLODManager;
-import it.polito.tellmefirst.apimanager.RestManager;
+import it.polito.tellmefirst.web.rest.apimanager.*;
+import it.polito.tellmefirst.web.rest.lodmanager.*;
 import it.polito.tellmefirst.lucene.IndexesUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,6 +29,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
 import java.util.ArrayList;
 import java.util.TreeMap;
 

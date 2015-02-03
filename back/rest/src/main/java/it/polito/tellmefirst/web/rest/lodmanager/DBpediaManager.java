@@ -17,13 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package it.polito.tellmefirst.lodmanager;
+package it.polito.tellmefirst.web.rest.lodmanager;
 
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Literal;
+import it.polito.tellmefirst.web.rest.lodmanager.JenaSparqlManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import java.util.ArrayList;
 
 /**

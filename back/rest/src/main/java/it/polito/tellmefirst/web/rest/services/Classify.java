@@ -21,6 +21,11 @@ package it.polito.tellmefirst.web.rest.services;
 
 import com.sun.jersey.multipart.FormDataParam;
 import it.polito.tellmefirst.web.rest.interfaces.ClassifyInterface;
+import it.polito.tellmefirst.web.rest.lodmanager.DBpediaManager;
+import it.polito.tellmefirst.web.rest.parsing.DOCparser;
+import it.polito.tellmefirst.web.rest.parsing.HTMLparser;
+import it.polito.tellmefirst.web.rest.parsing.PDFparser;
+import it.polito.tellmefirst.web.rest.parsing.TXTparser;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import javax.ws.rs.*;
@@ -34,6 +39,7 @@ public class Classify {
 
     static Log LOG = LogFactory.getLog(Classify.class);
     private static ClassifyInterface classifyInterface = new ClassifyInterface();
+    private DBpediaManager dBpediaManager;
 
     private Response ok(String response) {
         return Response.ok().entity(response).header("Access-Control-Allow-Origin","*").build();
@@ -50,6 +56,21 @@ public class Classify {
                              @FormDataParam("lang") String lang) {
         LOG.debug("[postJSON] - BEGIN");
         LOG.info("Classify REST Service called.");
+
+        // Check if DBpedia is up
+        dBpediaManager = new DBpediaManager();
+        if (!lang.equals("english") && !dBpediaManager.isDBpediaEnglishUp()){
+            //comment for local use
+            throw new TMFVisibleException("DBpedia English service seems to be down, so TellMeFirst can't work " +
+                    "properly. Please try later!");
+        } else {
+            if (lang.equals("italian") && !dBpediaManager.isDBpediaItalianUp()){
+                //comment for local use
+                throw new TMFVisibleException("DBpedia Italian service seems to be down, so TellMeFirst can't work" +
+                        " properly. Please try later!");
+            }
+        }
+
         try {
             long startTime = System.currentTimeMillis();
             String response = classifyInterface.getJSON(text, file, url, fileName, numTopics, lang);

@@ -21,8 +21,8 @@ package it.polito.tellmefirst.web.rest.clients;
 
 import it.polito.tellmefirst.classify.Classifier;
 import it.polito.tellmefirst.classify.Text;
-import it.polito.tellmefirst.lodmanager.DBpediaManager;
 import it.polito.tellmefirst.web.rest.exception.TMFVisibleException;
+import it.polito.tellmefirst.web.rest.lodmanager.DBpediaManager;
 import it.polito.tellmefirst.util.TMFUtils;
 import it.polito.tellmefirst.web.rest.clients.ClassifyOutput;
 import static java.util.stream.Collectors.toList;
@@ -97,16 +97,6 @@ public class ClientEpub {
             throw new TMFVisibleException("Resource not valid: only epub files allowed.");
         }
 
-        dBpediaManager = new DBpediaManager();
-        if (!lang.equals("english") && !dBpediaManager.isDBpediaEnglishUp()){
-            throw new TMFVisibleException("DBpedia English service seems to be down, so TellMeFirst can't work " +
-                    "properly. Please try later!");
-        } else {
-            if (lang.equals("italian") && !dBpediaManager.isDBpediaItalianUp()){
-                throw new TMFVisibleException("DBpedia Italian service seems to be down, so TellMeFirst can't work" +
-                        " properly. Please try later!");
-            }
-        }
         File epubFile;
         if (url != null) {
             epubFile = fromURLtoFile(url);

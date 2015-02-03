@@ -17,9 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package it.polito.tellmefirst.apimanager;
+package it.polito.tellmefirst.web.rest.apimanager;
 
-import it.polito.tellmefirst.enhance.Enhancer;
+import it.polito.tellmefirst.web.rest.enhance.Enhancer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jsoup.Jsoup;
