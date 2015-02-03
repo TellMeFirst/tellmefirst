@@ -22,9 +22,9 @@
     <name>TellMeFirst (parent POM)</name>
 
     <modules>
-        <module>core</module>
-        <module>rest</module>
         <module>tmf_nyt</module>
+        <module>tmfcore</module>
+        <module>rest</module>
     </modules>
 
     <build>

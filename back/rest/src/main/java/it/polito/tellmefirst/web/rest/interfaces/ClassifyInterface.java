@@ -44,7 +44,7 @@ public class ClassifyInterface extends AbsResponseInterface {
     public String getJSON(String text, File file, String url, String fileName, int numTopics, String lang) throws Exception {
         LOG.debug("[getJSON] - BEGIN");
         String result;
-        String xml = getXML(text, file, url, fileName, numTopics, lang);
+        String xml = getXML(text, numTopics, lang);
         result = xml2json(xml);
         //no prod
         LOG.info("--------Result from Classify--------");
@@ -53,11 +53,11 @@ public class ClassifyInterface extends AbsResponseInterface {
         return result;
     }
 
-    public String getXML(String text, File file, String url, String fileName, int numTopics, String lang) throws TMFVisibleException, TMFOutputException {
+    public String getXML(String text, int numTopics, String lang) throws TMFVisibleException, TMFOutputException, InterruptedException, ParseException, IOException {
         LOG.debug("[getXML] - BEGIN");
         String result;
         Classifier classifier = (lang.equals("italian")) ? TMFServer.getItalianClassifier() : TMFServer.getEnglishClassifier();
-        ArrayList<String[]> topics = classifier.classify(text, file, url, fileName, numTopics, lang);
+        ArrayList<String[]> topics = classifier.classify(text, numTopics, lang);
         result = produceXML(topics);
         LOG.debug("[getXML] - END");
         return result;

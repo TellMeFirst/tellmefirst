@@ -20,6 +20,7 @@
 package it.polito.tellmefirst.web.rest.services;
 
 import com.sun.jersey.multipart.FormDataParam;
+import it.polito.tellmefirst.web.rest.exception.TMFVisibleException;
 import it.polito.tellmefirst.web.rest.interfaces.ClassifyInterface;
 import it.polito.tellmefirst.classify.Text;
 import it.polito.tellmefirst.web.rest.lodmanager.DBpediaManager;
@@ -49,12 +50,12 @@ public class Classify {
     @POST
     @Consumes("multipart/form-data")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response postJSON(@FormDataParam("text") String text,
+    public Response postJSON(@FormDataParam("text") String inputText,
                              @FormDataParam("file") File file,
                              @FormDataParam("url") String url,
                              @FormDataParam("fileName") String fileName,
                              @FormDataParam("numTopics") int numTopics,
-                             @FormDataParam("lang") String lang) {
+                             @FormDataParam("lang") String lang) throws TMFVisibleException {
         LOG.debug("[postJSON] - BEGIN");
         LOG.info("Classify REST Service called.");
 

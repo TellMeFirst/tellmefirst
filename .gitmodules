@@ -4,3 +4,6 @@
 [submodule "back/data"]
 	path = back/data
 	url = https://github.com/TellMeFirst/test-indexes
+[submodule "back/tmfcore"]
+	path = back/tmfcore
+	url = https://github.com/bassosimone/tmfcore

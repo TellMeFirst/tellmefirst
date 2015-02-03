@@ -20,6 +20,7 @@
 package it.polito.tellmefirst.web.rest.services;
 
 import com.sun.jersey.multipart.FormDataParam;
+import it.polito.tellmefirst.web.rest.exception.TMFVisibleException;
 import it.polito.tellmefirst.web.rest.interfaces.EpubChaptersInterface;
 import it.polito.tellmefirst.web.rest.lodmanager.DBpediaManager;
 import org.apache.commons.logging.Log;
@@ -49,7 +50,7 @@ public class ClassifyEpubChapters {
                              @FormDataParam("fileName") String fileName,
                              @FormDataParam("url") String url,
                              @FormDataParam("numTopics") int numTopics,
-                             @FormDataParam("lang") String lang) {
+                             @FormDataParam("lang") String lang) throws TMFVisibleException {
         LOG.debug("[postJSON] - BEGIN");
         LOG.info("Classify Epub chapters REST Service called.");
 

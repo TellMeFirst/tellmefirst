@@ -54,8 +54,8 @@ public class TMFServer {
         LOG.debug("[main] - BEGIN");
         String configFileName = args[0];
         TMFVariables tmfVariables = new TMFVariables(configFileName);
-        IndexesUtil indexesUtil = new IndexesUtil();
-        URI serverURI = new URI(tmfVariables.getRestURL());
+        IndexesUtil.init();
+        URI serverURI = new URI("http://localhost:2222/rest/"); // ### You have to choose where put this address!!!
         enhancer = new Enhancer();
         italianClassifier = new Classifier("it");
         englishClassifier = new Classifier("en");
