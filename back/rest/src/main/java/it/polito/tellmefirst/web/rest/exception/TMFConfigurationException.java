@@ -17,16 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package it.polito.tellmefirst.exception;
+package it.polito.tellmefirst.web.rest.exception;
 
 /**
  * Created by IntelliJ IDEA.
  * User: Federico Cairo
  */
-public class TMFOutputException extends Exception{
+public class TMFConfigurationException extends Exception{
 
-    public TMFOutputException(String msg, Exception e) {
-        super(msg,e);
+    public TMFConfigurationException(String s, Exception e){
+        super(s, e);
     }
-
 }

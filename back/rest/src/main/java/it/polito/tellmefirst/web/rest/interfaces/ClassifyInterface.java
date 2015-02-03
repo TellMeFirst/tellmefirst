@@ -19,16 +19,18 @@
 
 package it.polito.tellmefirst.web.rest.interfaces;
 
-import it.polito.tellmefirst.exception.TMFOutputException;
+import it.polito.tellmefirst.web.rest.exception.TMFOutputException;
 import it.polito.tellmefirst.classify.Classifier;
-import it.polito.tellmefirst.exception.TMFVisibleException;
+import it.polito.tellmefirst.web.rest.exception.TMFVisibleException;
 import it.polito.tellmefirst.web.rest.TMFServer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.queryParser.ParseException;
 import org.xml.sax.helpers.AttributesImpl;
 import javax.xml.transform.sax.TransformerHandler;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**

@@ -17,15 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package it.polito.tellmefirst.exception;
+package it.polito.tellmefirst.web.rest.exception;
 
 /**
  * Created by IntelliJ IDEA.
  * User: Federico Cairo
  */
-public class TMFIndexesWarmUpException extends Exception{
-    
-    public TMFIndexesWarmUpException(String s, Exception e){
-        super(s, e);
+public class TMFVisibleException extends Exception {
+
+    // massage is directly visualized in the GUI
+    public TMFVisibleException(String s){
+        super(s);
     }
 }

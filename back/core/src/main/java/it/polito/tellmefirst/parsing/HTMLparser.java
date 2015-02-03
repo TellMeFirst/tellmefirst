@@ -24,7 +24,7 @@ import com.gravity.goose.Configuration;
 import com.gravity.goose.Goose;
 import de.jetwick.snacktory.HtmlFetcher;
 import de.jetwick.snacktory.JResult;
-import it.polito.tellmefirst.exception.TMFVisibleException;
+import it.polito.tellmefirst.web.rest.exception.TMFVisibleException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

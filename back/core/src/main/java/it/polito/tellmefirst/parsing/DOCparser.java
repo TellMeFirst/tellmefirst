@@ -19,7 +19,7 @@
 
 package it.polito.tellmefirst.parsing;
 
-import it.polito.tellmefirst.exception.TMFVisibleException;
+import it.polito.tellmefirst.web.rest.exception.TMFVisibleException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.hwpf.extractor.WordExtractor;

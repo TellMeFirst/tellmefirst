@@ -19,8 +19,8 @@
 
 package it.polito.tellmefirst.web.rest.interfaces;
 
-import it.polito.tellmefirst.exception.TMFOutputException;
-import it.polito.tellmefirst.enhance.Enhancer;
+import it.polito.tellmefirst.web.rest.exception.TMFOutputException;
+import it.polito.tellmefirst.web.rest.enhance.Enhancer;
 import it.polito.tellmefirst.web.rest.TMFServer;
 import net.sf.json.xml.XMLSerializer;
 import org.apache.commons.logging.Log;

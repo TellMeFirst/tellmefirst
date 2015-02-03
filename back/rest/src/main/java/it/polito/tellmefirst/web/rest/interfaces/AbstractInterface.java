@@ -19,7 +19,7 @@
 
 package it.polito.tellmefirst.web.rest.interfaces;
 
-import it.polito.tellmefirst.exception.TMFOutputException;
+import it.polito.tellmefirst.web.rest.exception.TMFOutputException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xml.sax.helpers.AttributesImpl;

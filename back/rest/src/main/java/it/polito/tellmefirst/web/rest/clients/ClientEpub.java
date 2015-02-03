@@ -21,8 +21,8 @@ package it.polito.tellmefirst.web.rest.clients;
 
 import it.polito.tellmefirst.classify.Classifier;
 import it.polito.tellmefirst.classify.Text;
-import it.polito.tellmefirst.exception.TMFVisibleException;
 import it.polito.tellmefirst.lodmanager.DBpediaManager;
+import it.polito.tellmefirst.web.rest.exception.TMFVisibleException;
 import it.polito.tellmefirst.util.TMFUtils;
 import it.polito.tellmefirst.web.rest.clients.ClassifyOutput;
 import static java.util.stream.Collectors.toList;
