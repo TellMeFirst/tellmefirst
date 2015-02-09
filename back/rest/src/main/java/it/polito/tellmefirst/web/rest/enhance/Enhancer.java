@@ -22,6 +22,7 @@ package it.polito.tellmefirst.web.rest.enhance;
 import com.aliasi.spell.JaroWinklerDistance;
 import it.polito.tellmefirst.web.rest.apimanager.*;
 import it.polito.tellmefirst.web.rest.lodmanager.*;
+import it.polito.tellmefirst.apimanager.NYTimesSearcher;
 import it.polito.tellmefirst.lucene.IndexesUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,7 +42,7 @@ public class Enhancer {
 
     private RestManager restManager;
     private DBpediaManager dBpediaManager;
-    private NewYorkTimesLODManager nytManager;
+    private NYTimesSearcher nyTimesSearcher;
     private ImageManager imageManager;
     private VideoManager videoManager;
     private ArrayList<String> badWikiImages;
@@ -56,7 +57,7 @@ public class Enhancer {
         typesWhiteList = createTypesWhiteList();
         restManager = new RestManager();
         dBpediaManager = new DBpediaManager();
-        nytManager = new NewYorkTimesLODManager();
+        nyTimesSearcher = new NYTimesSearcher();
         imageManager = new ImageManager();
         videoManager = new VideoManager();
         LOG.debug("[constructor] - END");
@@ -237,14 +238,14 @@ public class Enhancer {
         return result;
     }
 
-    public String getNewsFromNYT(String uri) {
+    public String getNewsFromNYT(String uri, String label) {
         LOG.debug("[getNewsFromNYT] - BEGIN");
         String result;
         String nytUri = dBpediaManager.getNytUri(uri);
         if(nytUri.equals("")){
             result = "{\"offset\" : \"0\" , \"results\" : []  , \"total\" : 0}";
         } else {
-            String search = nytManager.getSearchApiQuery(nytUri);
+            String search = nyTimesSearcher.getSearchApiQuery(nytUri, label);
             result = restManager.getStringFromAPI(search);
         }
         LOG.debug("[getNewsFromNYT] - END");

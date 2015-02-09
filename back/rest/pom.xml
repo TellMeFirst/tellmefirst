@@ -65,6 +65,12 @@
             <artifactId>tmfcore</artifactId>
             <version>2.0.0.0</version>
         </dependency>
+
+        <dependency>
+            <groupId>it.polito.tellmefirst.lodmanager</groupId>
+            <artifactId>tmf_nyt</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
         
         <dependency>
             <groupId>com.sun.jersey</groupId>
