@@ -3,7 +3,7 @@ TellMeFirst APIs
 
 ## About This Guide
 
-This guide is intended for all those that want to develop applications using TellMeFirst APIs.
+This guide is intended for users that want to develop applications using TellMeFirst APIs.
 
 ## Conventions
 
@@ -46,25 +46,15 @@ words - max 20,000 words). The results are expressed in the form of DBpedia URIs
 
 Example of the use of classify service for extracting topics from a PDF file.
 
-'''
-curl -F file=@/home/tellmefirst/files/2011-iscc-paper.pdf -F fileName="2011-iscc-paper.pdf" -
-F numTopics=7 -F lang=english -F key="" http://tellmefirst.polito.it:2222/rest/classify
-'''
+	curl -F file=@/home/tellmefirst/files/2011-iscc-paper.pdf -F fileName="2011-iscc-paper.pdf" -F numTopics=7 -F lang=english -F http://tellmefirst.polito.it:2222/rest/classify
 
 Example of the use of classify service for extracting topics from a URL. 
 
-'''
-curl -F url=”http://www.theguardian.com/environment/2012/nov/05/letter-decarbonisationtarget-energy-bill”
--F numTopics=7 -F lang=english http://tellmefirst.polito.it:2222/rest/classify 
-'''
+	curl -F url="http://www.theguardian.com/environment/2012/nov/05/letter-decarbonisationtarget-energy-bill" -F numTopics=7 -F lang=english http://tellmefirst.polito.it:2222/rest/classify 
 
 Example of the use of classify service for extracting topics from a plain text.
 
-'''
-curl -F text="The final work of legendary director Stanley Kubrick, who died within a week of
-completing the edit, is based upon a novel by Arthur Schnitzler." -F numTopics=7 -F
-lang=english http://tellmefirst.polito.it:2222/rest/classify
-'''
+	curl -F text="The final work of legendary director Stanley Kubrick, who died within a week of completing the edit, is based upon a novel by Arthur Schnitzler." -F numTopics=7 -F lang=english http://tellmefirst.polito.it:2222/rest/classify
 
 #### Response JSON elements
 
@@ -79,6 +69,7 @@ lang=english http://tellmefirst.polito.it:2222/rest/classify
 | @mergedTypes |                            DBpedia classes useful for getVideo and getMap requests                            | DBpedia:Person#DBpedia:Http://xmlns.com/foaf/0.1/Person #Schema:Person#DBpedia:Agent |
 |    @image    | Wikipedia image url of the topic  (for topics in which is not present,  you can exploit the getImage service) |                                 http://bit.ly/1zOQt0k                                |
 
+#### Example of result in JSON
 
 ``` javascript
 
