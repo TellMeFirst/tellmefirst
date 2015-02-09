@@ -163,9 +163,7 @@ DBpedia URI and the title of the Wikipedia entry page. Usually it could be usefu
 
 #### Request Example
 
-```
 http://tellmefirst.polito.it:2222/rest/getImage?uri=http%3A%2F%2Fdbpedia.org%2Fresource%2FStanley_Kubrick&label=Stanley+Kubrick
-```
 
 ### Response
 Returns the standard HTTP status code of “200 – OK” and getImage results in the JSON format.
@@ -201,7 +199,7 @@ using the DBpedia URI.
 
 #### Request example
 
-	http://tellmefirst.polito.it:2222/rest/getNews?uri=http://dbpedia.org/resource/Stanley_Kubrick
+http://tellmefirst.polito.it:2222/rest/getNews?uri=http://dbpedia.org/resource/Stanley_Kubrick
 
 #### Response
 
@@ -236,7 +234,7 @@ NOTE: getText service works only for the Italian language.
 
 #### Request example
 
-	http://tellmefirst.polito.it:2222/rest/getText?uri=http://dbpedia.org/resource/Stanley_Kubrick&lang=italian
+http://tellmefirst.polito.it:2222/rest/getText?uri=http://dbpedia.org/resource/Stanley_Kubrick&lang=italian
 
 ### Response
 
@@ -273,7 +271,7 @@ DBpedia entity.
 |   label   |         TMF label         |               Stanley+Kubrick               |
 |    type   | DBpedia or Freebase class |             DBpedia:Person#{...}            |
 
-#### Request example with curl
+#### Request example
 
 http://tellmefirst.polito.it:2222/rest/getVideo?uri=http%3A%2F%2Fdbpedia.org%2Fresource%2FStanley_Kubrick&label=Stanley+Kubrick&key=
 
@@ -309,7 +307,7 @@ it's an instance of the DBpedia place class.
 |    uri    |     DBpedia URI     | http://dbpedia.org/resource/Turin |
 |    type   | DBpedia place class |           DBpedia:Place           |
 
-#### Request example with curl
+#### Request example
 	http://tellmefirst.polito.it:2222/rest/getMap?uri=http://dbpedia.org/resource/Turin&type=DBpedia:Place
 
 ### Response
