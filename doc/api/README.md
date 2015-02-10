@@ -33,7 +33,7 @@ words - max 20,000 words). The results are expressed in the form of DBpedia URIs
 #### Request URI parameters
 
 | PARAMETER |           DESCRIPTION          |                         EXAMPLE                         |
-|-----------|:------------------------------:|:-------------------------------------------------------:|
+|:---------:|:------------------------------:|:-------------------------------------------------------:|
 |    file   |            File path           |       @/home/tellmefirst/files/2011-isccpaper.pdf       |
 |  fileName |            File name           |                   2011-iscc-paper.pdf                   |
 |    url    |          Web page url          |                  http://bit.ly/1M66e9t                  |
@@ -59,7 +59,7 @@ Example of the use of classify service for extracting topics from a plain text.
 #### Response JSON elements
 
 | JSON ELEMENT |                                                  DESCRIPTION                                                  |                                        EXAMPLE                                       |
-|--------------|:-------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------:|
+|:------------:|:-------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------:|
 |   @service   |                             String that identify the results of the classify call                             |                               Default value: ”Classify”                              |
 |   Resources  |                    Array of the results (its length isrelated to the “numTopics” parameter)                   |                                 [{result1},{result2}]                                |
 |     @uri     |                                            DBpedia URI of the topic                                           |                      http://dbpedia.org/resource/Stanley_Kubrick                     |
@@ -308,7 +308,8 @@ it's an instance of the DBpedia place class.
 |    type   | DBpedia place class |           DBpedia:Place           |
 
 #### Request example
-	http://tellmefirst.polito.it:2222/rest/getMap?uri=http://dbpedia.org/resource/Turin&type=DBpedia:Place
+
+http://tellmefirst.polito.it:2222/rest/getMap?uri=http://dbpedia.org/resource/Turin&type=DBpedia:Place
 
 ### Response
 Returns the standard HTTP status code of “200 – OK” and getText results in the JSON format.
@@ -317,5 +318,5 @@ Returns the standard HTTP status code of “200 – OK” and getText results in
 
 | JSON ELEMENT |      DESCRIPTION     | EXAMPLE |
 |--------------|:--------------------:|:-------:|
-|      lat     |  Latitude coordinate | 45.0667 |
-|     long     | Longitude coordinate |   7.7   |
+|     @lat     |  Latitude coordinate | 45.0667 |
+|    @long     | Longitude coordinate |   7.7   |
