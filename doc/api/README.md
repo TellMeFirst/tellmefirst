@@ -17,7 +17,8 @@ braces and brackets in the request.
 ### Description
 The classify service allows you to identify the main topics of a textual document. The input data
 could be a URL of a specific Web page, a PDF or DOC document (max 3MB) or a plain text (min 50
-words - max 20,000 words). The results are expressed in the form of DBpedia URIs.
+words - max 20,000 words). The results are expressed in the form of DBpedia URIs. For the APIs 
+and the specific classification policy defined for EPUB, you can visit [the doc/epub section](https://github.com/TellMeFirst/tellmefirst/tree/master/doc/epub) 
 
 ### Request - POST
 
