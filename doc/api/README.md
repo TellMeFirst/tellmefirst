@@ -70,6 +70,69 @@ Example of the use of classify service for extracting topics from a plain text.
 | @mergedTypes |                            DBpedia classes useful for getVideo and getMap requests                            | DBpedia:Person#DBpedia:Http://xmlns.com/foaf/0.1/Person #Schema:Person#DBpedia:Agent |
 |    @image    | Wikipedia image url of the topic  (for topics in which is not present,  you can exploit the getImage service) |                                 http://bit.ly/1zOQt0k                                |
 
+#### jQuery implementation
+
+``` javascript
+
+	var sampleText = "The final work of legendary director Stanley Kubrick, who died \
+	within a week of completing the edit, is based upon a novel by Arthur Schnitzler. \
+	Tom Cruise and Nicole Kidman play William and Alice Harford, a physician and a \	
+	gallery manager who are wealthy, successful, and travel in a sophisticated social circle."
+
+	var dataForClassify = new FormData();
+	dataForClassify.append('text', sampleText)
+	dataForClassify.append('numTopics',7)
+	dataForClassify.append('lang',"english")
+	dataForClassify.append('key',"")
+
+	$.ajax({
+	    url: 'http://tellmefirst.polito.it:2222/rest/classify',
+	    data: dataForClassify,
+	    cache: false,
+	    contentType: false,
+	    processData: false,
+	    type: 'POST',
+	    success: function(data){
+	        console.log(data);
+	    }
+	});
+
+```
+
+#### Node.js implementation
+
+``` javascript
+
+	function classify (url) {
+	    var data = new FormData();
+	    data.append('url', url)
+	    data.append('numTopics', 7)
+	    data.append('lang',"english")
+	    data.append('key',"")
+
+	    var options = {
+	        host: 'tellmefirst.polito.it',
+	        port: 2222,
+	        path: '/rest/classify',
+	        method: 'POST',
+	        headers: data.getHeaders()
+	    };
+
+	    var req = http.request(options, function (res) {
+	        res.setEncoding('utf8');
+	        res.on('data', function (chunk) {
+	            try {
+	                console.info(JSON.parse(chunk)["Resources"]);
+	            } catch (e) {
+	                // TODO
+	            }	
+	        });
+	    });
+	    data.pipe(req);
+	}
+
+```
+
 #### Example of result in JSON
 
 ``` javascript
