@@ -305,7 +305,7 @@ Returns the standard HTTP status code of “200 – OK” and getText results in
 #### Response JSON elements
 
 | JSON ELEMENT |       DESCRIPTION     |                   EXAMPLE                   |
-|--------------|:---------------------:|:-------------------------------------------:|
+|:------------:|:---------------------:|:-------------------------------------------:|
 |    @title    | Wikipedia entry title | Italia (http://it.wikipedia.org/wiki/Italia)|
 
 ## getVideo
