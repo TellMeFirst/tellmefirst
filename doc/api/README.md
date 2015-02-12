@@ -82,7 +82,7 @@ Example of the use of classify service for extracting topics from a plain text.
 	var dataForClassify = new FormData();
 	dataForClassify.append('text', sampleText)
 	dataForClassify.append('numTopics',7)
-	dataForClassify.append('lang',"english")
+	dataForClassify.append('lang','english')
 
 	$.ajax({
 	    url: 'http://tellmefirst.polito.it:2222/rest/classify',
@@ -106,7 +106,7 @@ Example of the use of classify service for extracting topics from a plain text.
 	    var data = new FormData();
 	    data.append('url', url)
 	    data.append('numTopics', 7)
-	    data.append('lang',"english")
+	    data.append('lang','english')
 
 	    var options = {
 	        host: 'tellmefirst.polito.it',
@@ -120,7 +120,7 @@ Example of the use of classify service for extracting topics from a plain text.
 	        res.setEncoding('utf8');
 	        res.on('data', function (chunk) {
 	            try {
-	                console.info(JSON.parse(chunk)["Resources"]);
+	                console.info(JSON.parse(chunk)['Resources']);
 	            } catch (e) {
 	                // TODO
 	            }	
