@@ -70,7 +70,7 @@ Example of the use of classify service for extracting topics from a plain text.
 | @mergedTypes |                            DBpedia classes useful for getVideo and getMap requests                            | DBpedia:Person#DBpedia:Http://xmlns.com/foaf/0.1/Person #Schema:Person#DBpedia:Agent |
 |    @image    | Wikipedia image url of the topic  (for topics in which is not present,  you can exploit the getImage service) |                                 http://bit.ly/1zOQt0k                                |
 
-#### jQuery implementation
+#### jQuery implementation example
 
 ``` javascript
 
@@ -83,7 +83,6 @@ Example of the use of classify service for extracting topics from a plain text.
 	dataForClassify.append('text', sampleText)
 	dataForClassify.append('numTopics',7)
 	dataForClassify.append('lang',"english")
-	dataForClassify.append('key',"")
 
 	$.ajax({
 	    url: 'http://tellmefirst.polito.it:2222/rest/classify',
@@ -99,7 +98,7 @@ Example of the use of classify service for extracting topics from a plain text.
 
 ```
 
-#### Node.js implementation
+#### Node.js implementation example
 
 ``` javascript
 
@@ -108,7 +107,6 @@ Example of the use of classify service for extracting topics from a plain text.
 	    data.append('url', url)
 	    data.append('numTopics', 7)
 	    data.append('lang',"english")
-	    data.append('key',"")
 
 	    var options = {
 	        host: 'tellmefirst.polito.it',
@@ -133,7 +131,7 @@ Example of the use of classify service for extracting topics from a plain text.
 
 ```
 
-#### Example of result in JSON
+#### Example of JSON result
 
 ``` javascript
 
