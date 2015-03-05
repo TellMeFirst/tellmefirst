@@ -59,14 +59,14 @@ public class EpubChaptersInterface extends AbsResponseInterface {
 
         Classifier classifier = (lang.equals("italian")) ? TMFServer.getItalianClassifier() : TMFServer.getEnglishClassifier();
         ClientEpub client = new ClientEpub(classifier);
-        HashMap<String, ArrayList<String[]>> chapters = client.classifyEPubChapters(file, fileName, url, numTopics, lang);
+        HashMap<String, List<String[]>> chapters = client.classifyEPubChapters(file, fileName, url, numTopics, lang);
         result = produceXML(chapters);
         LOG.debug("[getXML] - END");
 
         return result;
     }
 
-    private String produceXML(HashMap<String, ArrayList<String[]>> chapters) throws TMFOutputException {
+    private String produceXML(HashMap<String, List<String[]>> chapters) throws TMFOutputException {
 
         LOG.debug("[produceXML] - BEGIN");
 

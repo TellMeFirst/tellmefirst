@@ -32,6 +32,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -57,13 +58,13 @@ public class ClassifyInterface extends AbsResponseInterface {
         LOG.debug("[getXML] - BEGIN");
         String result;
         Classifier classifier = (lang.equals("italian")) ? TMFServer.getItalianClassifier() : TMFServer.getEnglishClassifier();
-        ArrayList<String[]> topics = classifier.classify(text, numTopics, lang);
+        List<String[]> topics = classifier.classify(text, numTopics);
         result = produceXML(topics);
         LOG.debug("[getXML] - END");
         return result;
     }
 
-    private String produceXML(ArrayList<String[]> topics) throws TMFOutputException {
+    private String produceXML(List<String[]> topics) throws TMFOutputException {
         LOG.debug("[produceXML] - BEGIN");
         String xml;
         try {
