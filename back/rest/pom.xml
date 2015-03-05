@@ -63,7 +63,7 @@
         <dependency>
             <groupId>it.polito.tellmefirst</groupId>
             <artifactId>tmfcore</artifactId>
-            <version>2.0.0.0</version>
+            <version>3.0.0.0</version>
         </dependency>
 
         <dependency>
