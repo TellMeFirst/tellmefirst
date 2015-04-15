@@ -23,7 +23,7 @@ import com.aliasi.spell.JaroWinklerDistance;
 import it.polito.tellmefirst.web.rest.apimanager.*;
 import it.polito.tellmefirst.web.rest.lodmanager.*;
 import it.polito.tellmefirst.apimanager.NYTimesSearcher;
-import it.polito.tellmefirst.lucene.IndexesUtil;
+import it.polito.tellmefirst.lucene.SimpleSearcher;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jsoup.Jsoup;
@@ -31,6 +31,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
@@ -47,11 +48,13 @@ public class Enhancer {
     private VideoManager videoManager;
     private ArrayList<String> badWikiImages;
     private ArrayList<String> typesWhiteList;
+    private SimpleSearcher italianSearcher;
+    private SimpleSearcher englishSearcher;
     static Log LOG = LogFactory.getLog(Enhancer.class);
     public final static String DEFAULT_IMAGE = "http://tellmefirst.polito.it/images/default_img.jpg";
 
 
-    public Enhancer() {
+    public Enhancer(SimpleSearcher is, SimpleSearcher es) {
         LOG.debug("[constructor] - BEGIN");
         badWikiImages = createBadImagesList();
         typesWhiteList = createTypesWhiteList();
@@ -60,6 +63,8 @@ public class Enhancer {
         nyTimesSearcher = new NYTimesSearcher();
         imageManager = new ImageManager();
         videoManager = new VideoManager();
+        italianSearcher = is;
+        englishSearcher = es;
         LOG.debug("[constructor] - END");
     }
 
@@ -103,7 +108,10 @@ public class Enhancer {
                     // no prod
                     LOG.debug("Ok, we'll search an image for the concept "+conceptUri+" (related to the URI "+uri+")");
                     oldResults.add(conceptUri);
-                    String conceptLabel = IndexesUtil.getTitle(conceptUri, lang);
+                    String conceptLabel;
+                    if(lang.equals("italian")) {
+                        conceptLabel = italianSearcher.getTitle(conceptUri);
+                    } else conceptLabel = englishSearcher.getTitle(conceptUri);
                     // recursive use of getImageFromMediaWiki()
                     return getImageFromMediaWiki(dbpediaPrefix + conceptUri, conceptLabel, oldResults);
                 } else{
@@ -139,7 +147,10 @@ public class Enhancer {
                         // no prod
                         LOG.debug("Ok, we'll search an image for the concept "+conceptUri+" (related to the URI "+uri+")");
                         oldResults.add(conceptUri);
-                        String conceptLabel = IndexesUtil.getTitle(conceptUri, lang);
+                        String conceptLabel;
+                        if(lang.equals("italian")) {
+                            conceptLabel = italianSearcher.getTitle(conceptUri);
+                        } else conceptLabel = englishSearcher.getTitle(conceptUri);
                         // recursive use of getImageFromMediaWiki()
                         return getImageFromMediaWiki(dbpediaPrefix + conceptUri, conceptLabel, oldResults);
                     }else {
@@ -207,7 +218,10 @@ public class Enhancer {
                             // no prod
                             LOG.debug("Ok, we'll search an image for the concept "+conceptUri+" (related to the URI "+uri+")");
                             oldResults.add(conceptUri);
-                            String conceptLabel = IndexesUtil.getTitle(conceptUri, lang);
+                            String conceptLabel;
+                            if(lang.equals("italian")) {
+                                conceptLabel = italianSearcher.getTitle(conceptUri);
+                            } else conceptLabel = englishSearcher.getTitle(conceptUri);
                             // recursive use of getImageFromMediaWiki()
                             return getImageFromMediaWiki(dbpediaPrefix + conceptUri, conceptLabel, oldResults);
                         }else {
@@ -310,13 +324,13 @@ public class Enhancer {
         return result;
     }
 
-    public String getTitleFromDBpedia(String uri, String lang) {
+    public String getTitleFromDBpedia(String uri, String lang) throws IOException {
         LOG.debug("[getTitleFromDBpedia] - BEGIN");
         String result = "";
         if(lang.equals("italian") && uri.startsWith("http://dbpedia")){
             String itaUri = IndexesUtil.getSameAsFromEngToIta(uri);
             if(!itaUri.equals("")){
-                result = IndexesUtil.getTitle(itaUri, "it");
+                result = italianSearcher.getTitle(itaUri);
             }
         }
         LOG.debug("[getTitleFromDBpedia] - END");
