@@ -22,12 +22,12 @@ package it.polito.tellmefirst.web.rest;
 import com.sun.grizzly.http.SelectorThread;
 import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 import it.polito.tellmefirst.classify.Classifier;
+import it.polito.tellmefirst.lucene.KBIndexSearcher;
 import it.polito.tellmefirst.lucene.LuceneManager;
 import it.polito.tellmefirst.lucene.SimpleSearcher;
 import it.polito.tellmefirst.web.rest.enhance.Enhancer;
 import it.polito.tellmefirst.web.rest.exception.TMFConfigurationException;
 import it.polito.tellmefirst.web.rest.exception.TMFIndexesWarmUpException;
-import it.polito.tellmefirst.lucene.IndexesUtil;
 import it.polito.tellmefirst.util.TMFVariables;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -54,6 +54,8 @@ public class TMFServer {
     protected static Classifier englishClassifier;
     public static SimpleSearcher ITALIAN_CORPUS_INDEX_SEARCHER;
     public static SimpleSearcher ENGLISH_CORPUS_INDEX_SEARCHER;
+    public static KBIndexSearcher ITALIAN_KB_INDEX_SEARCHER;
+    public static KBIndexSearcher ENGLISH_KB_INDEX_SEARCHER;
 
     /**
      * TMF starting point. From rest directory, launch this command:
@@ -83,9 +85,23 @@ public class TMFServer {
         contextLuceneManagerEN.setLuceneDefaultAnalyzer(new EnglishAnalyzer(Version.LUCENE_36, TMFVariables.STOPWORDS_EN));
         ENGLISH_CORPUS_INDEX_SEARCHER = new SimpleSearcher(contextLuceneManagerEN);
 
-        enhancer = new Enhancer(ITALIAN_CORPUS_INDEX_SEARCHER, ENGLISH_CORPUS_INDEX_SEARCHER);
-        italianClassifier = new Classifier("it");
-        englishClassifier = new Classifier("en");
+        // build kb italian searcher
+        String kbDirIT = TMFVariables.KB_IT;
+        String residualKbDirIT = TMFVariables.RESIDUAL_KB_IT;
+        ITALIAN_KB_INDEX_SEARCHER = new KBIndexSearcher(kbDirIT, residualKbDirIT);
+
+        // build kb english searcher
+        String kbDirEN = TMFVariables.KB_EN;
+        String residualKbDirEN = TMFVariables.RESIDUAL_KB_EN;
+        ENGLISH_KB_INDEX_SEARCHER = new KBIndexSearcher(kbDirEN, residualKbDirEN);
+
+        enhancer = new Enhancer(ITALIAN_CORPUS_INDEX_SEARCHER,
+                                ENGLISH_CORPUS_INDEX_SEARCHER,
+                                ITALIAN_KB_INDEX_SEARCHER,
+                                ENGLISH_KB_INDEX_SEARCHER);
+
+        italianClassifier = new Classifier("it", ITALIAN_CORPUS_INDEX_SEARCHER);
+        englishClassifier = new Classifier("en", ENGLISH_CORPUS_INDEX_SEARCHER);
 
         //The following is adapted from DBpedia Spotlight (https://github.com/dbpedia-spotlight/dbpedia-spotlight)
         final Map<String, String> initParams = new HashMap<String, String>();
@@ -109,7 +125,6 @@ public class TMFServer {
         System.exit(0);
         LOG.debug("[main] - END");
     }
-
 
     public static Enhancer getEnhancer(){
         return enhancer;

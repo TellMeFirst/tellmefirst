@@ -71,6 +71,12 @@
             <artifactId>tmf_nyt</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+
+        <dependency>
+            <groupId>it.polito.tellmefirst.lucene</groupId>
+            <artifactId>tmf_enhance_util</artifactId>
+            <version>1.0.0.0</version>
+        </dependency>
         
         <dependency>
             <groupId>com.sun.jersey</groupId>

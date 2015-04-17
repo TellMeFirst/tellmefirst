@@ -20,10 +20,13 @@
 package it.polito.tellmefirst.web.rest.enhance;
 
 import com.aliasi.spell.JaroWinklerDistance;
+import it.polito.tellmefirst.lucene.IndexesUtil;
+import it.polito.tellmefirst.lucene.KBIndexSearcher;
 import it.polito.tellmefirst.web.rest.apimanager.*;
 import it.polito.tellmefirst.web.rest.lodmanager.*;
 import it.polito.tellmefirst.apimanager.NYTimesSearcher;
 import it.polito.tellmefirst.lucene.SimpleSearcher;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jsoup.Jsoup;
@@ -33,6 +36,7 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeMap;
 
 /**
@@ -50,11 +54,27 @@ public class Enhancer {
     private ArrayList<String> typesWhiteList;
     private SimpleSearcher italianSearcher;
     private SimpleSearcher englishSearcher;
+    private KBIndexSearcher kbItalianSearcher;
+    private KBIndexSearcher kbEnglishSearcher;
     static Log LOG = LogFactory.getLog(Enhancer.class);
     public final static String DEFAULT_IMAGE = "http://tellmefirst.polito.it/images/default_img.jpg";
 
-
-    public Enhancer(SimpleSearcher is, SimpleSearcher es) {
+    /**
+     * Instantiate the enhancer taking as input all indexes involved at the enrichment phase.
+     * @param is Italian Corpus Index Searcher.
+     * @param es English Corpus Index Searcher.
+     * @param kbIt Italian Knowledge Base Index Searcher
+     * @param kbEn English Knowledge Base Index Searcher
+     *
+     * To improve when you create an enhancement git module. In the future, if we find better
+     * solutions to get images, we will remove Knowledge Base Indexes to get entities related
+     * to a specific URI.
+     *
+     * We also should improve how to manage language.
+     *
+     * @since 3.0.0.0.
+     */
+    public Enhancer(SimpleSearcher is, SimpleSearcher es, KBIndexSearcher kbIt, KBIndexSearcher kbEn) {
         LOG.debug("[constructor] - BEGIN");
         badWikiImages = createBadImagesList();
         typesWhiteList = createTypesWhiteList();
@@ -65,6 +85,8 @@ public class Enhancer {
         videoManager = new VideoManager();
         italianSearcher = is;
         englishSearcher = es;
+        kbItalianSearcher = kbIt;
+        kbEnglishSearcher = kbEn;
         LOG.debug("[constructor] - END");
     }
 
@@ -91,11 +113,18 @@ public class Enhancer {
             if(elementsFound == null || elementsFound.size() == 0){
                 //no prod
                 LOG.debug("No images at all from Wikimedia for the resource "+uri+". We'll search for its BOC.");
-                ArrayList<String> bagOfConcepts = IndexesUtil.getBagOfConcepts(uri.replace(dbpediaPrefix, ""), lang);
+
+                List<String> bagOfConcepts;
+                if(lang.equals("italian")){
+                    bagOfConcepts = kbItalianSearcher.getBagOfConcepts(uri.replace(dbpediaPrefix, ""));
+                } else bagOfConcepts = kbEnglishSearcher.getBagOfConcepts(uri.replace(dbpediaPrefix, ""));
+
                 if (bagOfConcepts.size() == 0 ||(bagOfConcepts.size() == 1 && bagOfConcepts.get(0).equals(""))) {
                     //no prod
                     LOG.debug("No concepts retrieved from the BOC of "+uri+". We'll search for its residual BOC.");
-                    bagOfConcepts = IndexesUtil.getResidualBagOfConcepts(uri.replace(dbpediaPrefix, ""), lang);
+                    if(lang.equals("italian")) {
+                        bagOfConcepts = kbItalianSearcher.getResidualBagOfConcepts(uri.replace(dbpediaPrefix, ""));
+                    } else bagOfConcepts = kbEnglishSearcher.getResidualBagOfConcepts(uri.replace(dbpediaPrefix, ""));
                 }
                 if(bagOfConcepts.size() == 0){
                     LOG.debug("No concepts in the residual BOC of: "+uri+". We'll return default image.");
@@ -130,11 +159,17 @@ public class Enhancer {
                 if(imagesFound.size() == 0){
                     //no prod
                     LOG.debug("No good images from Wikimedia for the resource "+uri+". We'll search for its BOC.");
-                    ArrayList<String> bagOfConcepts = IndexesUtil.getBagOfConcepts(uri.replace(dbpediaPrefix, ""), lang);
+                    List<String> bagOfConcepts;
+                    if(lang.equals("italian")){
+                        bagOfConcepts = kbItalianSearcher.getBagOfConcepts(uri.replace(dbpediaPrefix, ""));
+                    } else bagOfConcepts = kbEnglishSearcher.getBagOfConcepts(uri.replace(dbpediaPrefix, ""));
+
                     if (bagOfConcepts.size() == 0 ||(bagOfConcepts.size() == 1 && bagOfConcepts.get(0).equals(""))) {
                         //no prod
                         LOG.debug("No concepts retrieved from the BOC of "+uri+". We'll search for its residual BOC.");
-                        bagOfConcepts = IndexesUtil.getResidualBagOfConcepts(uri.replace(dbpediaPrefix, ""), lang);
+                        if(lang.equals("italian")){
+                            bagOfConcepts = kbItalianSearcher.getBagOfConcepts(uri.replace(dbpediaPrefix, ""));
+                        } else bagOfConcepts = kbEnglishSearcher.getBagOfConcepts(uri.replace(dbpediaPrefix, ""));
                     }
                     if(bagOfConcepts.size() == 0){
                         LOG.debug("No concepts in the residual BOC of: "+uri+". We'll return default image.");
@@ -200,12 +235,20 @@ public class Enhancer {
                         //no prod
                         LOG.debug("After filtering, there are not good images for the resource "+uri+
                                 ". We'll search for its BOC.");
-                        ArrayList<String> bagOfConcepts = IndexesUtil.getBagOfConcepts(uri.replace(dbpediaPrefix, ""), lang);
+                        List<String> bagOfConcepts;
+                        if(lang.equals("italian")){
+                            bagOfConcepts = kbItalianSearcher.getBagOfConcepts(uri.replace(dbpediaPrefix, ""));
+                        } else bagOfConcepts = kbEnglishSearcher.getBagOfConcepts(uri.replace(dbpediaPrefix, ""));
+
                         if (bagOfConcepts.size() == 0 ||(bagOfConcepts.size() == 1 && bagOfConcepts.get(0).equals(""))) {
                             //no prod
                             LOG.debug("No concepts retrieved from the BOC of "+uri+
                                     ". We'll search for its residual BOC.");
-                            bagOfConcepts = IndexesUtil.getResidualBagOfConcepts(uri.replace(dbpediaPrefix, ""), lang);
+
+                            if(lang.equals("italian")){
+                                bagOfConcepts = kbItalianSearcher.getResidualBagOfConcepts(uri.replace(dbpediaPrefix, ""));
+                            } else bagOfConcepts = kbEnglishSearcher.getResidualBagOfConcepts(uri.replace(dbpediaPrefix, ""));
+
                         }
                         if(bagOfConcepts.size() == 0){
                             LOG.debug("No concepts in the residual BOC of: "+uri+". We'll return default image.");
