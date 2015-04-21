@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.xml.sax.helpers.AttributesImpl;
 import javax.xml.transform.sax.TransformerHandler;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,7 +44,7 @@ public class TextInterface extends AbsResponseInterface{
         return result;
     }
 
-    public String getXML(String uri, String lang) throws TMFOutputException {
+    public String getXML(String uri, String lang) throws TMFOutputException, IOException {
         LOG.debug("[getXML] - BEGIN");
         String result;
         String title = enhancer.getTitleFromDBpedia(uri, lang);
