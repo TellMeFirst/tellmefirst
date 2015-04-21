@@ -371,7 +371,7 @@ public class Enhancer {
         LOG.debug("[getTitleFromDBpedia] - BEGIN");
         String result = "";
         if(lang.equals("italian") && uri.startsWith("http://dbpedia")){
-            String itaUri = IndexesUtil.getSameAsFromEngToIta(uri);
+            String itaUri = italianSearcher.getSameAsFromEngToIta(uri);
             if(!itaUri.equals("")){
                 result = italianSearcher.getTitle(itaUri);
             }
