@@ -40,7 +40,7 @@ public class ImageManager {
         String result = Enhancer.DEFAULT_IMAGE;
         try {
             Document doc = Jsoup.connect(pageURL).get();
-            Element image = doc.select("img").first();
+            Element image = doc.select("div.fullImageLink").select("img").first();
             result = image.attr("src");
         } catch (Exception e) {
             LOG.error("[scrapeImageFromPage] - EXCEPTION: ", e);
@@ -55,7 +55,7 @@ public class ImageManager {
         String result = "";
         try {
             Document doc = Jsoup.connect(pageURL).get();
-            Element image = doc.select("img").first();
+            Element image = doc.select("div.fullImageLink").select("img").first();
             result = "http:"+ image.attr("src");
         } catch (Exception e) {
             LOG.error("[scrapeDBpediaImageFromPage] - EXCEPTION: ", e);
@@ -69,7 +69,7 @@ public class ImageManager {
         int[] result = {0,0};
         try {
             Document doc = Jsoup.connect(pageURL).get();
-            Element image = doc.select("img").first();
+            Element image = doc.select("div.fullImageLink").select("img").first();
             result[0] = Integer.valueOf(image.attr("width"));
             result[1] = Integer.valueOf(image.attr("height"));
         } catch (Exception e) {
