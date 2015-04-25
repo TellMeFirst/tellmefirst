@@ -19,14 +19,21 @@
 
 package it.polito.tellmefirst.web.rest.parsing;
 
-import com.gravity.goose.Article;
-import com.gravity.goose.Configuration;
-import com.gravity.goose.Goose;
 import de.jetwick.snacktory.HtmlFetcher;
 import de.jetwick.snacktory.JResult;
 import it.polito.tellmefirst.web.rest.exception.TMFVisibleException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.tika.exception.TikaException;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.html.HtmlParser;
+import org.apache.tika.sax.BodyContentHandler;
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 /**
  * Created by IntelliJ IDEA.
@@ -53,24 +60,18 @@ public class HTMLparser {
     }
 
 
-    public String htmlToTextGoose(String url) throws TMFVisibleException {
+    public String htmlToTextGoose(String url) throws TMFVisibleException, IOException, TikaException, SAXException {
         LOG.debug("[htmlToTextGoose] - BEGIN");
         String result;
-        try{
-            Configuration conf = new Configuration();
-            conf.setEnableImageFetching(false);
-            Goose goose = new Goose(conf);
-            Article article = goose.extractContent(url);
-            result = article.cleanedArticleText();
-            if(result.equals("")){
-                // call twice to prevent Goose (frequent) malfunctions
-                article = goose.extractContent(url);
-                result = article.cleanedArticleText();
-            }
-        }catch (Exception e){
-            LOG.error("[htmlToTextGoose] - EXCEPTION: ", e);
-            throw new TMFVisibleException("Unable to scrape text from specified URL. Try copying and pasting in the text area!");
-        }
+        BodyContentHandler handler = new BodyContentHandler();
+        Metadata metadata = new Metadata();
+        InputStream inputstream = new URL(url).openStream();
+        ParseContext pcontext = new ParseContext();
+
+        HtmlParser htmlparser = new HtmlParser();
+        htmlparser.parse(inputstream, handler, metadata,pcontext);
+        result = handler.toString();
+
         LOG.debug("[htmlToTextGoose] - END");
         return result;
     }

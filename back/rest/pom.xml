@@ -22,21 +22,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-install-plugin</artifactId>
                 <version>${maven.install.plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>install-goose-jar</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>install-file</goal>
-                        </goals>
-                        <configuration>
-                            <groupId>com.gravity</groupId>
-                            <artifactId>goose</artifactId>
-                            <version>2.1.22</version>
-                            <packaging>jar</packaging>
-                            <file>${basedir}/../lib/goose-2.1.22.jar</file>
-                        </configuration>
-                    </execution>
+                <executions>    
                     <execution>
                         <id>install-lingpipe-jar</id>
                         <phase>generate-resources</phase>
