@@ -102,6 +102,11 @@ TMF.handleFormSubmit = function () {
 			//$('#file').val('C:\fakepath\fakefile.pdf');
 		}
 		$('#fileName').val($('#file').val().replace(/C:\\fakepath\\/i,''));
+		var extension = $('#file').val().substr( ($('#file').val().lastIndexOf('.') +1) );
+		if(extension == "epub") {
+			var action = TMF.setLanguageService()+"classifyEpub";
+			$("#mainForm").attr("action", action);
+		}
 		if($('#text').val()=="" && $('#formUrl').val()=="") {
 			if ($("#file")[0].files[0].size>3145728) { //Filesize > 3 MB
 				$(".formwrapper").animate({
@@ -645,17 +650,19 @@ TMF.getNews = function (i) {
 }
 
 TMF.publishNews = function(data,i) {
-	TMF.initFancyBox(); 		
-	if(data["results"].length==0) { //No results found
+	TMF.initFancyBox();
+	var articles = data["results"][0]["article_list"]["results"];
+	if(articles.length == 0) { //No results found
 		TMF.log("publishNews: no news found (0 results)");
 	} else { //At least 1 res has been found
+		console.log(articles);
 		var articlesDiv = $('<div id="news'+(i+1)+'" style="display:none;width:700px" class="nyTimesNews"></div>');
 		if($("input[name=lang]:checked").val() == "italian")
 			articlesDiv.append('<h1>Ultime notizie su '+TMF.data.Resources[i]["@label"]+'</h1>')
 		else
 			articlesDiv.append('<h1>Latest News About '+TMF.data.Resources[i]["@label"]+'</h1>')
-		for(var k in data["results"]) {
-			var article = data["results"][k];
+		for(var k in articles) {
+			var article = articles[k];
 			var newsTable = $("<table><table>");
 			newsTable.append('<tr><td class="nyTimesDate">'+article["date"].substr(0,4)+'/'+article["date"].substr(4,2)+'/'+article["date"].substr(6,2)+'</td><td><h2>'+article["title"]+'</h2><p>'+article["body"]+' <a href="'+article["url"]+'" target="_blank">[...]</a></p></td></tr>');
 			articlesDiv.append(newsTable.prop("outerHTML"));
@@ -723,7 +730,7 @@ TMF.getMap = function(i) {
 TMF.publishMap = function(latLong, i) {
 	if(latLong["@lat"] && latLong["@long"]) {
 		TMF.data.Resources[i]["@latLong"] = latLong;
-		$('#box'+(i+1)+' .fancyboxmap').append('<a href="leaflet/index.html?'+Math.random()+'&id='+i+'" class="group'+(i+1)+' fancybox.iframe video" content="map" rel="group'+(i+1)+'" title="'+TMF.data.Resources[i]["@label"]+' - Map"></a>');
+		$('#box'+(i+1)+' .fancyboxmap').append('<a href="/leaflet/index.html?'+Math.random()+'&id='+i+'" class="group'+(i+1)+' fancybox.iframe video" content="map" rel="group'+(i+1)+'" title="'+TMF.data.Resources[i]["@label"]+' - Map"></a>');
 	} else {
 		TMF.log("No map found for resource "+i);
 	}
