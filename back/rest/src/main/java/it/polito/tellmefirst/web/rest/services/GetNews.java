@@ -44,13 +44,12 @@ public class GetNews {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getJSON(@QueryParam("uri") String uri,
-                            @QueryParam("label") String label) {
+    public Response getJSON(@QueryParam("uri") String uri) {
         LOG.debug("[postJSON] - BEGIN");
         //no prod
         LOG.info("GetNews REST Service called for the resource: "+ uri);
         try {
-            String response = newsInterface.getJSON(uri, label);
+            String response = newsInterface.getJSON(uri);
             LOG.debug("[postJSON] - END");
             return ok(response);
         } catch (Exception e) {

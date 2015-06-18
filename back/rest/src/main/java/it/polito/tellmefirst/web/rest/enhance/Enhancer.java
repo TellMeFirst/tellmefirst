@@ -20,6 +20,7 @@
 package it.polito.tellmefirst.web.rest.enhance;
 
 import com.aliasi.spell.JaroWinklerDistance;
+import it.polito.tellmefirst.enhancer.NYTimesEnhancer;
 import it.polito.tellmefirst.lucene.IndexesUtil;
 import it.polito.tellmefirst.lucene.KBIndexSearcher;
 import it.polito.tellmefirst.web.rest.apimanager.*;
@@ -295,15 +296,13 @@ public class Enhancer {
         return result;
     }
 
-    public String getNewsFromNYT(String uri, String label) {
+    public String getNewsFromNYT(String uri) {
         LOG.debug("[getNewsFromNYT] - BEGIN");
         String result;
-        String nytUri = dBpediaManager.getNytUri(uri);
-        if(nytUri.equals("")){
+        NYTimesEnhancer nyTimesEnhancer = new NYTimesEnhancer();
+        result = nyTimesEnhancer.getNewsFromNYTimes(uri);
+        if(result.equals("")) {
             result = "{\"offset\" : \"0\" , \"results\" : []  , \"total\" : 0}";
-        } else {
-            String search = nyTimesSearcher.getSearchApiQuery(nytUri, label);
-            result = restManager.getStringFromAPI(search);
         }
         LOG.debug("[getNewsFromNYT] - END");
         return result;

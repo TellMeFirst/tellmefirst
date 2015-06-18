@@ -30,9 +30,9 @@ public class NewsInterface extends AbsResponseInterface {
 
     static Log LOG = LogFactory.getLog(NewsInterface.class);
 
-    public String getJSON(String uri, String label) throws Exception {
+    public String getJSON(String uri) throws Exception {
         LOG.debug("[getJSON] - BEGIN");
-        String result = enhancer.getNewsFromNYT(uri, label);
+        String result = enhancer.getNewsFromNYT(uri);
         LOG.debug("[getJSON] - END");
         return result;
     }
