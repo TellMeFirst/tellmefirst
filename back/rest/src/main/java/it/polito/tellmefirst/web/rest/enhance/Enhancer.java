@@ -20,6 +20,7 @@
 package it.polito.tellmefirst.web.rest.enhance;
 
 import com.aliasi.spell.JaroWinklerDistance;
+import it.polito.tellmefirst.enhancer.BBCEnhancer;
 import it.polito.tellmefirst.enhancer.NYTimesEnhancer;
 import it.polito.tellmefirst.lucene.IndexesUtil;
 import it.polito.tellmefirst.lucene.KBIndexSearcher;
@@ -305,6 +306,16 @@ public class Enhancer {
             result = "{\"offset\" : \"0\" , \"results\" : []  , \"total\" : 0}";
         }
         LOG.debug("[getNewsFromNYT] - END");
+        return result;
+    }
+
+    public String getNewsFromBBC(String uri) {
+        LOG.debug("[getNewsFromBBC] - BEGIN");
+        String result;
+        BBCEnhancer bbcEnhancer = new BBCEnhancer();
+        String URL = bbcEnhancer.createURL("uri");
+        result = bbcEnhancer.getResultFromAPI(URL, "application/json");
+        LOG.debug("[getNewsFromBBC] - END");
         return result;
     }
 

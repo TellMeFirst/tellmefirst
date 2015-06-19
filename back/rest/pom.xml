@@ -59,6 +59,12 @@
         </dependency>
 
         <dependency>
+            <groupId>it.polito.tellmefirst.enhancer</groupId>
+            <artifactId>tmf_bbc</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>it.polito.tellmefirst.lucene</groupId>
             <artifactId>tmf_enhance_util</artifactId>
             <version>1.0.0.0</version>

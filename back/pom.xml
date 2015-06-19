@@ -22,8 +22,9 @@
     <name>TellMeFirst (parent POM)</name>
 
     <modules>
-        <module>tmf_nyt</module>
         <module>tmfcore</module>
+        <module>tmf_nyt</module>
+        <module>tmf_bbc</module>
         <module>tmf_enhance_util</module>
         <module>rest</module>
     </modules>
