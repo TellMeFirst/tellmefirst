@@ -19,16 +19,24 @@ Requirements:
 * Git
 * RAM 10 GiB
 
-Checkout all code using the command:
+Since this repository contains submodules, to clone this you have to
+run the following command:
 
 ```
-https://github.com/TellMeFirst/tellmefirst.git
+git clone --recursive https://github.com/TellMeFirst/tellmefirst.git
+```
+
+Otherwise, if you have already cloned, you can fetch the submodules using
+the following command:
+
+```
+git submodule update --init
 ```
 
 Run install through Maven:
 
 ```
-cd tellmefirst
+cd tellmefirst/back
 mvn install
 ```
 
