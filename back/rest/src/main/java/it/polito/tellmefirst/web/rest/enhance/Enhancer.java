@@ -19,10 +19,8 @@
 
 package it.polito.tellmefirst.web.rest.enhance;
 
-import com.aliasi.spell.JaroWinklerDistance;
 import it.polito.tellmefirst.enhancer.BBCEnhancer;
 import it.polito.tellmefirst.enhancer.NYTimesEnhancer;
-import it.polito.tellmefirst.lucene.IndexesUtil;
 import it.polito.tellmefirst.lucene.KBIndexSearcher;
 import it.polito.tellmefirst.web.rest.apimanager.*;
 import it.polito.tellmefirst.web.rest.lodmanager.*;
@@ -33,13 +31,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeMap;
 
 public class Enhancer {
 
@@ -47,7 +42,6 @@ public class Enhancer {
     private DBpediaManager dBpediaManager;
     private NYTimesSearcher nyTimesSearcher;
     private VideoManager videoManager;
-    private ArrayList<String> badWikiImages;
     private ArrayList<String> typesWhiteList;
     private SimpleSearcher italianSearcher;
     private SimpleSearcher englishSearcher;
@@ -73,7 +67,6 @@ public class Enhancer {
      */
     public Enhancer(SimpleSearcher is, SimpleSearcher es, KBIndexSearcher kbIt, KBIndexSearcher kbEn) {
         LOG.debug("[constructor] - BEGIN");
-        badWikiImages = createBadImagesList();
         typesWhiteList = createTypesWhiteList();
         restManager = new RestManager();
         dBpediaManager = new DBpediaManager();
@@ -258,25 +251,6 @@ public class Enhancer {
         }
         LOG.debug("[getAbstractFromDBpedia] - END");
         return result;
-    }
-
-    // if there's not a rule for template images in Wikipedia, this is the only way so far...
-    private ArrayList<String> createBadImagesList(){
-        ArrayList<String> badWords = new ArrayList<String>();
-        badWords.add("Question book-new.svg");
-        badWords.add("Wikibooks-logo-en-noslogan.svg");
-        badWords.add("Wiktionary-logo-en.svg");
-        badWords.add("Translation arrow.svg");
-        badWords.add("Local-important.svg");
-        badWords.add("Symbol list class.svg");
-        badWords.add("Commons-logo.svg");
-        badWords.add("Ambox globe content.svg");
-        badWords.add("Monitor padlock.svg");
-        badWords.add("Wikisource-logo.svg");
-        badWords.add("Wiktionary_small.svg");
-        // TODO: test this one!
-        badWords.add("Nuvola mimetypes charnotfound.PNG");
-        return badWords;
     }
 
     private ArrayList<String> createTypesWhiteList(){
