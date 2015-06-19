@@ -43,6 +43,7 @@ public class RestManager {
             URL url = new URL(urlStr);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             if (conn.getResponseCode() != 200) {
+                System.out.println(conn.getResponseCode() + "***********************************");
                 throw new IOException(conn.getResponseMessage());
             }
             BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));

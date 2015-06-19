@@ -48,7 +48,7 @@ public class ImageInterface extends AbsResponseInterface {
         LOG.debug("[getXML] - BEGIN");
         String result;
         ArrayList<String> oldResults = new ArrayList<String>();
-        String imageURL = enhancer.getImageFromMediaWiki(uri, label, oldResults);
+        String imageURL = enhancer.getImageFromMediaWiki(uri, label);
         result = produceXML(imageURL);
         LOG.debug("[getXML] - END");
         return result;
