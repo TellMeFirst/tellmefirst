@@ -313,7 +313,8 @@ public class Enhancer {
         LOG.debug("[getNewsFromBBC] - BEGIN");
         String result;
         BBCEnhancer bbcEnhancer = new BBCEnhancer();
-        String URL = bbcEnhancer.createURL("uri");
+        String URL = bbcEnhancer.createURL(uri);
+        System.out.println(URL);
         result = bbcEnhancer.getResultFromAPI(URL, "application/json");
         LOG.debug("[getNewsFromBBC] - END");
         return result;
