@@ -84,7 +84,7 @@ public class ClassifyInterface extends AbsResponseInterface {
                 atts.addAttribute("","","title","",topic[2]);
                 atts.addAttribute("","","score","",topic[3]);
                 atts.addAttribute("", "", "mergedTypes", "", topic[4]);
-                atts.addAttribute("", "", "image", "", topic[5]);
+                atts.addAttribute("", "", "image", "", ""); // We should remove this parameter in favour of Wikimedia/Wikidata API
                 hd.startElement("","","Resource",atts);
                 hd.endElement("","","Resource");
                 i++;
