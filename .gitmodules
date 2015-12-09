@@ -1,0 +1,15 @@
+[submodule "back/tmf_nyt"]
+	path = back/tmf_nyt
+	url = https://github.com/giuseppefutia/tmf_nyt.git
+[submodule "back/data"]
+	path = back/data
+	url = https://github.com/TellMeFirst/test-indexes
+[submodule "back/tmfcore"]
+	path = back/tmfcore
+	url = https://github.com/bassosimone/tmfcore
+[submodule "back/tmf_enhance_util"]
+	path = back/tmf_enhance_util
+	url = https://github.com/giuseppefutia/tmf_enhance_util.git
+[submodule "back/tmf_bbc"]
+	path = back/tmf_bbc
+	url = https://github.com/giuseppefutia/tmf_bbc.git

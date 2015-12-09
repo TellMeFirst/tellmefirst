@@ -19,17 +19,20 @@
 
 package it.polito.tellmefirst.web.rest.interfaces;
 
-import it.polito.tellmefirst.exception.TMFOutputException;
+import it.polito.tellmefirst.web.rest.exception.TMFOutputException;
 import it.polito.tellmefirst.classify.Classifier;
-import it.polito.tellmefirst.exception.TMFVisibleException;
+import it.polito.tellmefirst.web.rest.exception.TMFVisibleException;
 import it.polito.tellmefirst.web.rest.TMFServer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.queryParser.ParseException;
 import org.xml.sax.helpers.AttributesImpl;
 import javax.xml.transform.sax.TransformerHandler;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -42,7 +45,7 @@ public class ClassifyInterface extends AbsResponseInterface {
     public String getJSON(String text, File file, String url, String fileName, int numTopics, String lang) throws Exception {
         LOG.debug("[getJSON] - BEGIN");
         String result;
-        String xml = getXML(text, file, url, fileName, numTopics, lang);
+        String xml = getXML(text, numTopics, lang);
         result = xml2json(xml);
         //no prod
         LOG.info("--------Result from Classify--------");
@@ -51,17 +54,17 @@ public class ClassifyInterface extends AbsResponseInterface {
         return result;
     }
 
-    public String getXML(String text, File file, String url, String fileName, int numTopics, String lang) throws TMFVisibleException, TMFOutputException {
+    public String getXML(String text, int numTopics, String lang) throws TMFVisibleException, TMFOutputException, InterruptedException, ParseException, IOException {
         LOG.debug("[getXML] - BEGIN");
         String result;
         Classifier classifier = (lang.equals("italian")) ? TMFServer.getItalianClassifier() : TMFServer.getEnglishClassifier();
-        ArrayList<String[]> topics = classifier.classify(text, file, url, fileName, numTopics, lang);
+        List<String[]> topics = classifier.classify(text, numTopics);
         result = produceXML(topics);
         LOG.debug("[getXML] - END");
         return result;
     }
 
-    private String produceXML(ArrayList<String[]> topics) throws TMFOutputException {
+    private String produceXML(List<String[]> topics) throws TMFOutputException {
         LOG.debug("[produceXML] - BEGIN");
         String xml;
         try {
@@ -81,7 +84,7 @@ public class ClassifyInterface extends AbsResponseInterface {
                 atts.addAttribute("","","title","",topic[2]);
                 atts.addAttribute("","","score","",topic[3]);
                 atts.addAttribute("", "", "mergedTypes", "", topic[4]);
-                atts.addAttribute("", "", "image", "", topic[5]);
+                atts.addAttribute("", "", "image", "", ""); // We should remove this parameter in favour of Wikimedia/Wikidata API
                 hd.startElement("","","Resource",atts);
                 hd.endElement("","","Resource");
                 i++;

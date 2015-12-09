@@ -22,13 +22,21 @@ package it.polito.tellmefirst.web.rest;
 import com.sun.grizzly.http.SelectorThread;
 import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 import it.polito.tellmefirst.classify.Classifier;
-import it.polito.tellmefirst.enhance.Enhancer;
-import it.polito.tellmefirst.exception.TMFConfigurationException;
-import it.polito.tellmefirst.exception.TMFIndexesWarmUpException;
-import it.polito.tellmefirst.lucene.IndexesUtil;
+import it.polito.tellmefirst.lucene.KBIndexSearcher;
+import it.polito.tellmefirst.lucene.LuceneManager;
+import it.polito.tellmefirst.lucene.SimpleSearcher;
+import it.polito.tellmefirst.web.rest.enhance.Enhancer;
+import it.polito.tellmefirst.web.rest.exception.TMFConfigurationException;
+import it.polito.tellmefirst.web.rest.exception.TMFIndexesWarmUpException;
 import it.polito.tellmefirst.util.TMFVariables;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import org.apache.lucene.analysis.it.ItalianAnalyzer;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.util.Version;
+
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -44,21 +52,56 @@ public class TMFServer {
     protected static Enhancer enhancer;
     protected static Classifier italianClassifier;
     protected static Classifier englishClassifier;
+    public static SimpleSearcher ITALIAN_CORPUS_INDEX_SEARCHER;
+    public static SimpleSearcher ENGLISH_CORPUS_INDEX_SEARCHER;
+    public static KBIndexSearcher ITALIAN_KB_INDEX_SEARCHER;
+    public static KBIndexSearcher ENGLISH_KB_INDEX_SEARCHER;
 
-
-    // TMF starting point. From rest directory, launch this command:
-    // mvn exec:java -Dexec.mainClass="it.polito.temefirst.web.rest.TMFServer" -Dexec.args="<path_to_TMF_installation>/conf/server.properties"
-    // or use the run.sh file in bin directory
+    /**
+     * TMF starting point. From rest directory, launch this command:
+     * mvn exec:java -Dexec.mainClass="it.polito.temefirst.web.rest.TMFServer" -Dexec.args="<path_to_TMF_installation>/conf/server.properties"
+     * or use the run.sh file in bin directory
+     */
     public static void main(String[] args) throws TMFConfigurationException, TMFIndexesWarmUpException,
             URISyntaxException, InterruptedException, IOException {
         LOG.debug("[main] - BEGIN");
+        URI serverURI = new URI("http://localhost:2222/rest/");
         String configFileName = args[0];
-        TMFVariables tmfVariables = new TMFVariables(configFileName);
-        IndexesUtil indexesUtil = new IndexesUtil();
-        URI serverURI = new URI(tmfVariables.getRestURL());
-        enhancer = new Enhancer();
-        italianClassifier = new Classifier("it");
-        englishClassifier = new Classifier("en");
+        new TMFVariables(configFileName);
+
+        // XXX I put the code of IndexUtil.init() here, because, for now, I need a reference of SimpleSearchers for the Enhancer
+
+        // build italian searcher
+        Directory contextIndexDirIT = LuceneManager.pickDirectory(new File(TMFVariables.CORPUS_INDEX_IT));
+        LOG.info("Corpus index used for italian: " + contextIndexDirIT);
+        LuceneManager contextLuceneManagerIT = new LuceneManager(contextIndexDirIT);
+        contextLuceneManagerIT.setLuceneDefaultAnalyzer(new ItalianAnalyzer(Version.LUCENE_36, TMFVariables.STOPWORDS_IT));
+        ITALIAN_CORPUS_INDEX_SEARCHER = new SimpleSearcher(contextLuceneManagerIT);
+
+        // build english searcher
+        Directory contextIndexDirEN = LuceneManager.pickDirectory(new File(TMFVariables.CORPUS_INDEX_EN));
+        LOG.info("Corpus index used for english: " + contextIndexDirEN);
+        LuceneManager contextLuceneManagerEN = new LuceneManager(contextIndexDirEN);
+        contextLuceneManagerEN.setLuceneDefaultAnalyzer(new EnglishAnalyzer(Version.LUCENE_36, TMFVariables.STOPWORDS_EN));
+        ENGLISH_CORPUS_INDEX_SEARCHER = new SimpleSearcher(contextLuceneManagerEN);
+
+        // build kb italian searcher
+        String kbDirIT = TMFVariables.KB_IT;
+        String residualKbDirIT = TMFVariables.RESIDUAL_KB_IT;
+        ITALIAN_KB_INDEX_SEARCHER = new KBIndexSearcher(kbDirIT, residualKbDirIT);
+
+        // build kb english searcher
+        String kbDirEN = TMFVariables.KB_EN;
+        String residualKbDirEN = TMFVariables.RESIDUAL_KB_EN;
+        ENGLISH_KB_INDEX_SEARCHER = new KBIndexSearcher(kbDirEN, residualKbDirEN);
+
+        enhancer = new Enhancer(ITALIAN_CORPUS_INDEX_SEARCHER,
+                                ENGLISH_CORPUS_INDEX_SEARCHER,
+                                ITALIAN_KB_INDEX_SEARCHER,
+                                ENGLISH_KB_INDEX_SEARCHER);
+
+        italianClassifier = new Classifier("it", ITALIAN_CORPUS_INDEX_SEARCHER);
+        englishClassifier = new Classifier("en", ENGLISH_CORPUS_INDEX_SEARCHER);
 
         //The following is adapted from DBpedia Spotlight (https://github.com/dbpedia-spotlight/dbpedia-spotlight)
         final Map<String, String> initParams = new HashMap<String, String>();
@@ -82,7 +125,6 @@ public class TMFServer {
         System.exit(0);
         LOG.debug("[main] - END");
     }
-
 
     public static Enhancer getEnhancer(){
         return enhancer;

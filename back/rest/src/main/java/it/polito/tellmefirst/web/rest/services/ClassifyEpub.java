@@ -20,7 +20,9 @@
 package it.polito.tellmefirst.web.rest.services;
 
 import com.sun.jersey.multipart.FormDataParam;
+import it.polito.tellmefirst.web.rest.exception.TMFVisibleException;
 import it.polito.tellmefirst.web.rest.interfaces.EpubInterface;
+import it.polito.tellmefirst.web.rest.lodmanager.DBpediaManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -35,6 +37,7 @@ public class ClassifyEpub {
 
     static Log LOG = LogFactory.getLog(ClassifyEpub.class);
     private static EpubInterface ePubInterface = new EpubInterface();
+    private DBpediaManager dBpediaManager;
 
     private Response ok(String response) {
         return Response.ok().entity(response).header("Access-Control-Allow-Origin","*").build();
@@ -47,9 +50,21 @@ public class ClassifyEpub {
                              @FormDataParam("fileName") String fileName,
                              @FormDataParam("url") String url,
                              @FormDataParam("numTopics") int numTopics,
-                             @FormDataParam("lang") String lang) {
+                             @FormDataParam("lang") String lang) throws TMFVisibleException {
         LOG.debug("[postJSON] - BEGIN");
         LOG.info("Classify Epub REST Service called.");
+
+        dBpediaManager = new DBpediaManager();
+        if (!lang.equals("english") && !dBpediaManager.isDBpediaEnglishUp()){
+            throw new TMFVisibleException("DBpedia English service seems to be down, so TellMeFirst can't work " +
+                    "properly. Please try later!");
+        } else {
+            if (lang.equals("italian") && !dBpediaManager.isDBpediaItalianUp()){
+                throw new TMFVisibleException("DBpedia Italian service seems to be down, so TellMeFirst can't work" +
+                        " properly. Please try later!");
+            }
+        }
+
         try {
             long startTime = System.currentTimeMillis();
             String response = ePubInterface.getJSON(file, fileName, url, numTopics, lang);

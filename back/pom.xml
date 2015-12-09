@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <properties>
-        <tellmefirst.version>1.04</tellmefirst.version>
+        <tellmefirst.version>3.0.0.0</tellmefirst.version>
 
         <heapspace.Xmx.compiler>-Xmx2g</heapspace.Xmx.compiler>
 
@@ -22,7 +22,10 @@
     <name>TellMeFirst (parent POM)</name>
 
     <modules>
-        <module>core</module>
+        <module>tmfcore</module>
+        <module>tmf_nyt</module>
+        <module>tmf_bbc</module>
+        <module>tmf_enhance_util</module>
         <module>rest</module>
     </modules>
 

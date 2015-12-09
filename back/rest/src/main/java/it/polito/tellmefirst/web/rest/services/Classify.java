@@ -20,7 +20,14 @@
 package it.polito.tellmefirst.web.rest.services;
 
 import com.sun.jersey.multipart.FormDataParam;
+import it.polito.tellmefirst.web.rest.exception.TMFVisibleException;
 import it.polito.tellmefirst.web.rest.interfaces.ClassifyInterface;
+import it.polito.tellmefirst.classify.Text;
+import it.polito.tellmefirst.web.rest.lodmanager.DBpediaManager;
+import it.polito.tellmefirst.web.rest.parsing.DOCparser;
+import it.polito.tellmefirst.web.rest.parsing.HTMLparser;
+import it.polito.tellmefirst.web.rest.parsing.PDFparser;
+import it.polito.tellmefirst.web.rest.parsing.TXTparser;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import javax.ws.rs.*;
@@ -34,6 +41,7 @@ public class Classify {
 
     static Log LOG = LogFactory.getLog(Classify.class);
     private static ClassifyInterface classifyInterface = new ClassifyInterface();
+    private DBpediaManager dBpediaManager;
 
     private Response ok(String response) {
         return Response.ok().entity(response).header("Access-Control-Allow-Origin","*").build();
@@ -42,17 +50,60 @@ public class Classify {
     @POST
     @Consumes("multipart/form-data")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response postJSON(@FormDataParam("text") String text,
+    public Response postJSON(@FormDataParam("text") String inputText,
                              @FormDataParam("file") File file,
                              @FormDataParam("url") String url,
                              @FormDataParam("fileName") String fileName,
                              @FormDataParam("numTopics") int numTopics,
-                             @FormDataParam("lang") String lang) {
+                             @FormDataParam("lang") String lang) throws TMFVisibleException {
         LOG.debug("[postJSON] - BEGIN");
         LOG.info("Classify REST Service called.");
+
+        // Check if DBpedia is up
+        dBpediaManager = new DBpediaManager();
+        if (!lang.equals("english") && !dBpediaManager.isDBpediaEnglishUp()){
+            //comment for local use
+            throw new TMFVisibleException("DBpedia English service seems to be down, so TellMeFirst can't work " +
+                    "properly. Please try later!");
+        } else {
+            if (lang.equals("italian") && !dBpediaManager.isDBpediaItalianUp()){
+                //comment for local use
+                throw new TMFVisibleException("DBpedia Italian service seems to be down, so TellMeFirst can't work" +
+                        " properly. Please try later!");
+            }
+        }
+
         try {
             long startTime = System.currentTimeMillis();
-            String response = classifyInterface.getJSON(text, file, url, fileName, numTopics, lang);
+            // retrieving input text/url/file as text string
+            Text text;
+
+            if (inputText != null && !inputText.equals("")){
+                text = new Text(inputText);
+            } else if (url != null){
+                HTMLparser parser = new HTMLparser();
+                text = new Text(parser.htmlToTextGoose(url));
+            } else if(file != null){
+                if(fileName.endsWith(".pdf") || fileName.endsWith(".PDF")){
+                    PDFparser parser = new PDFparser();
+                    text = new Text(parser.pdfToText(file));
+                } else if(fileName.endsWith(".doc") || fileName.endsWith(".DOC")){
+                    DOCparser parser = new DOCparser();
+                    text = new Text(parser.docToText(file));
+                } else if(fileName.endsWith(".txt") || fileName.endsWith(".TXT")){
+                    TXTparser parser = new TXTparser();
+                    text = new Text(parser.txtToText(file));
+                } else {
+                    throw new TMFVisibleException("File extension not valid: only 'pdf', 'doc' and 'txt' allowed.");
+                }
+            } else {
+                throw new TMFVisibleException("No valid parameters in your request: both 'text' and 'url' and 'file'" +
+                        " are null.");
+            }
+
+            String textString = text.getText();
+
+            String response = classifyInterface.getJSON(textString, file, url, fileName, numTopics, lang);
             long endTime = System.currentTimeMillis();
             long duration = (endTime - startTime) / 1000;
             //no prod
