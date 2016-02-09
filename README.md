@@ -15,7 +15,7 @@ A demo of the software can be explored at: [http://tellmefirst.polito.it/](http:
 Requirements:
 
 * Java 1.8+
-* Maven 2
+* Maven 3
 * Git
 * RAM 10 GiB
 
