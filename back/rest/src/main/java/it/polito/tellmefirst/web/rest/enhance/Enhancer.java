@@ -159,12 +159,12 @@ public class Enhancer {
         return result;
     }
 
-    public String getNewsFromBBC(String uri) {
+    public String getNewsFromBBC(String uri) throws IOException {
         LOG.debug("[getNewsFromBBC] - BEGIN");
         String result;
         BBCEnhancer bbcEnhancer = new BBCEnhancer();
-        String URL = bbcEnhancer.createURL(uri);
-        System.out.println(URL);
+        String API_KEY = bbcEnhancer.getPropValues();
+        String URL = bbcEnhancer.createURL(uri, API_KEY);
         result = bbcEnhancer.getResultFromAPI(URL, "application/json");
         LOG.debug("[getNewsFromBBC] - END");
         return result;
