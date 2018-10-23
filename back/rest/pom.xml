@@ -149,11 +149,11 @@
             <artifactId>commons-lang</artifactId>
         </dependency>
         
-        <dependency>
+      <!--  <dependency>
             <groupId>com.aliasi</groupId>
             <artifactId>lingpipe</artifactId>
             <version>4.0.0</version>
-        </dependency>
+        </dependency> -->
 
         <dependency>
             <groupId>org.apache.jena</groupId>
