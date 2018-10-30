@@ -47,7 +47,7 @@ and the specific classification policy defined for EPUB, you can visit [the doc/
 
 Example of the use of classify service for extracting topics from a PDF file.
 
-	curl -F file=@/home/tellmefirst/files/2011-iscc-paper.pdf -F fileName="2011-iscc-paper.pdf" -F numTopics=7 -F lang=english -F http://tellmefirst.polito.it:2222/rest/classify
+	curl -F file=@/home/tellmefirst/files/2011-iscc-paper.pdf -F fileName="2011-iscc-paper.pdf" -F numTopics=7 -F lang=english http://tellmefirst.polito.it:2222/rest/classify
 
 Example of the use of classify service for extracting topics from a URL. 
 
