@@ -18,6 +18,7 @@ The first step is to download the following files:
 * [DBpedia Disambiguation](http://downloads.dbpedia.org/3.9/en/disambiguations_en.nt.bz2): used to generate bad URIs.
 * [DBpedia Ontology Types](http://downloads.dbpedia.org/3.9/en/instance_types_en.nt.bz2): used to create type-specific datasets useful for the enrichment stage of TellMeFirst.
 * [DBpedia Interlanguage](http://downloads.dbpedia.org/3.9/it/interlanguage_links_it.nt.bz2) (required for the Italian Version): used in the enrichment stage. In order to retrieve new information from other Linked Data repositories, you need to use English URIs.
+* [DBpedia Page Links](http://downloads.dbpedia.org/3.9/en/page_links_en.nt.bz2): used to have a complete set of all wikilinks from the entity URI to other Wikipedia pages.
 
 In addition to these datasets you need to download the Wikipedia pages dump. The paragraphs of Wikipedia pages are stored in the CONTEXT field of a Lucene Document and are used in the classification process. For building TellMeFirst indexes we choose the following versions of the Wikipedia dump.
 
