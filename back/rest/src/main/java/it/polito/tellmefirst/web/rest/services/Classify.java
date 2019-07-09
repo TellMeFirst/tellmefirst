@@ -23,7 +23,6 @@ import com.sun.jersey.multipart.FormDataParam;
 import it.polito.tellmefirst.web.rest.exception.TMFVisibleException;
 import it.polito.tellmefirst.web.rest.interfaces.ClassifyInterface;
 import it.polito.tellmefirst.classify.Text;
-import it.polito.tellmefirst.web.rest.lodmanager.DBpediaManager;
 import it.polito.tellmefirst.web.rest.parsing.DOCparser;
 import it.polito.tellmefirst.web.rest.parsing.HTMLparser;
 import it.polito.tellmefirst.web.rest.parsing.PDFparser;
@@ -41,7 +40,6 @@ public class Classify {
 
     static Log LOG = LogFactory.getLog(Classify.class);
     private static ClassifyInterface classifyInterface = new ClassifyInterface();
-    private DBpediaManager dBpediaManager;
 
     private Response ok(String response) {
         return Response.ok().entity(response).header("Access-Control-Allow-Origin","*").build();
@@ -59,19 +57,7 @@ public class Classify {
         LOG.debug("[postJSON] - BEGIN");
         LOG.info("Classify REST Service called.");
 
-        // Check if DBpedia is up
-        dBpediaManager = new DBpediaManager();
-        if (!lang.equals("english") && !dBpediaManager.isDBpediaEnglishUp()){
-            //comment for local use
-            throw new TMFVisibleException("DBpedia English service seems to be down, so TellMeFirst can't work " +
-                    "properly. Please try later!");
-        } else {
-            if (lang.equals("italian") && !dBpediaManager.isDBpediaItalianUp()){
-                //comment for local use
-                throw new TMFVisibleException("DBpedia Italian service seems to be down, so TellMeFirst can't work" +
-                        " properly. Please try later!");
-            }
-        }
+        // XXX: check on DBpedia is currently removed! Need to understand if it is still useful
 
         try {
             long startTime = System.currentTimeMillis();
